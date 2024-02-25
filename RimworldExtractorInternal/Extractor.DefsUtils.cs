@@ -178,11 +178,11 @@ namespace RimworldExtractorInternal
                         var tKeyTip = curNode.ParentNode?["tKeyTip"]?.InnerText;
                         if (lastTag is "label" or "text" && tKey != null)
                         {
-                            yield return new TranslationEntry("Keyed", $"XmlExtensionSettings.{tKey}", curNode.InnerText, null);
+                            yield return new TranslationEntry("Keyed", tKey, curNode.InnerText, null);
                         }
                         else if (lastTag == "tooltip" && tKeyTip != null)
                         {
-                            yield return new TranslationEntry("Keyed", $"XmlExtensionSettings.{tKeyTip}", curNode.InnerText, null);
+                            yield return new TranslationEntry("Keyed", tKeyTip, curNode.InnerText, null);
                         }
                         else
                         {
