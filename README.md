@@ -3,7 +3,7 @@
 
 ### [다운로드 (Downloads)](https://github.com/csh1668/RimworldExtractor/releases)
 
-![스크린샷 2024-02-25 181047](https://github.com/csh1668/RimworldExtractor/assets/18442452/de909fa1-0d5c-429a-89ce-8a197eb90efd)
+![스크린샷 2024-02-25 184956](https://github.com/csh1668/RimworldExtractor/assets/18442452/75e36e73-3cc7-425d-9755-36c399f6ee34)
 기존에 존재하던 [알파 추출기](https://github.com/Han-ju/AlphaExtractor)의 여러 아쉬운 점을 보완하고자 개발하였습니다. \
 \
 예) Patches에 존재하는 번역 데이터를 제대로 처리하지 못하는 점, TranslationHandle이나 Full-List Translation을 지원하지 않는 점, XML 상속을 지원하지 않아 정확한 인덱싱이 불가한 점. TKey를 지원하지 않는 점 등
