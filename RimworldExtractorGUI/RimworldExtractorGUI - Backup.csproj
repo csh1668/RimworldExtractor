@@ -1,0 +1,37 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net7.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <ProduceReferenceAssembly>True</ProduceReferenceAssembly>
+    <SignAssembly>False</SignAssembly>
+    <NoWin32Manifest>true</NoWin32Manifest>
+    <PublishTrimmed>true</PublishTrimmed>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebugType>embedded</DebugType>
+    <GenerateAssemblyInfo>True</GenerateAssemblyInfo>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DebugType>embedded</DebugType>
+    <GenerateAssemblyInfo>True</GenerateAssemblyInfo>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RimworldExtractorInternal\RimworldExtractorInternal.csproj">
+      <Private>True</Private>
+      <CopyLocalSatelliteAssemblies></CopyLocalSatelliteAssemblies>
+    </ProjectReference>
+  </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec
+      Command="xcopy /Y &quot;$(OutDir)ClosedXML.dll&quot; &quot;$(OutDir)bin\&quot;&#xD;&#xA;del /Q &quot;$(OutDir)ClosedXML.dll&quot;&#xD;&#xA;xcopy /Y &quot;$(OutDir)ClosedXML.Parser.dll&quot; &quot;$(OutDir)bin\&quot;&#xD;&#xA;del /Q &quot;$(OutDir)ClosedXML.Parser.dll&quot;&#xD;&#xA;xcopy /Y &quot;$(OutDir)DocumentFormat.OpenXml.dll&quot; &quot;$(OutDir)bin\&quot;&#xD;&#xA;del /Q &quot;$(OutDir)DocumentFormat.OpenXml.dll&quot;&#xD;&#xA;xcopy /Y &quot;$(OutDir)ExcelNumberFormat.dll&quot; &quot;$(OutDir)bin\&quot;&#xD;&#xA;del /Q &quot;$(OutDir)ExcelNumberFormat.dll&quot;&#xD;&#xA;xcopy /Y &quot;$(OutDir)RBush.dll&quot; &quot;$(OutDir)bin\&quot;&#xD;&#xA;del /Q &quot;$(OutDir)RBush.dll&quot;&#xD;&#xA;xcopy /Y &quot;$(OutDir)RimworldExtractorInternal.dll&quot; &quot;$(OutDir)bin\&quot;&#xD;&#xA;del /Q &quot;$(OutDir)RimworldExtractorInternal.dll&quot;&#xD;&#xA;xcopy /Y &quot;$(OutDir)SixLabors.Fonts.dll&quot; &quot;$(OutDir)bin\&quot;&#xD;&#xA;del /Q &quot;$(OutDir)SixLabors.Fonts.dll&quot;" />
+  </Target>
+
+</Project>
