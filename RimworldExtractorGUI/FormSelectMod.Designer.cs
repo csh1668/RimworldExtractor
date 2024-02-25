@@ -82,6 +82,7 @@
             // 
             // buttonDone
             // 
+            buttonDone.Enabled = false;
             buttonDone.Location = new Point(506, 401);
             buttonDone.Name = "buttonDone";
             buttonDone.Size = new Size(282, 54);

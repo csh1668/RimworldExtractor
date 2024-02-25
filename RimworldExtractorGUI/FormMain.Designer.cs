@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormMain));
             buttonSelectMod = new Button();
             buttonExtract = new Button();
             button2 = new Button();
@@ -126,7 +127,7 @@
             labelSelectedMods.Name = "labelSelectedMods";
             labelSelectedMods.Size = new Size(570, 182);
             labelSelectedMods.TabIndex = 9;
-            labelSelectedMods.Text = "선택된 모드가 없습니다.\r\n\r\n===기본적인 사용방법===\r\n1) '1. 추출할 모드 선택'을 통해 번역할 모드를 선택하세요.\r\n2) '2. 번역 데이터 추출'을 통해 번역 텍스트를 추출하세요.\r\n3) 추출된 엑셀 파일을 번역하세요.\r\n4) 'XLSX -> XML'을 통해 엑셀 파일을 배포용 XML 파일로 변환하세요.\r\n5) 끝!";
+            labelSelectedMods.Text = resources.GetString("labelSelectedMods.Text");
             labelSelectedMods.TextAlign = ContentAlignment.TopCenter;
             // 
             // button1

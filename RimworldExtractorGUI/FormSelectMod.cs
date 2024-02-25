@@ -204,6 +204,7 @@ namespace RimworldExtractorGUI
         {
             var currentMod = SelectCurrentMod();
             labelSelectedMod.Text = "추출할 모드를 선택하세요";
+            buttonDone.Enabled = true;
             if (currentMod == null)
                 return;
             SelectedMod = currentMod;
@@ -264,7 +265,7 @@ namespace RimworldExtractorGUI
                 contextMenu.Items.Add(menuItem3);
             }
 
-            var menuItem4 = new ToolStripMenuItem("코어와 이 모드의 선행 모드, 선택적 선행 모드를 참조 모드로 선택");
+            var menuItem4 = new ToolStripMenuItem("이 모드와 관련된 모든 모드를 참조 모드로 선택");
             menuItem4.Click += (o, args) =>
             {
                 var requiredMods = item.ModDependencies?.Select(x => _allModsCached.Find(y => y.PackageId == x))
