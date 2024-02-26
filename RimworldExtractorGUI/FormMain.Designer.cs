@@ -39,6 +39,7 @@
             richTextBoxLog = new RichTextBox();
             labelSelectedMods = new Label();
             button1 = new Button();
+            linkLabelLatestVersion = new LinkLabel();
             SuspendLayout();
             // 
             // buttonSelectMod
@@ -139,11 +140,21 @@
             button1.Text = "경고나 에러 발생 시";
             button1.UseVisualStyleBackColor = true;
             // 
+            // linkLabelLatestVersion
+            // 
+            linkLabelLatestVersion.Location = new Point(12, 217);
+            linkLabelLatestVersion.Name = "linkLabelLatestVersion";
+            linkLabelLatestVersion.Size = new Size(200, 23);
+            linkLabelLatestVersion.TabIndex = 11;
+            linkLabelLatestVersion.TextAlign = ContentAlignment.MiddleLeft;
+            linkLabelLatestVersion.LinkClicked += linkLabelLatestVersion_LinkClicked;
+            // 
             // FormMain
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
+            Controls.Add(linkLabelLatestVersion);
             Controls.Add(button1);
             Controls.Add(labelSelectedMods);
             Controls.Add(richTextBoxLog);
@@ -171,5 +182,6 @@
         private RichTextBox richTextBoxLog;
         private Label labelSelectedMods;
         private Button button1;
+        private LinkLabel linkLabelLatestVersion;
     }
 }

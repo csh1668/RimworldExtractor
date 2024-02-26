@@ -30,6 +30,38 @@ namespace RimworldExtractorGUI
                 Close();
                 throw;
             }
+
+            Task.Factory.StartNew(() =>
+            {
+                try
+                {
+                    var latest = GithubVersionCheker.GetLatest();
+                    var current = Program.VERSION;
+                    var action = () =>
+                    {
+                        if (latest == current)
+                        {
+                            linkLabelLatestVersion.Text = $"{current} 최신 버전입니다";
+                        }
+                        else
+                        {
+                            linkLabelLatestVersion.Text = $"{current} < {latest} 최신 버전 사용가능";
+                        }
+                    };
+                    if (linkLabelLatestVersion.InvokeRequired)
+                    {
+                        linkLabelLatestVersion.Invoke(action);
+                    }
+                    else
+                    {
+                        action();
+                    }
+                }
+                catch (Exception e)
+                {
+                    Log.Wrn($"최신 버전 확인에 실패하였습니다: {e.Message}");
+                }
+            });
         }
 
         private static bool HasErrorAfter(string keyword)
@@ -154,7 +186,7 @@ namespace RimworldExtractorGUI
             }
         }
 
-        
+
 
         private void buttonConvertXml_Click(object sender, EventArgs e)
         {
@@ -184,6 +216,9 @@ namespace RimworldExtractorGUI
 
         }
 
-
+        private void linkLabelLatestVersion_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            Process.Start(GithubVersionCheker.LatestUrl);
+        }
     }
 }
