@@ -234,7 +234,7 @@ namespace RimworldExtractorInternal
                                 li.AppendElement("success", "Always");
                                 if (commentOriginal)
                                     li.AppendComment($"Original={SecurityElement.Escape(translation.original).Replace('-', 'ー')}");
-                                li.AppendElement("xpath", Utils.GetXpath(translation.className, translation.node));
+                                li.AppendElement("xpath", Utils.GetXpath(translation.className[(translation.className.IndexOf('.') + 1)..], translation.node));
                                 li.AppendElement("value", value =>
                                 {
                                     var noMatchLastNode = translation.node.Split('.').Last();
@@ -258,7 +258,7 @@ namespace RimworldExtractorInternal
                         if (commentOriginal)
                             li.AppendComment(
                                 $"Original={SecurityElement.Escape(translation.original).Replace('-', 'ー')}");
-                        li.AppendElement("xpath", Utils.GetXpath(translation.className, translation.node));
+                        li.AppendElement("xpath", Utils.GetXpath(translation.className[(translation.className.IndexOf('.') + 1)..], translation.node));
                         li.AppendElement("value", value =>
                         {
                             var lastNode = translation.node.Split('.').Last();

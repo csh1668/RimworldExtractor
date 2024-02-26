@@ -36,7 +36,7 @@ namespace RimworldExtractorGUI
             _officialModsCached = ModLister.OfficialMods.ToList();
             _localModsCached = ModLister.LocalMods.ToList();
             _workshopModsCached = ModLister.WorkshopMods.ToList();
-            _allModsCached = ModLister.AllMods.ToList();
+            _allModsCached = _officialModsCached.Concat(_localModsCached).Concat(_workshopModsCached).ToList();
 
             SelectedFolders = new List<ExtractableFolder>();
             ReferenceMods = new List<ModMetadata>();

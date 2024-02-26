@@ -62,7 +62,11 @@ namespace RimworldExtractorGUI
                 labelSelectedMods.Text = $"선택된 모드: {SelectedMod.ModName}";
                 if (ReferenceMods?.Count > 1)
                 {
-                    labelSelectedMods.Text += $"\n참조로 선택된 모드: {ReferenceMods.First().ModName} 포함 {ReferenceMods.Count}개";
+                    var concatText = string.Join(", ", ReferenceMods.Select(x => x.ModName));
+                    var stripedText = concatText.Substring(0, Math.Min(concatText.Length, 200));
+                    if (concatText.Length > 200)
+                        stripedText += "...";
+                    labelSelectedMods.Text += $"\n참조로 선택된 모드: {concatText}";
                 }
             }
         }

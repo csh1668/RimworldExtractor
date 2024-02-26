@@ -220,6 +220,7 @@ namespace RimworldExtractorInternal
             }
 
             var set = new HashSet<ModMetadata>();
+            modMetadataByPackageIdLookUp.Clear();
 
             IEnumerable<ModMetadata> FindAllReferenceModsInternal(ModMetadata modMetadata)
             {
@@ -268,9 +269,10 @@ namespace RimworldExtractorInternal
                 yield return modMetadata;
             }
 
+            modMetadataByPackageIdLookUp.Clear();
         }
 
-        public static bool TryGetModMetadataByPackageId(string packageId, out ModMetadata? modMetadata)
+        internal static bool TryGetModMetadataByPackageId(string packageId, out ModMetadata? modMetadata)
         {
             if (packageId == null)
             {

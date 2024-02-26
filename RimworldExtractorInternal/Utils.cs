@@ -101,7 +101,6 @@ namespace RimworldExtractorInternal
 
         public static string GetXpath(string className, string nodeName)
         {
-            className = className.Split('.').Last();
             var defName = nodeName.Split('.')[0];
             var token = nodeName[(defName.Length + 1)..].Split('.');
             for (int i = 0; i < token.Length; i++)
