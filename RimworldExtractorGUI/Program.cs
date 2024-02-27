@@ -8,7 +8,7 @@ namespace RimworldExtractorGUI
     */
     internal static class Program
     {
-        internal const string VERSION = "0.1.2b";
+        internal const string VERSION = "0.1.2c";
         /// <summary>
         ///  The main entry point for the application.
         /// </summary>
