@@ -1,0 +1,59 @@
+name: Build and Publish Release
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    env:
+      Solution_Name: RimworldExtractor.sln
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '7.0.x'
+
+    - name: Setup Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'
+
+    - name: Get Current Version
+      id: get_version
+      run: |
+        python get_version.py
+
+    - name: Set Environment Variables
+      run: |
+        echo "RELEASE_NAME=${{ steps.get_version.outputs.tag_name }}" >> $GITHUB_ENV
+      
+    - name: Publish
+      run: dotnet publish $env:Solution_Name -c Release -o ${{github.workspace}}/publish
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GH_ACTION_SECRET }}
+      with:
+        tag_name: ${{ steps.get_version.outputs.tag_name }}
+        release_name: ${{ steps.get_version.outputs.tag_name }}
+        draft: false
+        prerelease: false
+
+    - name: Upload Release Asset
+      id: upload-release-asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GH_ACTION_SECRET }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ${{ github.workspace }}/publish/*  # 배포된 파일이 있는 디렉토리 경로
+        asset_name: test.zip  # 업로드할 압축 파일의 이름
+        asset_content_type: application/zip

@@ -8,7 +8,7 @@ namespace RimworldExtractorGUI
     */
     internal static class Program
     {
-        internal const string VERSION = "0.1.2c";
+        internal const string VERSION = "";
         /// <summary>
         ///  The main entry point for the application.
         /// </summary>
@@ -25,7 +25,7 @@ namespace RimworldExtractorGUI
                 formInitialPathSelect.StartPosition = FormStartPosition.CenterScreen;
                 if (formInitialPathSelect.ShowDialog() != DialogResult.OK)
                 {
-                    MessageBox.Show("Æú´õ ÁöÁ¤À» ¿Ï·áÇØÁÖ¼¼¿ä.");
+                    MessageBox.Show("í´ë” ì§€ì •ì„ ì™„ë£Œí•´ì£¼ì„¸ìš”.");
                     return;
                 }
                 // Application.Run();
