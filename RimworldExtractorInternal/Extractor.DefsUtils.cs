@@ -227,6 +227,10 @@ namespace RimworldExtractorInternal
                     {
                         translationHandleResult = isTypeField ? 
                             childNode.InnerText.Split('.').Last() : NormalizedHandle(childNode.InnerText);
+                        if (string.IsNullOrWhiteSpace(translationHandleResult))
+                        {
+                            return false;
+                        }
                         return true;
                     }
                 }
