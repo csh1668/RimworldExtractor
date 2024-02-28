@@ -218,7 +218,7 @@ namespace RimworldExtractorGUI
 
         private void linkLabelLatestVersion_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            Process.Start(GithubVersionCheker.LatestUrl);
+            Process.Start("explorer.exe", GithubVersionCheker.LatestUrl);
         }
     }
 }
