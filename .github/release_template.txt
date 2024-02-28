@@ -1,0 +1,11 @@
+Portable 버전과 Standard 버전이 있습니다.
+
+- **Portable 버전:**
+  1. 단일 파일로 구성되어 있습니다.
+  2. 단독 실행이 가능한 대신, 파일 용량이 큽니다.
+
+- **Standard 버전:**
+  1. 압축을 풀어 사용해야 합니다.
+  2. [**.NET 7.0 데스크톱 런타임**](https://dotnet.microsoft.com/ko-kr/download/dotnet/thank-you/runtime-desktop-7.0.16-windows-x64-installer)을 설치해야 실행이 가능하지만, 파일 용량이 작습니다.
+ 
+애플리케이션의 기능은 같으므로 둘 중 하나를 선택하여 사용하면 됩니다.

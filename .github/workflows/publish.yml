@@ -25,50 +25,36 @@ jobs:
       with:
         python-version: '3.8'
 
-    - name: Get Current Version
-      id: get_version
-      run: |
-        python $env:Script_Path version
+    - name: Generate Change Log
+      id: changelog
+      uses: mathieudutour/github-tag-action@v6.1
+      with:
+          github_token: ${{ secrets.GH_ACTION_SECRET }}
+          tag_prefix: ""
+          release_branches: .*
 
-    - name: Set Environment Variables
+    - name: Pre-Cleanup / Write Current Version
+      id: cleanup
       run: |
-        echo "RELEASE_NAME=${{ steps.get_version.outputs.tag_name }}" >> $GITHUB_ENV
+        python $env:Script_Path utf8
+        python $env:Script_Path version ${{ steps.changelog.outputs.new_tag }}
+        python $env:Script_Path template "${{ steps.changelog.outputs.changelog }}"
       
-    - name: Publish
+    - name: Publish / Post-Cleanup
       run: |
         dotnet publish $env:Solution_Name -c Release -p:PublishDir=${{github.workspace}}/publish_standard
         dotnet publish $env:Solution_Name -c Release -p:PublishDir=${{github.workspace}}/publish_portable -p:PublishProtocol=FileSystem -p:TargetFramework=net7.0-windows -r win-x64 --self-contained true  -p:PublishSingleFile=true -p:IncludeAllContentForSelfExtract=true -p:PublishDir=${{github.workspace}}/publish_portable
         python $env:Script_Path cleanup
-
     - name: Create Release
       id: create_release
-      uses: actions/create-release@v1
+      uses: softprops/action-gh-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GH_ACTION_SECRET }}
       with:
-        tag_name: ${{ steps.get_version.outputs.tag_name }}
-        release_name: ${{ steps.get_version.outputs.tag_name }}
+        tag_name: ${{ steps.changelog.outputs.new_tag }}
         draft: false
         prerelease: false
-
-    - name: Upload Standard Release
-      id: upload-standard
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GH_ACTION_SECRET }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: .\standard.zip
-        asset_name: RimworldExtractor-Standard.zip
-        asset_content_type: application/zip
-
-    - name: Upload Portable Release
-      id: upload-portable
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GH_ACTION_SECRET }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: .\portable.exe
-        asset_name: RimworldExtractor-Portable.exe
-        asset_content_type: application/zip
+        files: |
+          RimworldExtractor-Standard.zip
+          RimworldExtractor-Portable.exe
+        body_path: .github/release_template.txt
