@@ -9,6 +9,7 @@ jobs:
 
     env:
       Solution_Name: RimworldExtractor.sln
+      Script_Path: tools.py
 
     steps:
     - name: Checkout repository
@@ -27,14 +28,17 @@ jobs:
     - name: Get Current Version
       id: get_version
       run: |
-        python get_version.py
+        python $env:Script_Path version
 
     - name: Set Environment Variables
       run: |
         echo "RELEASE_NAME=${{ steps.get_version.outputs.tag_name }}" >> $GITHUB_ENV
       
     - name: Publish
-      run: dotnet publish $env:Solution_Name -c Release -o ${{github.workspace}}/publish
+      run: |
+        dotnet publish $env:Solution_Name -c Release -p:PublishDir=${{github.workspace}}/publish_standard
+        dotnet publish $env:Solution_Name -c Release -p:PublishDir=${{github.workspace}}/publish_portable -p:PublishProtocol=FileSystem -p:TargetFramework=net7.0-windows -r win-x64 --self-contained true  -p:PublishSingleFile=true -p:IncludeAllContentForSelfExtract=true -p:PublishDir=${{github.workspace}}/publish_portable
+        python $env:Script_Path cleanup
 
     - name: Create Release
       id: create_release
@@ -47,13 +51,24 @@ jobs:
         draft: false
         prerelease: false
 
-    - name: Upload Release Asset
-      id: upload-release-asset
+    - name: Upload Standard Release
+      id: upload-standard
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GH_ACTION_SECRET }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ${{ github.workspace }}/publish/*  # 배포된 파일이 있는 디렉토리 경로
-        asset_name: test.zip  # 업로드할 압축 파일의 이름
+        asset_path: .\standard.zip
+        asset_name: RimworldExtractor-Standard.zip
+        asset_content_type: application/zip
+
+    - name: Upload Portable Release
+      id: upload-portable
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GH_ACTION_SECRET }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: .\portable.exe
+        asset_name: RimworldExtractor-Portable.exe
         asset_content_type: application/zip
