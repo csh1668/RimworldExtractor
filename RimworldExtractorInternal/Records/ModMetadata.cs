@@ -40,5 +40,7 @@ namespace RimworldExtractorInternal.Records
         {
             return $"{(IsOfficialContent ? "Official" : "Mod")}:{Identifier}:requires={string.Join(',', ModDependencies ?? new List<string>())}";
         }
+
+        public static ModMetadata Emptry => new("", "", "", "", false, null);
     }
 }

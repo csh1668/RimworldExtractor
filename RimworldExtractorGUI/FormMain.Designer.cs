@@ -75,13 +75,13 @@
             // 
             // buttonConvertXlsx
             // 
-            buttonConvertXlsx.Enabled = false;
             buttonConvertXlsx.Location = new Point(12, 116);
             buttonConvertXlsx.Name = "buttonConvertXlsx";
             buttonConvertXlsx.Size = new Size(97, 46);
             buttonConvertXlsx.TabIndex = 3;
             buttonConvertXlsx.Text = "XML -> XLSX";
             buttonConvertXlsx.UseVisualStyleBackColor = true;
+            buttonConvertXlsx.Click += buttonConvertXlsx_Click;
             // 
             // buttonConvertXml
             // 

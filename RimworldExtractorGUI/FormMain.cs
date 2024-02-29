@@ -150,6 +150,19 @@ namespace RimworldExtractorGUI
                 }
             }
 
+            int cntDefs = 0, cntKeyed = 0, cntStrings = 0, cntPatches = 0;
+            foreach (var translationEntry in extraction)
+            {
+                if (translationEntry.className.StartsWith("Keyed"))
+                    ++cntKeyed;
+                else if(translationEntry.className.StartsWith("Strings"))
+                    ++cntStrings;
+                else if(translationEntry.className.StartsWith("Patches"))
+                    ++cntPatches;
+                else
+                    ++cntDefs;
+            }
+
             var outPath = SelectedMod.Identifier.StripInvaildChars();
             switch (Prefabs.Method)
             {
@@ -166,7 +179,9 @@ namespace RimworldExtractorGUI
                     throw new ArgumentOutOfRangeException();
             }
 
-            Log.Msg($"번역 데이터 수: {extraction.Count}, 완료!");
+
+
+            Log.Msg($"번역 데이터 수: 총 {extraction.Count}개 중 Defs {cntDefs}개, Keyed {cntKeyed}개, Strings {cntStrings}개, Patches {cntPatches}개, 완료!");
 
             var hasError = HasErrorAfter("추출 시작...");
 
@@ -227,6 +242,21 @@ namespace RimworldExtractorGUI
         private void linkLabelLatestVersion_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             Process.Start("explorer.exe", GithubVersionCheker.LatestUrl);
+        }
+
+        private void buttonConvertXlsx_Click(object sender, EventArgs e)
+        {
+            var form = new FormXmlister();
+            form.StartPosition = FormStartPosition.CenterParent;
+            if (form.ShowDialog() == DialogResult.OK)
+            {
+                var roots = form.FileNames;
+                foreach (var root in roots)
+                {
+                    var translations = IO.FromLanguageXml(root);
+                    IO.ToExcel(translations, Path.Combine(root, Path.GetFileNameWithoutExtension(root)));
+                }
+            }
         }
     }
 }

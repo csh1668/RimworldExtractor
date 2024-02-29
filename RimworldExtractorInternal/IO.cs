@@ -42,6 +42,8 @@ namespace RimworldExtractorInternal
                     }
                 }
                 sheet.Cell(2 + i, 5).Value = entry.original;
+                if (entry.translated != null)
+                    sheet.Cell(2 + i, 6).Value = entry.translated;
             }
 
             sheet.Style.Font.FontName = "맑은 고딕";
@@ -390,7 +392,7 @@ namespace RimworldExtractorInternal
 
             foreach (var filePath in DescendantFiles(defInjectedDir).Where(x => x.ToLower().EndsWith(".xml")))
             {
-                var className = Path.GetRelativePath(defInjectedDir, filePath).Split(Path.PathSeparator).First();
+                var className = Path.GetRelativePath(defInjectedDir, filePath).Split(Path.DirectorySeparatorChar).First();
                 try
                 {
                     var doc = ReadXml(filePath);
@@ -406,6 +408,12 @@ namespace RimworldExtractorInternal
                     throw;
                 }
             }
+
+            var keyed = new ExtractableFolder(ModMetadata.Emptry, keyedDir, null);
+            translations.AddRange(Extractor.ExtractKeyed(keyed));
+
+            var strings = new ExtractableFolder(ModMetadata.Emptry, stringsDir, null);
+            translations.AddRange(Extractor.ExtractStrings(strings));
 
             return translations;
         }

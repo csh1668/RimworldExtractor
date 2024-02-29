@@ -49,15 +49,17 @@
             button1.TabIndex = 1;
             button1.Text = "...";
             button1.UseVisualStyleBackColor = true;
+            button1.Click += button1_Click;
             // 
             // button2
             // 
-            button2.Location = new Point(233, 75);
+            button2.Location = new Point(500, 75);
             button2.Name = "button2";
             button2.Size = new Size(75, 23);
             button2.TabIndex = 2;
             button2.Text = "완료";
             button2.UseVisualStyleBackColor = true;
+            button2.Click += button2_Click;
             // 
             // label1
             // 
