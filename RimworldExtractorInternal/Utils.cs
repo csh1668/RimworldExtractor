@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using ClosedXML.Excel;
 using DocumentFormat.OpenXml.Office.PowerPoint.Y2021.M06.Main;
 using DocumentFormat.OpenXml.Office.Word;
 using RimworldExtractorInternal.Records;
@@ -149,6 +150,14 @@ namespace RimworldExtractorInternal
             nodeName = $"/Defs/{className}[defName=\"{defName}\"]/";
             nodeName += string.Join('/', token);
             return nodeName;
+        }
+
+        public static string StrVal(this IXLCell cell)
+        {
+            var value = cell.Value;
+            if (value.TryGetText(out string str))
+                return str;
+            return string.Empty;
         }
     }
 }

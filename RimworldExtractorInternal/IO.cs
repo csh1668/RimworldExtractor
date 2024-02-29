@@ -3,6 +3,7 @@ using RimworldExtractorInternal.Records;
 using System.Security;
 using System.Text.RegularExpressions;
 using System.Xml;
+using RimworldExtractorInternal.Exceptions;
 
 namespace RimworldExtractorInternal
 {
@@ -55,36 +56,36 @@ namespace RimworldExtractorInternal
             var rows = sheet.RowsUsed().ToList();
             var headers = rows.First().Cells();
 
-            var idxClass = headers.FirstOrDefault(x => !x.Value.IsBlank && x.Value.GetText() == HeaderClass)
+            var colClass = headers.FirstOrDefault(x => x.StrVal() == HeaderClass)
                                ?.WorksheetColumn().ColumnNumber() ??
-                           throw new InvalidOperationException($"Couldn't find a header named {HeaderClass}");
-            var idxNode = headers.FirstOrDefault(x => !x.Value.IsBlank && x.Value.GetText() == HeaderNode)
+                           throw new XlsxReadingException(HeaderClass);
+            var colNode = headers.FirstOrDefault(x => x.StrVal() == HeaderNode)
                 ?.WorksheetColumn().ColumnNumber() ??
-                          throw new InvalidOperationException($"Couldn't find a header named {HeaderNode}");
-            var idxRequiredMods = headers
-                .FirstOrDefault(x => !x.Value.IsBlank && x.Value.GetText() == HeaderRequiredMods)
+                          throw new XlsxReadingException(HeaderNode);
+            var colRequiredMods = headers
+                .FirstOrDefault(x => x.StrVal() == HeaderRequiredMods)
                 ?.WorksheetColumn().ColumnNumber() ?? -1;
-            var idxOriginal = headers.FirstOrDefault(x => !x.Value.IsBlank && x.Value.GetText() == HeaderOriginal)
+            var colOriginal = headers.FirstOrDefault(x => x.StrVal() == HeaderOriginal)
                                   ?.WorksheetColumn().ColumnNumber() ??
-                              throw new InvalidOperationException($"Couldn't find a header named {HeaderOriginal}");
-            var idxTranslated = headers.FirstOrDefault(x => !x.Value.IsBlank && x.Value.GetText() == HeaderTranslated)
+                              throw new XlsxReadingException(HeaderOriginal);
+            var colTranslated = headers.FirstOrDefault(x => x.StrVal() == HeaderTranslated)
                 ?.WorksheetColumn().ColumnNumber() ??
-                                throw new InvalidOperationException($"Couldn't find a header named {HeaderTranslated}");
+                                throw new XlsxReadingException(HeaderTranslated);
 
 
 
             for (int i = 1; i < rows.Count; i++)
             {
                 var row = rows[i];
-                var className = row.Cell(idxClass).Value.GetText();
-                var node = row.Cell(idxNode).Value.GetText();
+                var className = row.Cell(colClass).StrVal();
+                var node = row.Cell(colNode).StrVal();
                 List<string>? requiredMods = null;
-                if (idxRequiredMods != -1 && row.Cell(idxRequiredMods).Value is { IsText: true } cellRequiredMods)
+                if (colRequiredMods != -1 && row.Cell(colRequiredMods).Value is { IsText: true } cellRequiredMods)
                 {
                     requiredMods = cellRequiredMods.GetText().Split('\n').ToList();
                 }
-                var original = row.Cell(idxOriginal).Value.IsBlank ? "" : row.Cell(idxOriginal).Value.GetText();
-                var cellTranslated = row.Cell(idxTranslated).Value;
+                var original = row.Cell(colOriginal).Value.IsBlank ? "" : row.Cell(colOriginal).StrVal();
+                var cellTranslated = row.Cell(colTranslated).Value;
                 var translated = cellTranslated.IsText ? (cellTranslated.GetText() == "" ? null : cellTranslated.GetText()) : null;
 
                 var translation = new TranslationEntry(className, node, original,
@@ -379,7 +380,34 @@ namespace RimworldExtractorInternal
 
         public static List<TranslationEntry> FromLanguageXml(string rootPath)
         {
-            throw new NotImplementedException();
+            var translationsDir = Path.Combine(rootPath, "Languages", Prefabs.TranslationLanguage);
+            var defInjectedDir = Path.Combine(translationsDir, "DefInjected");
+            var keyedDir = Path.Combine(translationsDir, "Keyed");
+            var stringsDir = Path.Combine(translationsDir, "Strings");
+            // var patchesDir = Path.Combine(rootPath, "Patches");
+
+            var translations = new List<TranslationEntry>();
+
+            foreach (var filePath in DescendantFiles(defInjectedDir).Where(x => x.ToLower().EndsWith(".xml")))
+            {
+                var className = Path.GetRelativePath(defInjectedDir, filePath).Split(Path.PathSeparator).First();
+                try
+                {
+                    var doc = ReadXml(filePath);
+                    foreach (XmlElement node in doc.DocumentElement!.ChildNodes)
+                    {
+                        var name = node.Name;
+                        translations.Add(new TranslationEntry(className, name, string.Empty, node.InnerText));
+                    }
+                }
+                catch (Exception e)
+                {
+                    Log.Err($"{filePath}를 읽는 중 에러 발생: {e.Message}");
+                    throw;
+                }
+            }
+
+            return translations;
         }
 
         private static void SaveSafely(this XLWorkbook xlsx, string path)
@@ -551,6 +579,45 @@ namespace RimworldExtractorInternal
                 foreach (var xmlNode in removedList)
                 {
                     defInjectedDoc.DocumentElement!.RemoveChild(xmlNode);
+                }
+            }
+        }
+
+        internal static XmlDocument ReadXml(string filePath)
+        {
+            var contents = File.ReadAllText(filePath);
+            var readerSettings = new XmlReaderSettings
+            {
+                IgnoreComments = true,
+                IgnoreWhitespace = true,
+                CheckCharacters = false
+            };
+            using var stringReader = new StringReader(contents);
+            using var xmlReader = XmlReader.Create(stringReader, readerSettings);
+            var childDoc = new XmlDocument();
+            childDoc.Load(xmlReader);
+            return childDoc;
+        }
+
+        internal static IEnumerable<string> DescendantFiles(string root)
+        {
+            if (!Directory.Exists(root))
+                yield break;
+
+            var q = new Queue<string>();
+            q.Enqueue(root);
+
+            while (q.Count > 0)
+            {
+                var curPath = q.Dequeue();
+                foreach (var subDir in Directory.GetDirectories(curPath).OrderBy(x => x))
+                {
+                    q.Enqueue(subDir);
+                }
+
+                foreach (var file in Directory.EnumerateFiles(curPath).OrderBy(x => x))
+                {
+                    yield return file;
                 }
             }
         }

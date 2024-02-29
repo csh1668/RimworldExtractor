@@ -34,11 +34,11 @@ namespace RimworldExtractorInternal
             {
                 var defsRoot = extractableFolder.FullPath;
                 var requiredPackageId = extractableFolder.RequiredPackageId;
-                foreach (var filePath in DescendantFiles(defsRoot).Where(x => x.ToLower().EndsWith(".xml")))
+                foreach (var filePath in IO.DescendantFiles(defsRoot).Where(x => x.ToLower().EndsWith(".xml")))
                 {
                     try
                     {
-                        var childDoc = ReadXml(filePath);
+                        var childDoc = IO.ReadXml(filePath);
 
                         foreach (XmlNode node in childDoc.DocumentElement!.ChildNodes)
                         {
@@ -132,12 +132,12 @@ namespace RimworldExtractorInternal
                 requiredMods = new List<string> { $"##packageId##{keyed.RequiredPackageId}" };
             }
             
-            foreach (var filePath in DescendantFiles(keyedRoot).Where(x => x.ToLower().EndsWith(".xml")))
+            foreach (var filePath in IO.DescendantFiles(keyedRoot).Where(x => x.ToLower().EndsWith(".xml")))
             {
                 //var nodeName = Path.GetRelativePath(keyedRoot, filePath);
                 //nodeName = Path.GetFileNameWithoutExtension(nodeName).Replace('\\', '.');
 
-                var doc = ReadXml(filePath);
+                var doc = IO.ReadXml(filePath);
                 foreach (XmlNode node in doc.DocumentElement!.ChildNodes)
                 {
                     yield return new TranslationEntry("Keyed", node.Name, node.InnerText, null, requiredMods);
@@ -161,7 +161,7 @@ namespace RimworldExtractorInternal
             {
                 requiredMods = new List<string> { $"##packageId##{strings.RequiredPackageId}" };
             }
-            foreach (var filePath in DescendantFiles(stringsRoot).Where(x => x.ToLower().EndsWith(".txt")))
+            foreach (var filePath in IO.DescendantFiles(stringsRoot).Where(x => x.ToLower().EndsWith(".txt")))
             {
                 var nodeName = Path.GetRelativePath(stringsRoot, filePath);
                 nodeName = Path.GetFileNameWithoutExtension(nodeName.Replace('\\', '.'));
@@ -203,9 +203,9 @@ namespace RimworldExtractorInternal
 
             var doc = new XmlDocument();
             doc.AppendChild(doc.CreateElement("Patch"));
-            foreach (var filePath in DescendantFiles(patchesRoot).Where(x => x.ToLower().EndsWith(".xml")))
+            foreach (var filePath in IO.DescendantFiles(patchesRoot).Where(x => x.ToLower().EndsWith(".xml")))
             {
-                var childDoc = ReadXml(filePath);
+                var childDoc = IO.ReadXml(filePath);
                 foreach (XmlNode node in childDoc.DocumentElement.ChildNodes)
                 {
                     if (node.Name != "Operation")
@@ -268,42 +268,6 @@ namespace RimworldExtractorInternal
                 };
             }
             yield break;
-        }
-
-        internal static XmlDocument ReadXml(string filePath)
-        {
-            var contents = File.ReadAllText(filePath);
-            var readerSettings = new XmlReaderSettings
-            {
-                IgnoreComments = true,
-                IgnoreWhitespace = true,
-                CheckCharacters = false
-            };
-            using var stringReader = new StringReader(contents);
-            using var xmlReader = XmlReader.Create(stringReader, readerSettings);
-            var childDoc = new XmlDocument();
-            childDoc.Load(xmlReader);
-            return childDoc;
-        }
-
-        private static IEnumerable<string> DescendantFiles(string root)
-        {
-            var q = new Queue<string>();
-            q.Enqueue(root);
-
-            while (q.Count > 0)
-            {
-                var curPath = q.Dequeue();
-                foreach (var subDir in Directory.GetDirectories(curPath).OrderBy(x => x))
-                {
-                    q.Enqueue(subDir);
-                }
-
-                foreach (var file in Directory.EnumerateFiles(curPath).OrderBy(x => x))
-                {
-                    yield return file;
-                }
-            }
         }
 
 

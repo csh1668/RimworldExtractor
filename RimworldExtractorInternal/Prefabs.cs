@@ -50,8 +50,8 @@ namespace RimworldExtractorInternal
 
         public static void Init()
         {
-            PathRimworld = "C:\\Games\\Steam\\steamapps\\common\\RimWorld";
-            PathWorkshop = "C:\\Games\\Steam\\steamapps\\workshop\\content\\294100";
+            PathRimworld = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\RimWorld";
+            PathWorkshop = "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100";
             PathBaseRefList = "";
             CurrentVersion = "1.4";
             PatternVersion = @"^[1]\.\d+";

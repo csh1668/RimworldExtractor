@@ -197,13 +197,21 @@ namespace RimworldExtractorGUI
 
             if (openfileDialog.ShowDialog() == DialogResult.OK)
             {
-                var path = openfileDialog.FileName;
-                var fileName = Path.GetFileNameWithoutExtension(path);
-                var translations = IO.FromExcel(path);
-                IO.ToLanguageXml(translations, true, Prefabs.CommentOriginal, fileName, Path.GetDirectoryName(path) ?? "");
-                if (MessageBox.Show("완료되었습니다! 변환된 폴더의 위치를 탐색기로 열까요?", "완료", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                try
                 {
-                    Process.Start("explorer.exe", Path.GetDirectoryName(path) ?? "");
+                    var path = openfileDialog.FileName;
+                    var fileName = Path.GetFileNameWithoutExtension(path);
+                    var translations = IO.FromExcel(path);
+                    IO.ToLanguageXml(translations, true, Prefabs.CommentOriginal, fileName, Path.GetDirectoryName(path) ?? "");
+                    if (MessageBox.Show("완료되었습니다! 변환된 폴더의 위치를 탐색기로 열까요?", "완료", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                    {
+                        Process.Start("explorer.exe", Path.GetDirectoryName(path) ?? "");
+                    }
+                }
+                catch (Exception exception)
+                {
+                    Console.WriteLine(exception);
+                    throw;
                 }
             }
         }

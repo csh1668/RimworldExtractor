@@ -22,12 +22,12 @@ namespace RimworldExtractorInternal
 
             foreach (var referenceDefsRoot in referenceDefsRoots)
             {
-                foreach (var filePath in DescendantFiles(referenceDefsRoot)
+                foreach (var filePath in IO.DescendantFiles(referenceDefsRoot)
                              .Where(x => x.ToLower().EndsWith(".xml")))
                 {
                     try
                     {
-                        var childDoc = ReadXml(filePath);
+                        var childDoc = IO.ReadXml(filePath);
 
                         foreach (XmlNode node in childDoc.DocumentElement!.ChildNodes)
                         {

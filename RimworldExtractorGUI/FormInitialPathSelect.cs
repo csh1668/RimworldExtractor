@@ -17,11 +17,13 @@ namespace RimworldExtractorGUI
         public FormInitialPathSelect()
         {
             InitializeComponent();
+            Prefabs.Init();
+            textBoxPathRimworld.Text = Prefabs.PathRimworld;
+            textBoxPathWorkshop.Text = Prefabs.PathWorkshop;
         }
 
         private void buttonSelectPathRimworld_Click(object sender, EventArgs e)
         {
-            textBoxPathRimworld.Clear();
             var dialog = new OpenFileDialog();
             dialog.Title = "RimWorldWin64.exe를 지정해주세요";
             dialog.FileName = "";
@@ -37,7 +39,6 @@ namespace RimworldExtractorGUI
 
         private void buttonSelectPathWorkshop_Click(object sender, EventArgs e)
         {
-            textBoxPathWorkshop.Clear();
             var dialog = new CommonOpenFileDialog();
             dialog.IsFolderPicker = true;
             dialog.Title = "림월드 창작마당 경로를 지정해주세요 => Steam\\steamapps\\workshop\\content\\294100";
@@ -51,7 +52,6 @@ namespace RimworldExtractorGUI
         private void buttonDone_Click(object sender, EventArgs e)
         {
             DialogResult = DialogResult.OK;
-            Prefabs.Init();
             Prefabs.PathRimworld = textBoxPathRimworld.Text;
             Prefabs.PathWorkshop = textBoxPathWorkshop.Text;
             Prefabs.Save();
