@@ -12,10 +12,28 @@ namespace RimworldExtractorInternal
 {
     internal static class Utils
     {
+        public static XmlNode Append(this XmlNode parent, Action<XmlNode> work)
+        {
+            work(parent);
+            return parent;
+        }
         public static XmlElement Append(this XmlElement parent, Action<XmlElement> work)
         {
             work(parent);
             return parent;
+        }
+
+        public static XmlElement AppendElement(this XmlNode parent, string name, string? innerText = null)
+        {
+            var child = (XmlElement?)parent.AppendChild(
+                (parent.NodeType == XmlNodeType.Document ? (XmlDocument)parent : parent.OwnerDocument!)
+                .CreateElement(name)) ?? throw new NullReferenceException();
+            if (innerText != null)
+            {
+                child.InnerText = innerText;
+            }
+
+            return child;
         }
         public static XmlElement AppendElement(this XmlElement parent, string name, string? innerText = null)
         {
@@ -29,6 +47,12 @@ namespace RimworldExtractorInternal
             return child;
         }
 
+        public static XmlElement AppendElement(this XmlNode parent, string name, Action<XmlNode> work)
+        {
+            var child = parent.AppendElement(name);
+            work(child);
+            return child;
+        }
         public static XmlElement AppendElement(this XmlElement parent, string name, Action<XmlElement> work)
         {
             var child = parent.AppendElement(name);
@@ -36,6 +60,13 @@ namespace RimworldExtractorInternal
             return child;
         }
 
+        public static XmlAttribute? AppendAttribute(this XmlNode parent, string name, string? value)
+        {
+            if (parent is XmlElement e)
+                return e.AppendAttribute(name, value);
+            else
+                return null;
+        }
         public static XmlAttribute AppendAttribute(this XmlElement parent, string name, string? value)
         {
             var attr = parent.Attributes.Append(parent.OwnerDocument.CreateAttribute(name));

@@ -6,7 +6,8 @@ namespace RimworldExtractorInternal;
 internal static class PatchesUtils
 {
     /// <summary>
-    /// Required Mods, Xml Node
+    /// Defs added by Patch operations, to be extracted after Patch operations end.
+    /// Item1) required mods, Item2) Xml Node
     /// </summary>
     public static readonly List<(List<string>?, XmlNode)> DefsAddedByPatches = new();
 

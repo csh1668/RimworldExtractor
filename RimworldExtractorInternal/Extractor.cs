@@ -18,7 +18,7 @@ namespace RimworldExtractorInternal
         public static void Reset()
         {
             CombinedDefs = new XmlDocument();
-            CombinedDefs.AppendChild(CombinedDefs.CreateElement("Defs"));
+            CombinedDefs.AppendElement("Defs");
             ParentNodeLookUp.Clear();
         }
 
@@ -81,7 +81,7 @@ namespace RimworldExtractorInternal
                 if (defName == null)
                 {
                     if (node.Name != "SongDef")
-                        Log.Wrn($"Abstract가 아닌 XML 요소에서 'defName' 태그를 찾지 못했습니다. InnerXml: {node.InnerXml}");
+                        Log.Wrn($"SongDef과 Abstract가 아닌 XML 요소 {node.Name}에서 'defName' 태그를 찾지 못했습니다. InnerXml: {node.InnerXml}");
                     continue;
                 }
 
@@ -240,12 +240,13 @@ namespace RimworldExtractorInternal
                 var name = node.Attributes?["Name"]?.Value;
                 if (listRequiredMods != null)
                 {
-                    var tmpElement = node.AppendChild(node.OwnerDocument!.CreateElement("REQUIREDMODS"));
-                    foreach (var requiredMod in listRequiredMods)
+                    node.AppendElement("REQUIREDMODS", tmpNode =>
                     {
-                        var li = tmpElement.AppendChild(tmpElement.OwnerDocument!.CreateElement("li"));
-                        li.InnerText = requiredMod;
-                    }
+                        foreach (var requiredMod in listRequiredMods)
+                        {
+                            tmpNode.AppendElement("li", requiredMod);
+                        }
+                    });
                 }
                 if (name != null)
                 {

@@ -95,7 +95,7 @@ namespace RimworldExtractorGUI
 
             if (SelectedMod != null)
             {
-                listBoxMods.SelectedItem = GetModDisplayText(SelectedMod);
+                listBoxMods.SelectedItem = SelectedMod;
             }
         }
 
