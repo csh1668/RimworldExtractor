@@ -26,7 +26,7 @@ def edit_template(changelog):
         lines = file.readlines()
     lines.insert(0, changelog.strip())
     lines.insert(1, '\n')
-    lines.insert(1, '\n')
+    lines.insert(1, '##\n')
     with open(TEMPLATE_PATH, 'w', encoding='utf-8') as file:
         file.writelines(lines)
 
