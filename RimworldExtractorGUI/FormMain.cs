@@ -67,7 +67,11 @@ namespace RimworldExtractorGUI
         private static bool HasErrorAfter(string keyword)
         {
             var messages = Log.Messages.ToList();
-            for (int i = messages.LastIndexOf(keyword); i < messages.Count; i++)
+            int i = messages.LastIndexOf(keyword);
+            if (i == -1)
+                return false;
+            
+            for (; i < messages.Count; i++)
             {
                 var cur = messages[i];
                 if (cur.Contains(Log.PrefixError))

@@ -194,17 +194,9 @@ namespace RimworldExtractorInternal
                 var commonDir = Path.Combine(root, "Common");
                 if (Directory.Exists(commonDir))
                 {
-                    foreach (var directory in Directory.EnumerateDirectories(commonDir))
+                    foreach (var extractableFolder in GetExtractableFoldersInternal(commonDir).Select(x => new ExtractableFolder(modMetadata, x, null, "Common")))
                     {
-                        var lastDir = Path.GetFileName(directory);
-                        if (Regex.IsMatch(lastDir, Prefabs.PatternVersion))
-                        {
-                            foreach (var extractableFolder in GetExtractableFoldersInternal(directory)
-                                         .Select(x => new ExtractableFolder(modMetadata, x, null, lastDir)))
-                            {
-                                sets.Add(extractableFolder);
-                            }
-                        }
+                        sets.Add(extractableFolder);
                     }
                 }
             }

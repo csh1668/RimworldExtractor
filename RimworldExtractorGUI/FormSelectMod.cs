@@ -112,7 +112,7 @@ namespace RimworldExtractorGUI
                 var autoSelected = new List<ExtractableFolder>();
                 foreach (ExtractableFolder extractableFolder in listBoxExtractableFolders.Items)
                 {
-                    if (extractableFolder.VersionInfo == "default" || extractableFolder.VersionInfo == Prefabs.CurrentVersion)
+                    if (extractableFolder.VersionInfo is "default" or "Common" || extractableFolder.VersionInfo == Prefabs.CurrentVersion)
                         autoSelected.Add(extractableFolder);
                 }
 
