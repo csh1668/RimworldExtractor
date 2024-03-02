@@ -44,9 +44,9 @@ namespace RimworldExtractorGUI
                 {
                     xlsx.SaveAs(path);
                 }
-                catch (IOException)
+                catch (IOException io)
                 {
-                    Log.Err("파일이 이미 사용 중이기 때문에 파일을 저장할 수 없었습니다.");
+                    Log.Err($"파일이 이미 사용 중이기 때문에 파일을 저장할 수 없었습니다. {io.Message}");
                 }
             }
             else

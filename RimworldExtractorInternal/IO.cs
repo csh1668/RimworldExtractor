@@ -442,7 +442,7 @@ namespace RimworldExtractorInternal
                     }
                     catch (IOException)
                     {
-                        Log.Err("파일이 이미 사용 중이기 때문에 파일을 저장할 수 없었습니다.");
+                        Log.Err($"{Path.GetFileName(path)}: 파일이 이미 사용 중이기 때문에 파일을 저장할 수 없었습니다. 종료 후 재시도 해주세요.");
                     }
                     return;
                 case Prefabs.DuplicatesPolicy.KeepOriginal:
