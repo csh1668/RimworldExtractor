@@ -137,11 +137,20 @@ internal static class PatchesUtils
         {
             var parentNode = selectNode.ParentNode!;
             var rootDefNode = Extractor.GetRootDefNode(parentNode, out var nodeName);
+            var defName = rootDefNode?["defName"]?.InnerText;
+            var className = (rootDefNode?.Attributes?["Class"]?.Value ?? rootDefNode?.Name);
+                            
+            if (rootDefNode == null)
+            {
+                defName = selectNode?["defName"]?.InnerText;
+                className = (selectNode?.Attributes?["Class"]?.Value ?? selectNode?.Name);
+            }
+            if (defName is null || className is null)
+                Log.Wrn($"defName 또는 className을 찾을 수 없는 Patch: xpath:{xpath}");
             foreach (XmlNode valueChildNode in value.ChildNodes)
             {
                 XmlNode selectNodeImported = parentNode.InsertBefore(Extractor.CombinedDefs.ImportNode(valueChildNode, true), selectNode);
-                foreach (var translation in Extractor.FindExtractableNodes(rootDefNode["defName"]!.InnerText,
-                             rootDefNode.Attributes?["Class"]?.Value ?? rootDefNode.Name, selectNodeImported, nodeName))
+                foreach (var translation in Extractor.FindExtractableNodes(defName, className, selectNodeImported, nodeName))
                 {
                     yield return translation with
                     {

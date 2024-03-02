@@ -72,7 +72,7 @@ namespace RimworldExtractorInternal
             };
             TranslationHandles = new()
             {
-                "label", // 200
+                // "label", // 200
                 "customLabel", "name", "inSignal", "def", "labelMale", // 100
                 "labelFemale", "*verbClass", "*compClass", "hediff"
             };
