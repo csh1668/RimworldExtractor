@@ -4,7 +4,7 @@ using System.Reflection;
 namespace RimworldExtractorGUI
 {
     /*
-    * TODO:
+    * TODO: https://github.com/RimWorldKorea/RMK/discussions/496#discussioncomment-8651025
     */
     internal static class Program
     {
