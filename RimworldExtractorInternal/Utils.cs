@@ -114,11 +114,13 @@ namespace RimworldExtractorInternal
             return nodes.OfType<XmlNode>().FirstOrDefault(x => predicate(x));
         }
 
-        public static bool HasSameElements<T>(this List<T> node1, List<T>? node2)
+        public static bool HasSameElements<T>(this IEnumerable<T> node1, IEnumerable<T>? node2)
         {
             if (node2 == null)
                 return false;
-            return !node1.Except(node2).Any() && !node2.Except(node1).Any();
+            var node1Array = node1 as T[] ?? node1.ToArray();
+            var node2Array = node2 as T[] ?? node2.ToArray();
+            return !node1Array.Except(node2Array).Any() && !node2Array.Except(node1Array).Any();
         }
 
         public static bool HasAttribute(this XmlNode node, string attributeName)

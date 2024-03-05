@@ -67,7 +67,7 @@ namespace RimworldExtractorInternal
                 yield break;
             }
 
-            var requiredMods = rootNode["REQUIREDMODS"]?.ChildNodes.OfType<XmlNode>().Select(x => x.InnerText).ToList();
+            var requiredMods = rootNode["REQUIREDMODS"]?.ChildNodes.OfType<XmlNode>().Select(x => x.InnerText).ToHashSet();
 
             // (CurrentNode, CurrentPath)
             var q = new Queue<(XmlNode, string)>();

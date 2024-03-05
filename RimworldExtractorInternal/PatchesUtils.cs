@@ -75,7 +75,7 @@ internal static class PatchesUtils
                     yield return translation with
                     {
                         className = $"Patches.{translation.className}",
-                        requiredMods = requiredMods
+                        requiredMods = requiredMods?.ToHashSet()
                     };
                 }
             }
@@ -114,7 +114,7 @@ internal static class PatchesUtils
                     yield return translation with
                     {
                         className = $"Patches.{translation.className}",
-                        requiredMods = requiredMods
+                        requiredMods = requiredMods?.ToHashSet()
                     };
                 }
             }
@@ -155,7 +155,7 @@ internal static class PatchesUtils
                     yield return translation with
                     {
                         className = $"Patches.{translation.className}",
-                        requiredMods = requiredMods
+                        requiredMods = requiredMods?.ToHashSet()
                     };
                 }
             }
@@ -203,14 +203,14 @@ internal static class PatchesUtils
                     {
                         yield return translation with
                         {
-                            requiredMods = requiredMods
+                            requiredMods = requiredMods?.ToHashSet()
                         };
                         continue;
                     }
                     yield return translation with
                     {
                         className = $"Patches.{translation.className}",
-                        requiredMods = requiredMods
+                        requiredMods = requiredMods?.ToHashSet()
                     };
                 }
             }

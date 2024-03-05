@@ -81,10 +81,10 @@ namespace RimworldExtractorInternal
                 var row = rows[i];
                 var className = row.Cell(colClass).StrVal();
                 var node = row.Cell(colNode).StrVal();
-                List<string>? requiredMods = null;
+                HashSet<string>? requiredMods = null;
                 if (colRequiredMods != -1 && row.Cell(colRequiredMods).Value is { IsText: true } cellRequiredMods)
                 {
-                    requiredMods = cellRequiredMods.GetText().Split('\n').ToList();
+                    requiredMods = cellRequiredMods.GetText().Split('\n').ToHashSet();
                 }
                 var original = row.Cell(colOriginal).Value.IsBlank ? "" : row.Cell(colOriginal).StrVal();
                 var cellTranslated = row.Cell(colTranslated).Value;
@@ -185,7 +185,7 @@ namespace RimworldExtractorInternal
                         operationFindMod.AppendAttribute("Class", "PatchOperationFindMod");
                         operationFindMod.AppendElement("mods", mods =>
                         {
-                            requiredMods.ForEach(requiredMod =>
+                            requiredMods.ToList().ForEach(requiredMod =>
                             {
                                 if (requiredMod.StartsWith("##packageId##"))
                                 {
