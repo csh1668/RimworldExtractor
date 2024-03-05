@@ -518,7 +518,7 @@ namespace RimworldExtractorInternal
         {
             foreach (var c in Path.GetInvalidFileNameChars())
             {
-                str = str.Replace(c, ' ');
+                str = str.Replace(c.ToString(), "");
             }
             return str;
         }

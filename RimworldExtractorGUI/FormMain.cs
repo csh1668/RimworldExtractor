@@ -3,6 +3,7 @@ using RimworldExtractorInternal;
 using RimworldExtractorInternal.Records;
 using System.Diagnostics;
 using System.Xml;
+using RimworldExtractorInternal.Compats;
 
 namespace RimworldExtractorGUI
 {
@@ -131,7 +132,9 @@ namespace RimworldExtractorGUI
             if (defs.Count > 0)
             {
                 Extractor.PrepareDefs(defs, refDefs);
-                extraction.AddRange(Extractor.ExtractDefs());
+                var rawExtractions = Extractor.ExtractDefs();
+                var postProcessed = CompatManager.DoPostProcessing(rawExtractions);
+                extraction.AddRange(postProcessed);
             }
             foreach (var extractableFolder in SelectedFolders)
             {
