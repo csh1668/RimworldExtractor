@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
+using RimworldExtractorInternal.Compats;
 using RimworldExtractorInternal.Records;
 
 namespace RimworldExtractorInternal
@@ -68,6 +69,14 @@ namespace RimworldExtractorInternal
         }
 
         public static IEnumerable<TranslationEntry> ExtractDefs()
+        {
+            var rawExtraction = ExtractDefsInternal().ToList();
+            foreach (var entry in CompatManager.DoPostProcessing(rawExtraction))
+            {
+                yield return entry;
+            }
+        }
+        private static IEnumerable<TranslationEntry> ExtractDefsInternal()
         {
             if (CombinedDefs == null)
             {
@@ -176,7 +185,17 @@ namespace RimworldExtractorInternal
             }
         }
 
+
         public static IEnumerable<TranslationEntry> ExtractPatches(ExtractableFolder patches)
+        {
+            var rawExtraction = ExtractPatchesInternal(patches).ToList();
+            foreach (var entry in CompatManager.DoPostProcessing(rawExtraction))
+            {
+                yield return entry;
+            }
+        }
+
+        public static IEnumerable<TranslationEntry> ExtractPatchesInternal(ExtractableFolder patches)
         {
             if (CombinedDefs == null)
             {

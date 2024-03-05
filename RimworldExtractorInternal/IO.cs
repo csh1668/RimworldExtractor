@@ -3,6 +3,7 @@ using RimworldExtractorInternal.Records;
 using System.Security;
 using System.Text.RegularExpressions;
 using System.Xml;
+using RimworldExtractorInternal.Compats;
 using RimworldExtractorInternal.Exceptions;
 
 namespace RimworldExtractorInternal
@@ -162,7 +163,7 @@ namespace RimworldExtractorInternal
                 var root = docPatch.DocumentElement ?? throw new InvalidOperationException();
 
                 // RequiredMods에 따라 뼈대 사전 생성
-                foreach (var translation in patches)
+                foreach (var translation in CompatManager.DoPostProcessing(patches))
                 {
                     var requiredMods = translation.RequiredMods;
                     if (requiredMods == null)
@@ -279,7 +280,7 @@ namespace RimworldExtractorInternal
             {
                 var defInjectedDir = PathCombineCreateDir(translationDir, "DefInjected");
                 var xmls = new Dictionary<string, XmlDocument>();
-                foreach (var translation in defInjected)
+                foreach (var translation in CompatManager.DoPostProcessing(defInjected))
                 {
                     if (patchedNodeSet.Contains(translation.Node))
                         continue;

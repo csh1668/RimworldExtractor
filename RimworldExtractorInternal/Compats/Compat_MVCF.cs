@@ -85,7 +85,7 @@ namespace RimworldExtractorInternal.Compats
                     }
                 }
 
-                if (mvcfForms.Any(x => x.VerbLabel == entry || x.VerbPropsVisualLabel == entry))
+                if (mvcfForms.Any(x => x.VerbPropsLabel == entry || x.VerbLabel == entry || x.VerbPropsVisualLabel == entry))
                     continue;
                 yield return entry;
             }

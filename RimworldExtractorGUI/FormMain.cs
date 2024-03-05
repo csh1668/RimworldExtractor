@@ -132,9 +132,7 @@ namespace RimworldExtractorGUI
             if (defs.Count > 0)
             {
                 Extractor.PrepareDefs(defs, refDefs);
-                var rawExtractions = Extractor.ExtractDefs();
-                var postProcessed = CompatManager.DoPostProcessing(rawExtractions);
-                extraction.AddRange(postProcessed);
+                extraction.AddRange(Extractor.ExtractDefs());
             }
             foreach (var extractableFolder in SelectedFolders)
             {

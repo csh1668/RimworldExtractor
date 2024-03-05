@@ -9,6 +9,12 @@ namespace RimworldExtractorInternal.Compats
 {
     public abstract class BaseCompat
     {
-        public abstract IEnumerable<TranslationEntry> DoPostProcessing(IEnumerable<TranslationEntry> entries);
+        public virtual IEnumerable<TranslationEntry> DoPostProcessing(IEnumerable<TranslationEntry> entries)
+        {
+            foreach (var entry in entries)
+            {
+                yield return entry;
+            }
+        }
     }
 }
