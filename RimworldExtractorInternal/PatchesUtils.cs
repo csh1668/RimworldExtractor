@@ -74,8 +74,8 @@ internal static class PatchesUtils
                 {
                     yield return translation with
                     {
-                        className = $"Patches.{translation.className}",
-                        requiredMods = requiredMods?.ToHashSet()
+                        ClassName = $"Patches.{translation.ClassName}",
+                        RequiredMods = requiredMods?.ToHashSet()
                     };
                 }
             }
@@ -113,8 +113,8 @@ internal static class PatchesUtils
                 {
                     yield return translation with
                     {
-                        className = $"Patches.{translation.className}",
-                        requiredMods = requiredMods?.ToHashSet()
+                        ClassName = $"Patches.{translation.ClassName}",
+                        RequiredMods = requiredMods?.ToHashSet()
                     };
                 }
             }
@@ -154,8 +154,8 @@ internal static class PatchesUtils
                 {
                     yield return translation with
                     {
-                        className = $"Patches.{translation.className}",
-                        requiredMods = requiredMods?.ToHashSet()
+                        ClassName = $"Patches.{translation.ClassName}",
+                        RequiredMods = requiredMods?.ToHashSet()
                     };
                 }
             }
@@ -199,18 +199,18 @@ internal static class PatchesUtils
                 foreach (var translation in Extractor.FindExtractableNodes(rootDefNode["defName"].InnerText,
                              rootDefNode.Attributes?["Class"]?.Value ?? rootDefNode.Name, selectNodeImported, nodeName))
                 {
-                    if (translation.className == "Keyed")
+                    if (translation.ClassName == "Keyed")
                     {
                         yield return translation with
                         {
-                            requiredMods = requiredMods?.ToHashSet()
+                            RequiredMods = requiredMods?.ToHashSet()
                         };
                         continue;
                     }
                     yield return translation with
                     {
-                        className = $"Patches.{translation.className}",
-                        requiredMods = requiredMods?.ToHashSet()
+                        ClassName = $"Patches.{translation.ClassName}",
+                        RequiredMods = requiredMods?.ToHashSet()
                     };
                 }
             }

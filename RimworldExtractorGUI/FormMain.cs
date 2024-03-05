@@ -157,11 +157,11 @@ namespace RimworldExtractorGUI
             int cntDefs = 0, cntKeyed = 0, cntStrings = 0, cntPatches = 0;
             foreach (var translationEntry in extraction)
             {
-                if (translationEntry.className.StartsWith("Keyed"))
+                if (translationEntry.ClassName.StartsWith("Keyed"))
                     ++cntKeyed;
-                else if(translationEntry.className.StartsWith("Strings"))
+                else if(translationEntry.ClassName.StartsWith("Strings"))
                     ++cntStrings;
-                else if(translationEntry.className.StartsWith("Patches"))
+                else if(translationEntry.ClassName.StartsWith("Patches"))
                     ++cntPatches;
                 else
                     ++cntDefs;

@@ -373,7 +373,7 @@ namespace RimworldExtractorInternal
         {
             if (original.Name != other.Name)
             {
-                // Log.Wrn($"Different name, original={original.Name}|{original.OuterXml}, other={other.Name}|{other.OuterXml}");
+                // Log.Wrn($"Different name, Original={Original.Name}|{Original.OuterXml}, other={other.Name}|{other.OuterXml}");
                 return;
             }
 

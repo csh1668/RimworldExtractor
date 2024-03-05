@@ -109,7 +109,7 @@ namespace RimworldExtractorInternal
                 {
                     yield return translationEntry with
                     {
-                        requiredMods = translationEntry.requiredMods?
+                        RequiredMods = translationEntry.RequiredMods?
                             .Concat(requiredPackageIds ?? Array.Empty<string>()).ToHashSet()
                     };
                 }
@@ -223,11 +223,11 @@ namespace RimworldExtractorInternal
                 {
                     yield return translationEntry with
                     {
-                        requiredMods = translationEntry.requiredMods == null
+                        RequiredMods = translationEntry.RequiredMods == null
                             ? requiredMods?.ToHashSet()
                             : (requiredMods == null
-                                ? translationEntry.requiredMods
-                                : translationEntry.requiredMods.Concat(requiredMods).ToHashSet())
+                                ? translationEntry.RequiredMods
+                                : translationEntry.RequiredMods.Concat(requiredMods).ToHashSet())
                     };
                 }
             }
@@ -260,12 +260,12 @@ namespace RimworldExtractorInternal
             {
                 yield return translation with
                 {
-                    className = $"Patches.{translation.className}",
-                    requiredMods = translation.requiredMods == null
+                    ClassName = $"Patches.{translation.ClassName}",
+                    RequiredMods = translation.RequiredMods == null
                         ? requiredMods?.ToHashSet()
                         : (requiredMods == null
-                            ? translation.requiredMods
-                            : translation.requiredMods.Concat(requiredMods).ToHashSet())
+                            ? translation.RequiredMods
+                            : translation.RequiredMods.Concat(requiredMods).ToHashSet())
                 };
             }
             yield break;

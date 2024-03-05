@@ -28,22 +28,22 @@ namespace RimworldExtractorInternal
             for (int i = 0; i < translations.Count; i++)
             {
                 var entry = translations[i];
-                sheet.Cell(2 + i, 1).Value = $"{entry.className}+{entry.node}";
-                sheet.Cell(2 + i, 2).Value = entry.className;
-                sheet.Cell(2 + i, 3).Value = entry.node;
-                if (entry.requiredMods != null)
+                sheet.Cell(2 + i, 1).Value = $"{entry.ClassName}+{entry.Node}";
+                sheet.Cell(2 + i, 2).Value = entry.ClassName;
+                sheet.Cell(2 + i, 3).Value = entry.Node;
+                if (entry.RequiredMods != null)
                 {
-                    var combinedRequiredMods = string.Join('\n', entry.requiredMods);
+                    var combinedRequiredMods = string.Join('\n', entry.RequiredMods);
                     sheet.Cell(2 + i, 4).Value = combinedRequiredMods;
-                    if (combinedRequiredMods.Contains("##packageId##") && entry.className.StartsWith("Patches"))
+                    if (combinedRequiredMods.Contains("##packageId##") && entry.ClassName.StartsWith("Patches"))
                     {
                         Log.WrnOnce($"Required Mods 열에 잘못된 값이 존재합니다. 추후 Patches의 올바른 생성을 위해 엑셀 파일에 있는 해당 문구: \"{combinedRequiredMods}\" 를 직접 모드 이름으로 바꿔야 합니다.",
                             $"잘못된{combinedRequiredMods}경고".GetHashCode());
                     }
                 }
-                sheet.Cell(2 + i, 5).Value = entry.original;
-                if (entry.translated != null)
-                    sheet.Cell(2 + i, 6).Value = entry.translated;
+                sheet.Cell(2 + i, 5).Value = entry.Original;
+                if (entry.Translated != null)
+                    sheet.Cell(2 + i, 6).Value = entry.Translated;
             }
 
             sheet.Style.Font.FontName = "맑은 고딕";
@@ -121,9 +121,9 @@ namespace RimworldExtractorInternal
 
             foreach (var translation in translations)
             {
-                var className = translation.className;
+                var className = translation.ClassName;
 
-                if (skipNoTranslation && className != "Strings" && string.IsNullOrEmpty(translation.translated))
+                if (skipNoTranslation && className != "Strings" && string.IsNullOrEmpty(translation.Translated))
                 {
                     continue;
                 }
@@ -164,7 +164,7 @@ namespace RimworldExtractorInternal
                 // RequiredMods에 따라 뼈대 사전 생성
                 foreach (var translation in patches)
                 {
-                    var requiredMods = translation.requiredMods;
+                    var requiredMods = translation.RequiredMods;
                     if (requiredMods == null)
                         continue;
                     var a = root.ChildNodes.Where(x => x.HasAttribute("Class", "PatchOperationFindMod")).ToList();
@@ -216,7 +216,7 @@ namespace RimworldExtractorInternal
 
                 foreach (var translation in patches)
                 {
-                    var requiredMods = translation.requiredMods;
+                    var requiredMods = translation.RequiredMods;
                     XmlElement operation;
                     if (requiredMods != null)
                     {
@@ -228,25 +228,25 @@ namespace RimworldExtractorInternal
                         operation = operationFindMod["match"]!["operations"]!.AppendElement("li");
 
 
-                        if (defInjected.Any(x => x.node == translation.node))
+                        if (defInjected.Any(x => x.Node == translation.Node))
                         {
-                            var noMatchTranslation = defInjected.First(x => x.node == translation.node);
+                            var noMatchTranslation = defInjected.First(x => x.Node == translation.Node);
                             operationFindMod["nomatch"]!["operations"]!.AppendElement("li", li =>
                             {
                                 li.AppendAttribute("Class", "PatchOperationReplace");
                                 li.AppendElement("success", "Always");
                                 if (commentOriginal)
-                                    li.AppendComment($"Original={SecurityElement.Escape(translation.original).Replace('-', 'ー')}");
-                                li.AppendElement("xpath", Utils.GetXpath(translation.className[(translation.className.IndexOf('.') + 1)..], translation.node));
+                                    li.AppendComment($"Original={SecurityElement.Escape(translation.Original).Replace('-', 'ー')}");
+                                li.AppendElement("xpath", Utils.GetXpath(translation.ClassName[(translation.ClassName.IndexOf('.') + 1)..], translation.Node));
                                 li.AppendElement("value", value =>
                                 {
-                                    var noMatchLastNode = translation.node.Split('.').Last();
+                                    var noMatchLastNode = translation.Node.Split('.').Last();
                                     if (int.TryParse(noMatchLastNode, out _)) noMatchLastNode = "li";
                                     value.AppendElement(noMatchLastNode,
-                                        noMatchTranslation.translated ?? noMatchTranslation.original);
+                                        noMatchTranslation.Translated ?? noMatchTranslation.Original);
                                 });
                             });
-                            patchedNodeSet.Add(translation.node);
+                            patchedNodeSet.Add(translation.Node);
                         }
                     }
                     else
@@ -260,13 +260,13 @@ namespace RimworldExtractorInternal
                         li.AppendElement("success", "Always");
                         if (commentOriginal)
                             li.AppendComment(
-                                $"Original={SecurityElement.Escape(translation.original).Replace('-', 'ー')}");
-                        li.AppendElement("xpath", Utils.GetXpath(translation.className[(translation.className.IndexOf('.') + 1)..], translation.node));
+                                $"Original={SecurityElement.Escape(translation.Original).Replace('-', 'ー')}");
+                        li.AppendElement("xpath", Utils.GetXpath(translation.ClassName[(translation.ClassName.IndexOf('.') + 1)..], translation.Node));
                         li.AppendElement("value", value =>
                         {
-                            var lastNode = translation.node.Split('.').Last();
+                            var lastNode = translation.Node.Split('.').Last();
                             if (int.TryParse(lastNode, out _)) lastNode = "li";
-                            value.AppendElement(lastNode, translation.translated ?? translation.original);
+                            value.AppendElement(lastNode, translation.Translated ?? translation.Original);
                         });
                     });
 
@@ -281,30 +281,30 @@ namespace RimworldExtractorInternal
                 var xmls = new Dictionary<string, XmlDocument>();
                 foreach (var translation in defInjected)
                 {
-                    if (patchedNodeSet.Contains(translation.node))
+                    if (patchedNodeSet.Contains(translation.Node))
                         continue;
-                    PathCombineCreateDir(defInjectedDir, translation.className);
-                    if (!xmls.TryGetValue(translation.className, out var doc))
+                    PathCombineCreateDir(defInjectedDir, translation.ClassName);
+                    if (!xmls.TryGetValue(translation.ClassName, out var doc))
                     {
                         doc = new XmlDocument();
-                        xmls[translation.className] = doc;
+                        xmls[translation.ClassName] = doc;
                         doc.AppendChild(doc.CreateElement("LanguageData"));
                     }
 
                     doc.DocumentElement!.Append(languageData =>
                     {
                         if (commentOriginal)
-                            languageData.AppendComment($"Original={SecurityElement.Escape(translation.original).Replace('-', 'ー')}");
-                        languageData.AppendElement(translation.node, t =>
+                            languageData.AppendComment($"Original={SecurityElement.Escape(translation.Original).Replace('-', 'ー')}");
+                        languageData.AppendElement(translation.Node, t =>
                         {
-                            t.InnerText = translation.translated ?? translation.original;
+                            t.InnerText = translation.Translated ?? translation.Original;
                             if (!t.InnerText.Contains("{*")) return;
                             t.InnerText = Regex.Replace(t.InnerText, "\\{\\*(.*?)\\}", match =>
                             {
                                 var targetIdentifier = match.Groups[1].Value;
-                                var replacement = translations.FirstOrDefault(x => $"{x.className}+{x.node}" == targetIdentifier);
+                                var replacement = translations.FirstOrDefault(x => $"{x.ClassName}+{x.Node}" == targetIdentifier);
                                 if (replacement != null)
-                                    return replacement.translated ?? replacement.original;
+                                    return replacement.Translated ?? replacement.Original;
                                 Log.Err($"Pointer: {targetIdentifier}에 대한 원본 Identifier를 찾을 수 없습니다.");
                                 return "ERR";
                             });
@@ -328,9 +328,9 @@ namespace RimworldExtractorInternal
                 var xmls = new Dictionary<string, XmlDocument>();
                 foreach (var translation in keyed)
                 {
-                    var idxSep = translation.node.IndexOf('|');
-                    var key = idxSep != -1 ? translation.node.Split('|')[0] : "default";
-                    var nodeName = idxSep != -1 ? translation.node[(idxSep + 1)..] : translation.node;
+                    var idxSep = translation.Node.IndexOf('|');
+                    var key = idxSep != -1 ? translation.Node.Split('|')[0] : "default";
+                    var nodeName = idxSep != -1 ? translation.Node[(idxSep + 1)..] : translation.Node;
 
                     if (!xmls.TryGetValue(key, out var doc))
                     {
@@ -342,8 +342,8 @@ namespace RimworldExtractorInternal
                     doc.DocumentElement!.Append(languageData =>
                     {
                         if (commentOriginal)
-                            languageData.AppendComment($"{Prefabs.OriginalLanguage}={SecurityElement.Escape(translation.original).Replace('-', 'ー')}");
-                        languageData.AppendElement(nodeName, translation.translated ?? translation.original);
+                            languageData.AppendComment($"{Prefabs.OriginalLanguage}={SecurityElement.Escape(translation.Original).Replace('-', 'ー')}");
+                        languageData.AppendElement(nodeName, translation.Translated ?? translation.Original);
                     });
                 }
 
@@ -360,14 +360,14 @@ namespace RimworldExtractorInternal
                 var txts = new Dictionary<string, List<string>>();
                 foreach (var translation in strings)
                 {
-                    var className = translation.node[..translation.node.LastIndexOf('.')];
+                    var className = translation.Node[..translation.Node.LastIndexOf('.')];
                     if (!txts.TryGetValue(className, out var lines))
                     {
                         lines = new List<string>();
                         txts[className] = lines;
                     }
 
-                    lines.Add(translation.translated ?? translation.original);
+                    lines.Add(translation.Translated ?? translation.Original);
                 }
 
                 foreach (var (className, lines) in txts)
@@ -525,13 +525,13 @@ namespace RimworldExtractorInternal
 
         private static TranslationEntry DoNodeReplacement(this TranslationEntry orig)
         {
-            if (orig.className is "Keyed" or "Strings")
+            if (orig.ClassName is "Keyed" or "Strings")
                 return orig;
 
-            var isPatches = orig.className.StartsWith("Patches.");
-            var defType = isPatches ? orig.className[("Patches.".Length + 1)..] : orig.className;
-            var defName = orig.node.Split('.')[0];
-            var nodeAfterDefName = orig.node[(orig.node.IndexOf('.') + 1)..];
+            var isPatches = orig.ClassName.StartsWith("Patches.");
+            var defType = isPatches ? orig.ClassName[("Patches.".Length + 1)..] : orig.ClassName;
+            var defName = orig.Node.Split('.')[0];
+            var nodeAfterDefName = orig.Node[(orig.Node.IndexOf('.') + 1)..];
 
             foreach (var (key, value) in Prefabs.NodeReplacement)
             {
@@ -543,7 +543,7 @@ namespace RimworldExtractorInternal
                 var changedNode = tokenValue[1];
                 if (defType == targetDef && nodeAfterDefName == targetNode)
                 {
-                    return orig with { className = isPatches ? $"Patches.{changedDef}" : changedDef, node = $"{defName}.{changedNode}" };
+                    return orig with { ClassName = isPatches ? $"Patches.{changedDef}" : changedDef, Node = $"{defName}.{changedNode}" };
                 }
             }
             return orig;

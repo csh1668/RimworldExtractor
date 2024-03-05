@@ -6,5 +6,5 @@ using System.Threading.Tasks;
 
 namespace RimworldExtractorInternal.Records
 {
-    public record TranslationEntry(string className, string node, string original, string? translated, HashSet<string>? requiredMods = null);
+    public record TranslationEntry(string ClassName, string Node, string Original, string? Translated, HashSet<string>? RequiredMods = null);
 }
