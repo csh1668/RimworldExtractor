@@ -36,7 +36,7 @@ namespace RimworldExtractorInternal
                 {
                     var combinedRequiredMods = string.Join('\n', entry.RequiredMods);
                     sheet.Cell(2 + i, 4).Value = combinedRequiredMods;
-                    if (combinedRequiredMods.Contains("##packageId##") && entry.ClassName.StartsWith("Patches"))
+                    if (combinedRequiredMods.Contains("##packageId##") && entry.ClassName.StartsWith("Patches."))
                     {
                         Log.WrnOnce($"Required Mods 열에 잘못된 값이 존재합니다. 추후 Patches의 올바른 생성을 위해 엑셀 파일에 있는 해당 문구: \"{combinedRequiredMods}\" 를 직접 모드 이름으로 바꿔야 합니다.",
                             $"잘못된{combinedRequiredMods}경고".GetHashCode());
@@ -44,7 +44,16 @@ namespace RimworldExtractorInternal
                 }
                 sheet.Cell(2 + i, 5).Value = entry.Original;
                 if (entry.Translated != null)
+                {
                     sheet.Cell(2 + i, 6).Value = entry.Translated;
+                }
+
+                if (entry.TryGetExtension(Prefabs.ExtensionKeyExtraComment, out object? extension) &&
+                    extension is string extensionStr)
+                {
+                    var comment = sheet.Cell(2 + i, 6).CreateComment();
+                    comment.AddText(extensionStr);
+                }
             }
 
             sheet.Style.Font.FontName = "맑은 고딕";

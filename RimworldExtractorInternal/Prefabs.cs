@@ -48,6 +48,9 @@ namespace RimworldExtractorInternal
         public static Action<XmlDocument, string>? StopCallbackXml = null; 
         public static Action<IEnumerable<string>, string>? StopCallbackTxt = null;
 
+
+        public const string ExtensionKeyExtraComment = "ExtraComment";
+
         public static void Init()
         {
             PathRimworld = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\RimWorld";

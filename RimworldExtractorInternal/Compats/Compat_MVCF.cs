@@ -7,7 +7,7 @@ using RimworldExtractorInternal.Records;
 
 namespace RimworldExtractorInternal.Compats
 {
-    public class Compat_MVCF : BaseCompat
+    internal class Compat_MVCF : BaseCompat
     {
         private const string verbPropsKeyword = "Comp_VerbProps.verbProps";
         private const string verbKeyword = ".verbs.";
@@ -43,6 +43,16 @@ namespace RimworldExtractorInternal.Compats
                     if (mvcfForm != null)
                     {
                         mvcfForm.VerbPropsVisualLabel = entry;
+                    }
+                }
+
+                if (lastToken == "description")
+                {
+                    tokens[^1] = "label";
+                    var mvcfForm = mvcfForms.FirstOrDefault(x => x.VerbPropsLabel.Node == string.Join('.', tokens));
+                    if (mvcfForm != null)
+                    {
+                        mvcfForm.VerbPropsDescription = entry;
                     }
                 }
             }
@@ -83,6 +93,24 @@ namespace RimworldExtractorInternal.Compats
                     {
                         yield return mvcfForm.VerbPropsVisualLabel;
                     }
+
+                    if (mvcfForm.VerbPropsDescription == null)
+                    {
+                        var tokens = mvcfForm.VerbPropsLabel.Node.Split('.');
+                        tokens[^1] = "description";
+
+                        var verbPropsDescription = (new TranslationEntry(mvcfForm.VerbPropsLabel) with
+                        {
+                            Node = string.Join('.', tokens),
+                            Original = ""
+                        });
+                        verbPropsDescription.AddExtension(Prefabs.ExtensionKeyExtraComment, "해당 노드를 번역하면 gizmo에 표시되는 설명을 수정할 수 있습니다");
+                        yield return verbPropsDescription;
+                    }
+                    else
+                    {
+                        yield return mvcfForm.VerbPropsDescription;
+                    }
                 }
 
                 if (mvcfForms.Any(x => x.VerbPropsLabel == entry || x.VerbLabel == entry || x.VerbPropsVisualLabel == entry))
@@ -97,33 +125,12 @@ namespace RimworldExtractorInternal.Compats
             public readonly TranslationEntry VerbPropsLabel;
             public TranslationEntry? VerbPropsVisualLabel = null;
             public TranslationEntry? VerbLabel = null;
+            public TranslationEntry? VerbPropsDescription = null;
 
             public MVCFForm(string defName, TranslationEntry verbPropsLabel)
             {
                 DefName = defName;
                 VerbPropsLabel = verbPropsLabel;
-            }
-
-            public override bool Equals(object? obj)
-            {
-                return obj is MVCFForm form && Equals(form);
-            }
-
-            private bool Equals(MVCFForm other)
-            {
-                return DefName == other.DefName && VerbPropsLabel.Equals(other.VerbPropsLabel) && Equals(VerbPropsVisualLabel, other.VerbPropsVisualLabel) && Equals(VerbLabel, other.VerbLabel);
-            }
-
-            public override int GetHashCode()
-            {
-                unchecked
-                {
-                    var hashCode = DefName.GetHashCode();
-                    hashCode = (hashCode * 397) ^ VerbPropsLabel.GetHashCode();
-                    hashCode = (hashCode * 397) ^ (VerbPropsVisualLabel != null ? VerbPropsVisualLabel.GetHashCode() : 0);
-                    hashCode = (hashCode * 397) ^ (VerbLabel != null ? VerbLabel.GetHashCode() : 0);
-                    return hashCode;
-                }
             }
         }
     }

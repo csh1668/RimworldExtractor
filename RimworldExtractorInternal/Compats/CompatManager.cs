@@ -22,6 +22,7 @@ namespace RimworldExtractorInternal.Compats
                 if (compat != null)
                     compats.Add(compat);
             }
+            Log.Msg($"{compats.Count}개의 compat가 로드됨");
         }
 
         public static IEnumerable<TranslationEntry> DoPostProcessing(IEnumerable<TranslationEntry> entries)
