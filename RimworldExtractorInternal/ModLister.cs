@@ -88,6 +88,7 @@ namespace RimworldExtractorInternal
                     {
                         var nodes = doc.DocumentElement["modDependenciesByVersion"]?["v" + Prefabs.CurrentVersion]
                             ?.ChildNodes;
+                        nodes ??= doc.DocumentElement["modDependenciesByVersion"]?.LastChild?.ChildNodes;
                         if (nodes != null)
                         {
                             foreach (XmlNode childNode in nodes)

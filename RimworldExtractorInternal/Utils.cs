@@ -84,7 +84,7 @@ namespace RimworldExtractorInternal
             return child;
         }
 
-        public static List<T> Combine<T>(this List<T>? first, List<T>? second)
+        public static List<T> Combine<T>(this IEnumerable<T>? first, IEnumerable<T>? second)
         {
             var newList = new List<T>();
             if (first != null)
@@ -136,21 +136,23 @@ namespace RimworldExtractorInternal
         public static string GetXpath(string className, string nodeName)
         {
             var defName = nodeName.Split('.')[0];
-            var token = nodeName[(defName.Length + 1)..].Split('.');
-            for (int i = 0; i < token.Length; i++)
+            var tokens = nodeName[(defName.Length + 1)..].Split('.');
+            for (int i = 0; i < tokens.Length; i++)
             {
-                if (int.TryParse(token[i], out var k))
+                // 리스트 노드일 경우
+                if (int.TryParse(tokens[i], out var k))
                 {
-                    token[i] = $"li[{k + 1}]";
+                    tokens[i] = $"li[{k + 1}]";
                 }
-                else if (char.IsUpper(token[i][0]))
+                // TranslationHandle을 사용한 경우
+                else if (!char.IsLower(tokens[i][0]))
                 {
-                    token[i] = $"*[text()='{token[i]}']";
+                    tokens[i] = $"*[.//*[contains(text(), '{tokens[i]}')]]";
                 }
             }
 
             nodeName = $"/Defs/{className}[defName=\"{defName}\"]/";
-            nodeName += string.Join('/', token);
+            nodeName += string.Join('/', tokens);
             return nodeName;
         }
 
