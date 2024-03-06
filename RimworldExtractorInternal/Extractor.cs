@@ -205,7 +205,7 @@ namespace RimworldExtractorInternal
                 yield break;
             }
 
-            PatchesUtils.DefsAddedByPatches.Clear();
+            PatchOperations.DefsAddedByPatches.Clear();
 
             var patchesRoot = patches.FullPath;
 
@@ -240,7 +240,7 @@ namespace RimworldExtractorInternal
 
             foreach (XmlNode node in doc.DocumentElement!.ChildNodes)
             {
-                foreach (var translationEntry in PatchesUtils.PatchOperationRecursive(node, null))
+                foreach (var translationEntry in PatchOperations.PatchOperationRecursive(node, null))
                 {
                     yield return translationEntry with
                     {
@@ -254,10 +254,10 @@ namespace RimworldExtractorInternal
             }
 
 
-            if (PatchesUtils.DefsAddedByPatches.Count == 0)
+            if (PatchOperations.DefsAddedByPatches.Count == 0)
                 yield break;
             CompatManager.DoPreProcessing(doc);
-            foreach (var (listRequiredMods, node) in PatchesUtils.DefsAddedByPatches)
+            foreach (var (listRequiredMods, node) in PatchOperations.DefsAddedByPatches)
             {
                 var name = node.Attributes?["Name"]?.Value;
                 if (listRequiredMods != null)
@@ -275,7 +275,7 @@ namespace RimworldExtractorInternal
                     ParentNodeLookUp[name] = node;
                 }
             }
-            DoXmlInheritance(PatchesUtils.DefsAddedByPatches.Select(x => x.Item2));
+            DoXmlInheritance(PatchOperations.DefsAddedByPatches.Select(x => x.Item2));
 
             foreach (var translation in ExtractDefs())
             {
@@ -284,9 +284,9 @@ namespace RimworldExtractorInternal
                     ClassName = $"Patches.{translation.ClassName}",
                     RequiredMods = translation.RequiredMods == null
                         ? requiredMods?.ToHashSet()
-                        : (requiredMods == null
+                        : requiredMods == null
                             ? translation.RequiredMods
-                            : translation.RequiredMods.Concat(requiredMods).ToHashSet())
+                            : translation.RequiredMods.Concat(requiredMods).ToHashSet()
                 };
             }
             yield break;

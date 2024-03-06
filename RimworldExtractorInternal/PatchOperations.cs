@@ -3,7 +3,7 @@ using RimworldExtractorInternal.Records;
 
 namespace RimworldExtractorInternal;
 
-internal static class PatchesUtils
+internal static class PatchOperations
 {
     /// <summary>
     /// Defs added by Patch operations, to be extracted after Patch operations end.
