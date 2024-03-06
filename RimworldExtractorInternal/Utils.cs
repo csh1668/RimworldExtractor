@@ -11,7 +11,7 @@ using RimworldExtractorInternal.Records;
 
 namespace RimworldExtractorInternal
 {
-    internal static class Utils
+    public static class Utils
     {
         public static XmlNode Append(this XmlNode parent, Action<XmlNode> work)
         {
@@ -162,6 +162,52 @@ namespace RimworldExtractorInternal
             if (value.TryGetText(out string str))
                 return str;
             return string.Empty;
+        }
+
+        internal static bool IsListNode(this XmlNode? curNode) => curNode?.Name == "li";
+
+        internal static bool IsTextNode(this XmlNode? curNode) =>
+            curNode?.ChildNodes.Count == 1 && curNode.FirstChild!.NodeType == XmlNodeType.Text;
+
+        public static XmlNodeList? SelectNodesSafe(this XmlDocument? doc, string? xpath)
+        {
+            if (doc == null || xpath == null) return null;
+            try
+            {
+                return doc.SelectNodes(xpath);
+            }
+            catch (Exception e)
+            {
+                Log.Err(e.Message);
+            }
+            return null;
+        }
+
+        public static string StripInvaildChars(this string str)
+        {
+            foreach (var c in Path.GetInvalidFileNameChars())
+            {
+                str = str.Replace(c.ToString(), "");
+            }
+            return str;
+        }
+
+        public static (int cntDefs, int cntKeyed, int cntStrings, int cntPatches) Count(
+            this IEnumerable<TranslationEntry> entries)
+        {
+            int cntDefs = 0, cntKeyed = 0, cntStrings = 0, cntPatches = 0;
+            foreach (var entry in entries)
+            {
+                if (entry.ClassName.StartsWith("Keyed"))
+                    ++cntKeyed;
+                else if (entry.ClassName.StartsWith("Strings"))
+                    ++cntStrings;
+                else if (entry.ClassName.StartsWith("Patches"))
+                    ++cntPatches;
+                else
+                    ++cntDefs;
+            }
+            return (cntDefs, cntKeyed, cntStrings, cntPatches);
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 using RimworldExtractorInternal.Records;
 
 namespace RimworldExtractorInternal.Compats
@@ -15,6 +16,11 @@ namespace RimworldExtractorInternal.Compats
             {
                 yield return entry;
             }
+        }
+
+        public virtual void DoPreProcessing(XmlDocument doc)
+        {
+            return;
         }
     }
 }

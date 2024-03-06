@@ -83,6 +83,8 @@ namespace RimworldExtractorInternal
                 throw new InvalidOperationException("You need to call PrepareDefs first");
             }
 
+            CompatManager.DoPreProcessing(CombinedDefs);
+
             foreach (XmlNode node in CombinedDefs.DocumentElement!.ChildNodes.OfType<XmlNode>()
                          .Where(x => x.Attributes?["Reference"]?.Value.ToLower() != "true"))
             {
@@ -226,13 +228,13 @@ namespace RimworldExtractorInternal
             foreach (var filePath in IO.DescendantFiles(patchesRoot).Where(x => x.ToLower().EndsWith(".xml")))
             {
                 var childDoc = IO.ReadXml(filePath);
-                foreach (XmlNode node in childDoc.DocumentElement.ChildNodes)
+                foreach (XmlNode node in childDoc.DocumentElement!.ChildNodes)
                 {
                     if (node.Name != "Operation")
                         continue;
 
                     var newNode = doc.ImportNode(node, true);
-                    doc.DocumentElement.AppendChild(newNode);
+                    doc.DocumentElement!.AppendChild(newNode);
                 }
             }
 
@@ -254,7 +256,7 @@ namespace RimworldExtractorInternal
 
             if (PatchesUtils.DefsAddedByPatches.Count == 0)
                 yield break;
-
+            CompatManager.DoPreProcessing(doc);
             foreach (var (listRequiredMods, node) in PatchesUtils.DefsAddedByPatches)
             {
                 var name = node.Attributes?["Name"]?.Value;
@@ -289,11 +291,5 @@ namespace RimworldExtractorInternal
             }
             yield break;
         }
-
-
-        private static bool IsListNode(this XmlNode? curNode) => curNode?.Name == "li";
-
-        private static bool IsTextNode(this XmlNode? curNode) =>
-            curNode?.ChildNodes.Count == 1 && curNode.FirstChild!.NodeType == XmlNodeType.Text;
     }
 }

@@ -155,20 +155,7 @@ namespace RimworldExtractorGUI
                 }
             }
 
-            int cntDefs = 0, cntKeyed = 0, cntStrings = 0, cntPatches = 0;
-            foreach (var translationEntry in extraction)
-            {
-                if (translationEntry.ClassName.StartsWith("Keyed"))
-                    ++cntKeyed;
-                else if(translationEntry.ClassName.StartsWith("Strings"))
-                    ++cntStrings;
-                else if(translationEntry.ClassName.StartsWith("Patches"))
-                    ++cntPatches;
-                else
-                    ++cntDefs;
-            }
-
-            var outPath = SelectedMod.Identifier.StripInvaildChars();
+            var outPath = Utils.StripInvaildChars(SelectedMod.Identifier);
             switch (Prefabs.Method)
             {
                 case Prefabs.ExtractionMethod.Excel:
@@ -185,7 +172,7 @@ namespace RimworldExtractorGUI
             }
 
 
-
+            var (cntDefs, cntKeyed, cntStrings, cntPatches) = extraction.Count();
             Log.Msg($"번역 데이터 수: 총 {extraction.Count}개 중 Defs {cntDefs}개, Keyed {cntKeyed}개, Strings {cntStrings}개, Patches {cntPatches}개, 완료!");
 
             var hasError = HasErrorAfter("추출 시작...");

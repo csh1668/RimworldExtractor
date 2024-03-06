@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 using RimworldExtractorInternal.Records;
 
 namespace RimworldExtractorInternal.Compats
@@ -32,11 +33,19 @@ namespace RimworldExtractorInternal.Compats
             {
                 translations = compat.DoPostProcessing(translations).ToList();
             }
-
             foreach (var entry in translations)
             {
                 yield return entry;
             }
+        }
+
+        public static void DoPreProcessing(XmlDocument doc)
+        {
+            foreach (var compat in compats)
+            {
+                compat.DoPreProcessing(doc);
+            } 
+            return;
         }
     }
 }

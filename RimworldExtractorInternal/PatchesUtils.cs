@@ -63,11 +63,15 @@ internal static class PatchesUtils
         if (selectNodes == null) yield break;
         foreach (XmlNode selectNode in selectNodes)
         {
-            var parentNode = selectNode.ParentNode!;
+            var parentNode = selectNode.ParentNode;
+            if (parentNode == null)
+            {
+                Log.Wrn($"선택된 노드 {selectNode.Name}의 부모 노드가 없습니다.");
+            }
             var rootDefNode = Extractor.GetRootDefNode(parentNode, out var nodeName);
             foreach (XmlElement valueChildNode in value.ChildNodes)
             {
-                XmlNode selectNodeImported = parentNode.InsertAfter(Extractor.CombinedDefs.ImportNode(valueChildNode, true), selectNode)!;
+                XmlNode selectNodeImported = parentNode.InsertAfter(Extractor.CombinedDefs!.ImportNode(valueChildNode, true), selectNode)!;
                 rootDefNode ??= selectNodeImported;
                 foreach (var translation in Extractor.FindExtractableNodes(rootDefNode["defName"]!.InnerText,
                              rootDefNode.Attributes?["Class"]?.Value ?? rootDefNode.Name, selectNodeImported, nodeName))
@@ -107,7 +111,7 @@ internal static class PatchesUtils
 
             foreach (XmlNode valueChildNode in value.ChildNodes)
             {
-                XmlNode selectNodeImported = modExtensionNode.AppendChild(Extractor.CombinedDefs.ImportNode(valueChildNode, true));
+                XmlNode selectNodeImported = modExtensionNode.AppendChild(Extractor.CombinedDefs!.ImportNode(valueChildNode, true))!;
                 foreach (var translation in Extractor.FindExtractableNodes(rootDefNode["defName"]!.InnerText,
                              rootDefNode.Attributes?["Class"]?.Value ?? rootDefNode.Name, selectNodeImported, nodeName))
                 {
@@ -149,7 +153,7 @@ internal static class PatchesUtils
                 Log.Wrn($"defName 또는 className을 찾을 수 없는 Patch: xpath:{xpath}");
             foreach (XmlNode valueChildNode in value.ChildNodes)
             {
-                XmlNode selectNodeImported = parentNode.InsertBefore(Extractor.CombinedDefs.ImportNode(valueChildNode, true), selectNode);
+                XmlNode selectNodeImported = parentNode.InsertBefore(Extractor.CombinedDefs!.ImportNode(valueChildNode, true), selectNode)!;
                 foreach (var translation in Extractor.FindExtractableNodes(defName, className, selectNodeImported, nodeName))
                 {
                     yield return translation with
@@ -180,7 +184,7 @@ internal static class PatchesUtils
             var rootDefNode = Extractor.GetRootDefNode(selectNode, out var nodeName);
             foreach (XmlNode valueChildNode in value.ChildNodes)
             {
-                XmlNode selectNodeImported = selectNode.AppendChild(Extractor.CombinedDefs.ImportNode(valueChildNode, true))!;
+                XmlNode selectNodeImported = selectNode.AppendChild(Extractor.CombinedDefs!.ImportNode(valueChildNode, true))!;
                 rootDefNode ??= selectNodeImported;
 
                 if (xpath is "Defs" or "Defs/")
@@ -189,14 +193,15 @@ internal static class PatchesUtils
                     continue;
                 }
 
-                if (rootDefNode["defName"] == null)
+                var defName = rootDefNode["defName"]?.InnerText;
+                if (defName == null)
                 {
 
                     Log.Wrn($"defName이 없는 경우는 지원하지 않습니다. xpath={xpath}, value={value.InnerXml}");
                     continue;
                 }
 
-                foreach (var translation in Extractor.FindExtractableNodes(rootDefNode["defName"].InnerText,
+                foreach (var translation in Extractor.FindExtractableNodes(defName,
                              rootDefNode.Attributes?["Class"]?.Value ?? rootDefNode.Name, selectNodeImported, nodeName))
                 {
                     if (translation.ClassName == "Keyed")
@@ -234,6 +239,7 @@ internal static class PatchesUtils
     private static IEnumerable<TranslationEntry> PatchOperationFindMod(XmlNode curNode, List<string>? requiredMods)
     {
         requiredMods ??= new List<string>();
+        var prevRequiredMods = new List<string>(requiredMods);
         var requiredModNodes = curNode["mods"]?.ChildNodes;
         if (requiredModNodes != null)
         {
@@ -248,21 +254,14 @@ internal static class PatchesUtils
                 yield return translationEntry;
             }
         }
-        // nomatch는 지원X
-    }
 
-    private static XmlNodeList? SelectNodesSafe(this XmlDocument? doc, string? xpath)
-    {
-        if (doc == null || xpath == null) return null;
-        try
+        var noMatch = curNode["nomatch"];
+        if (noMatch != null)
         {
-            return doc.SelectNodes(xpath);
+            foreach (var translationEntry in PatchOperationRecursive(noMatch, prevRequiredMods))
+            {
+                yield return translationEntry;
+            }
         }
-        catch (Exception e)
-        {
-            Log.Err(e.Message);
-        }
-        return null;
     }
-
 }

@@ -126,15 +126,6 @@ namespace RimworldExtractorInternal
                         path = $"{curPath}.{childNode.Name}";
 
 
-                    // TODO: 빠른 기능 구현을 위한 임시 기능. 나중에 더 구조화된 코드로 교체 필요
-                    var lastToken = path.Split('.').Last();
-                    if (lastToken is "Verb_Shoot" or "Verb_ShootOneUse" or "Verb_ShootWithSmoke"
-                        && childNode["label"] == null)
-                    {
-                        yield return new TranslationEntry(className, $"{defName}.{path}.label", rootNode["label"].InnerText, null,
-                            requiredMods);
-                    }
-
                     q.Enqueue((childNode, path));
                 }
             }

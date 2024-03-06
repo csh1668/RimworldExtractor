@@ -524,15 +524,6 @@ namespace RimworldExtractorInternal
             return dir;
         }
 
-        public static string StripInvaildChars(this string str)
-        {
-            foreach (var c in Path.GetInvalidFileNameChars())
-            {
-                str = str.Replace(c.ToString(), "");
-            }
-            return str;
-        }
-
         private static TranslationEntry DoNodeReplacement(this TranslationEntry orig)
         {
             if (orig.ClassName is "Keyed" or "Strings")
