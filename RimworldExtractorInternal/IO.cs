@@ -117,17 +117,6 @@ namespace RimworldExtractorInternal
             var patches = new List<TranslationEntry>();
             var patchedNodeSet = new HashSet<string>();
 
-            Parallel.For(0, translations.Count, (i) =>
-            {
-                var originalTranslations = translations[i];
-                var newTranslations = originalTranslations.DoNodeReplacement();
-                if (ReferenceEquals(originalTranslations, newTranslations))
-                    return;
-                lock (translations)
-                {
-                    translations[i] = newTranslations;
-                }
-            });
 
             foreach (var translation in translations)
             {
@@ -522,32 +511,6 @@ namespace RimworldExtractorInternal
             if (!Directory.Exists(dir))
                 Directory.CreateDirectory(dir);
             return dir;
-        }
-
-        private static TranslationEntry DoNodeReplacement(this TranslationEntry orig)
-        {
-            if (orig.ClassName is "Keyed" or "Strings")
-                return orig;
-
-            var isPatches = orig.ClassName.StartsWith("Patches.");
-            var defType = isPatches ? orig.ClassName[("Patches.".Length + 1)..] : orig.ClassName;
-            var defName = orig.Node.Split('.')[0];
-            var nodeAfterDefName = orig.Node[(orig.Node.IndexOf('.') + 1)..];
-
-            foreach (var (key, value) in Prefabs.NodeReplacement)
-            {
-                var tokenKey = key.Split('+');
-                var tokenValue = value.Split("+");
-                var targetDef = tokenKey[0];
-                var targetNode = tokenKey[1];
-                var changedDef = tokenValue[0];
-                var changedNode = tokenValue[1];
-                if (defType == targetDef && nodeAfterDefName == targetNode)
-                {
-                    return orig with { ClassName = isPatches ? $"Patches.{changedDef}" : changedDef, Node = $"{defName}.{changedNode}" };
-                }
-            }
-            return orig;
         }
 
         private static void DoFullListTranslation(this XmlDocument defInjectedDoc)

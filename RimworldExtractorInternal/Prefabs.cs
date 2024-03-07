@@ -72,6 +72,10 @@ namespace RimworldExtractorInternal
             NodeReplacement = new()
             {
                 ["ScenarioDef+label"] = "ScenarioDef+scenario.name",
+                ["CombatExtended.AmmoDef+*"] = "ThingDef+*",
+                ["VFECore.ExpandableProjectileDef+*"] = "ThingDef+*",
+                ["AbilityUser.ProjectileDef_AbilityLaser+*"] = "ThingDef+*",
+                ["AbilityUser.ProjectileDef_Ability+*"] = "ThingDef+*",
             };
             TranslationHandles = new()
             {
