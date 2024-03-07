@@ -71,7 +71,7 @@ namespace RimworldExtractorGUI
             int i = messages.LastIndexOf(keyword);
             if (i == -1)
                 return false;
-            
+
             for (; i < messages.Count; i++)
             {
                 var cur = messages[i];
@@ -240,7 +240,7 @@ namespace RimworldExtractorGUI
         {
             var form = new FormXmlister();
             form.StartPosition = FormStartPosition.CenterParent;
-            if (form.ShowDialog() == DialogResult.OK)
+            if (form.ShowDialog(this) == DialogResult.OK)
             {
                 var roots = form.FileNames;
                 foreach (var root in roots)
@@ -248,6 +248,16 @@ namespace RimworldExtractorGUI
                     var translations = IO.FromLanguageXml(root);
                     IO.ToExcel(translations, Path.Combine(root, Path.GetFileNameWithoutExtension(root)));
                 }
+            }
+        }
+
+        private void buttonJpgPackager_Click(object sender, EventArgs e)
+        {
+            var form = new FormJpgExport();
+            form.StartPosition = FormStartPosition.CenterParent;
+            if (form.ShowDialog(this) == DialogResult.OK)
+            {
+
             }
         }
     }

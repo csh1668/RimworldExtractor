@@ -40,6 +40,7 @@
             labelSelectedMods = new Label();
             button1 = new Button();
             linkLabelLatestVersion = new LinkLabel();
+            buttonJpgPackager = new Button();
             SuspendLayout();
             // 
             // buttonSelectMod
@@ -67,7 +68,7 @@
             // 
             button2.Location = new Point(12, 168);
             button2.Name = "button2";
-            button2.Size = new Size(200, 46);
+            button2.Size = new Size(97, 46);
             button2.TabIndex = 2;
             button2.Text = "옵션";
             button2.UseVisualStyleBackColor = true;
@@ -149,11 +150,22 @@
             linkLabelLatestVersion.TextAlign = ContentAlignment.MiddleLeft;
             linkLabelLatestVersion.LinkClicked += linkLabelLatestVersion_LinkClicked;
             // 
+            // buttonJpgPackager
+            // 
+            buttonJpgPackager.Location = new Point(115, 168);
+            buttonJpgPackager.Name = "buttonJpgPackager";
+            buttonJpgPackager.Size = new Size(97, 46);
+            buttonJpgPackager.TabIndex = 12;
+            buttonJpgPackager.Text = "이미지 파일로 패키징";
+            buttonJpgPackager.UseVisualStyleBackColor = true;
+            buttonJpgPackager.Click += buttonJpgPackager_Click;
+            // 
             // FormMain
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
+            Controls.Add(buttonJpgPackager);
             Controls.Add(linkLabelLatestVersion);
             Controls.Add(button1);
             Controls.Add(labelSelectedMods);
@@ -183,5 +195,6 @@
         private Label labelSelectedMods;
         private Button button1;
         private LinkLabel linkLabelLatestVersion;
+        private Button buttonJpgPackager;
     }
 }
