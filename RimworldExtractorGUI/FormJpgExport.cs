@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using RimworldExtractorGUI.Export;
+using System.Diagnostics;
 
 namespace RimworldExtractorGUI
 {
@@ -68,6 +69,10 @@ namespace RimworldExtractorGUI
                 var destPath = Path.Combine(Path.GetDirectoryName(filePath) ?? "",
                     Path.GetFileNameWithoutExtension(filePath) + ".jpg");
                 JpgPackageHelper.Package(filePath, destPath, imgPath);
+                if (MessageBox.Show("완료되었습니다! 패키징된 파일의 위치를 탐색기로 열까요?", "완료", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                {
+                    Process.Start("explorer.exe", Path.GetDirectoryName(destPath) ?? "");
+                }
             }
             else if (Directory.Exists(filePath))
             {
@@ -79,6 +84,10 @@ namespace RimworldExtractorGUI
                     Path.GetFileNameWithoutExtension(filePath) + ".jpg");
                 JpgPackageHelper.Package(newFilePath, destPath, imgPath);
                 File.Delete(newFilePath);
+                if (MessageBox.Show("완료되었습니다! 패키징된 파일의 위치를 탐색기로 열까요?", "완료", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                {
+                    Process.Start("explorer.exe", Path.GetDirectoryName(destPath) ?? "");
+                }
             }
             else
             {
