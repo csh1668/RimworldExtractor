@@ -155,7 +155,7 @@ namespace RimworldExtractorGUI
                 }
             }
 
-            var outPath = Utils.StripInvaildChars(SelectedMod.Identifier);
+            var outPath = SelectedMod.Identifier.StripInvaildChars();
             switch (Prefabs.Method)
             {
                 case Prefabs.ExtractionMethod.Excel:

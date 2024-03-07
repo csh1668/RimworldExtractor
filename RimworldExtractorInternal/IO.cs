@@ -79,9 +79,13 @@ namespace RimworldExtractorInternal
                 ?.WorksheetColumn().ColumnNumber() ?? -1;
             var colOriginal = headers.FirstOrDefault(x => x.StrVal() == HeaderOriginal)
                                   ?.WorksheetColumn().ColumnNumber() ??
+                              headers.FirstOrDefault(x => x.StrVal() == "EN [Source string]")
+                                  ?.WorksheetColumn().ColumnNumber() ??
                               throw new XlsxReadingException(HeaderOriginal);
             var colTranslated = headers.FirstOrDefault(x => x.StrVal() == HeaderTranslated)
-                ?.WorksheetColumn().ColumnNumber() ??
+                                    ?.WorksheetColumn().ColumnNumber() ??
+                                headers.FirstOrDefault(x => x.StrVal() == "KO [Translation]")
+                                    ?.WorksheetColumn().ColumnNumber() ??
                                 throw new XlsxReadingException(HeaderTranslated);
 
 
