@@ -17,6 +17,21 @@ internal static class PatchOperations
             yield break;
 
         var operation = curNode.Attributes?["Class"]?.Value;
+
+        if (curNode.TryGetAttritube("MayRequire", out string? mayRequire) && mayRequire != null)
+        {
+            requiredMods = requiredMods != null ? 
+                new List<string>(requiredMods) : new List<string>();
+            if (ModLister.TryGetModMetadataByPackageId(mayRequire, out var requiredMod) && requiredMod != null)
+            {
+                requiredMods.Add(requiredMod.ModName);
+            }
+            else
+            {
+                requiredMods.Add("##packageId##" + mayRequire);
+            }
+        }
+
         XmlNode? success = curNode["success"];
         switch (operation)
         {
@@ -239,16 +254,16 @@ internal static class PatchOperations
     private static IEnumerable<TranslationEntry> PatchOperationFindMod(XmlNode curNode, List<string>? requiredMods)
     {
         requiredMods ??= new List<string>();
-        var prevRequiredMods = new List<string>(requiredMods);
+        var noMatchRequiredMods = new List<string>(requiredMods);
         var requiredModNodes = curNode["mods"]?.ChildNodes;
-        if (requiredModNodes != null)
-        {
-            requiredMods.AddRange(from XmlNode requiredModsNode in requiredModNodes select requiredModsNode.InnerText);
-        }
 
         var match = curNode["match"];
         if (match != null)
         {
+            if (requiredModNodes != null)
+            {
+                requiredMods.AddRange(from XmlNode requiredModsNode in requiredModNodes select requiredModsNode.InnerText);
+            }
             foreach (var translationEntry in PatchOperationRecursive(match, requiredMods))
             {
                 yield return translationEntry;
@@ -258,8 +273,11 @@ internal static class PatchOperations
         var noMatch = curNode["nomatch"];
         if (noMatch != null)
         {
-            foreach (var translationEntry in PatchOperationRecursive(noMatch, prevRequiredMods))
+            foreach (var translationEntry in PatchOperationRecursive(noMatch, noMatchRequiredMods))
             {
+                Log.WrnOnce("PatchOperationFindMod가 noMatch인 경우는 제한적으로 지원합니다. " +
+                            "XML로 변환하는 과정 중 Patches의 자동 생성(특히 PatchOperationFindMod 부분)이 완전하지 않을 수 있으므로 배포 전 재확인이 필요합니다. " +
+                            $"문제가 될 수도 있는 부분: {noMatch.InnerXml.Substring(0, Math.Min(noMatch.InnerXml.Length, 100))}...", noMatch.InnerXml.GetHashCode());
                 yield return translationEntry;
             }
         }

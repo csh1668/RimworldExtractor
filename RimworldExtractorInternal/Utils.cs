@@ -133,6 +133,12 @@ namespace RimworldExtractorInternal
             return node.Attributes?[attributeName]?.Value == value;
         }
 
+        public static bool TryGetAttritube(this XmlNode node, string attritubeName, out string? value)
+        {
+            value = node.Attributes?[attritubeName]?.Value;
+            return value != null;
+        }
+
         public static string GetXpath(string className, string nodeName)
         {
             var defName = nodeName.Split('.')[0];

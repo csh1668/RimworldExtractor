@@ -190,7 +190,7 @@ namespace RimworldExtractorInternal
                         {
                             requiredMods.ToList().ForEach(requiredMod =>
                             {
-                                if (requiredMod.StartsWith("##packageId##"))
+                                if (requiredMod.Contains("##packageId##"))
                                 {
                                     Log.ErrOnce(
                                         $"Required Mods 열에 잘못된 값이 존재합니다. Patches의 올바른 생성을 위해 엑셀 파일에 있는 해당 문구: \"{requiredMod}\" 를 직접 모드 이름으로 바꿔야 합니다.",
