@@ -116,6 +116,7 @@ namespace RimworldExtractorInternal
             var languagesDir = PathCombineCreateDir(rootDirPath, "Languages");
             var translationDir = PathCombineCreateDir(languagesDir, Prefabs.TranslationLanguage);
             var defInjected = new List<TranslationEntry>();
+            var defInjectedFullListTranslations = new List<TranslationEntry>();
             var keyed = new List<TranslationEntry>();
             var strings = new List<TranslationEntry>();
             var patches = new List<TranslationEntry>();
@@ -143,6 +144,8 @@ namespace RimworldExtractorInternal
                         {
                             if (className.StartsWith("Patches."))
                                 patches.Add(translation);
+                            else if (Prefabs.FullListTranslationTags.Any(x => translation.Node.Contains(x)))
+                                defInjectedFullListTranslations.Add(translation);
                             else
                                 defInjected.Add(translation);
                             break;
@@ -151,7 +154,7 @@ namespace RimworldExtractorInternal
             }
 
             if (skipNoTranslation && patches.Count == 0 && defInjected.Count == 0 &&
-                keyed.Count == 0 && translations.Count > 0)
+                keyed.Count == 0 && translations.Count > 0 && defInjectedFullListTranslations.Count > 0)
             {
                 Log.Wrn("번역 데이터가 존재하지 않아 아무것도 추출되지 않습니다.");
             }
@@ -319,6 +322,56 @@ namespace RimworldExtractorInternal
                 foreach (var (className, doc) in xmls)
                 {
                     var outputPath = Path.Combine(defInjectedDir, className, fileName + ".xml");
+
+                    doc.DoFullListTranslation();
+                    doc.SaveSafely(outputPath);
+                }
+            }
+
+            if (defInjectedFullListTranslations.Count > 0)
+            {
+                var defInjectedDir = PathCombineCreateDir(translationDir, "DefInjected");
+                var xmls = new Dictionary<(string, string), XmlDocument>();
+                foreach (var translation in CompatManager.DoPostProcessing(defInjectedFullListTranslations))
+                {
+                    if (patchedNodeSet.Contains(translation.Node))
+                        continue;
+                    PathCombineCreateDir(defInjectedDir, translation.ClassName);
+                    var nodeParent = translation.Node[..translation.Node.LastIndexOf('.')];
+                    if (!xmls.TryGetValue((translation.ClassName, nodeParent), out var doc))
+                    {
+                        doc = new XmlDocument();
+                        xmls[(translation.ClassName, nodeParent)] = doc;
+                        doc.AppendChild(doc.CreateElement("LanguageData"));
+                    }
+
+                    doc.DocumentElement!.Append(languageData =>
+                    {
+                        if (commentOriginal)
+                            languageData.AppendComment($"Original={SecurityElement.Escape(translation.Original).Replace('-', 'ー')}");
+                        languageData.AppendElement(translation.Node, t =>
+                        {
+                            t.InnerText = translation.Translated ?? translation.Original;
+                            if (!t.InnerText.Contains("{*")) return;
+                            t.InnerText = Regex.Replace(t.InnerText, "\\{\\*(.*?)\\}", match =>
+                            {
+                                var targetIdentifier = match.Groups[1].Value;
+                                var replacement = translations.FirstOrDefault(x => $"{x.ClassName}+{x.Node}" == targetIdentifier);
+                                if (replacement != null)
+                                    return replacement.Translated ?? replacement.Original;
+                                Log.Err($"Pointer: {targetIdentifier}에 대한 원본 Identifier를 찾을 수 없습니다.");
+                                return "ERR";
+                            });
+                        });
+                    });
+
+                }
+
+                foreach (var ((className, nodeParent), doc) in xmls)
+                {
+                    var tokens = nodeParent.Split('.');
+                    var outputPath = Path.Combine(defInjectedDir, className,
+                        fileName + $"-{tokens[0]}{tokens.Last()}" + ".xml");
 
                     doc.DoFullListTranslation();
                     doc.SaveSafely(outputPath);
