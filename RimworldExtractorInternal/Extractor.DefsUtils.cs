@@ -1,7 +1,7 @@
-﻿using RimworldExtractorInternal.Records;
-using System.Text;
+﻿using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
+using RimworldExtractorInternal.DataTypes;
 
 namespace RimworldExtractorInternal
 {

@@ -1,9 +1,9 @@
 using DocumentFormat.OpenXml.Spreadsheet;
 using RimworldExtractorInternal;
-using RimworldExtractorInternal.Records;
 using System.Diagnostics;
 using System.Xml;
 using RimworldExtractorInternal.Compats;
+using RimworldExtractorInternal.DataTypes;
 
 namespace RimworldExtractorGUI
 {

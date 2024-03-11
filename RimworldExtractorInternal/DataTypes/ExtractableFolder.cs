@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace RimworldExtractorInternal.Records
+﻿namespace RimworldExtractorInternal.DataTypes
 {
     public record ExtractableFolder
         (ModMetadata Root, string FolderName, string? RequiredPackageId, string VersionInfo = "default")

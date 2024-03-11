@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RimworldExtractorGUI.Export
+namespace RimworldExtractorGUI.Utils
 {
     internal static class ImageFilePackageHelper
     {

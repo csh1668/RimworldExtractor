@@ -1,9 +1,9 @@
 ﻿using ClosedXML.Excel;
-using RimworldExtractorInternal.Records;
 using System.Security;
 using System.Text.RegularExpressions;
 using System.Xml;
 using RimworldExtractorInternal.Compats;
+using RimworldExtractorInternal.DataTypes;
 using RimworldExtractorInternal.Exceptions;
 
 namespace RimworldExtractorInternal

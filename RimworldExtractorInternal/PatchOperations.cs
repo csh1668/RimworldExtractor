@@ -1,5 +1,5 @@
 using System.Xml;
-using RimworldExtractorInternal.Records;
+using RimworldExtractorInternal.DataTypes;
 
 namespace RimworldExtractorInternal;
 
@@ -82,14 +82,15 @@ internal static class PatchOperations
             if (parentNode == null)
             {
                 Log.Wrn($"선택된 노드 {selectNode.Name}의 부모 노드가 없습니다.");
+                continue;
             }
             var rootDefNode = Extractor.GetRootDefNode(parentNode, out var nodeName);
             foreach (XmlElement valueChildNode in value.ChildNodes)
             {
                 XmlNode selectNodeImported = parentNode.InsertAfter(Extractor.CombinedDefs!.ImportNode(valueChildNode, true), selectNode)!;
-                rootDefNode ??= selectNodeImported;
-                foreach (var translation in Extractor.FindExtractableNodes(rootDefNode["defName"]!.InnerText,
-                             rootDefNode.Attributes?["Class"]?.Value ?? rootDefNode.Name, selectNodeImported, nodeName))
+                var curRootDefNode = rootDefNode ?? selectNodeImported;
+                foreach (var translation in Extractor.FindExtractableNodes(curRootDefNode["defName"]!.InnerText,
+                             curRootDefNode.Attributes?["Class"]?.Value ?? curRootDefNode.Name, selectNodeImported, nodeName))
                 {
                     yield return translation with
                     {
@@ -103,6 +104,8 @@ internal static class PatchOperations
 
     private static IEnumerable<TranslationEntry> PatchOperationAddModExtension(XmlNode curNode, List<string>? requiredMods)
     {
+        if (Extractor.CombinedDefs == null) yield break;
+
         var xpath = curNode["xpath"]?.InnerText;
         XmlNode? value = curNode["value"];
         if (xpath == null || value == null)
@@ -127,8 +130,9 @@ internal static class PatchOperations
             foreach (XmlNode valueChildNode in value.ChildNodes)
             {
                 XmlNode selectNodeImported = modExtensionNode.AppendChild(Extractor.CombinedDefs!.ImportNode(valueChildNode, true))!;
-                foreach (var translation in Extractor.FindExtractableNodes(rootDefNode["defName"]!.InnerText,
-                             rootDefNode.Attributes?["Class"]?.Value ?? rootDefNode.Name, selectNodeImported, nodeName))
+                var curRootDefNode = rootDefNode ?? selectNodeImported;
+                foreach (var translation in Extractor.FindExtractableNodes(curRootDefNode["defName"]!.InnerText,
+                             curRootDefNode.Attributes?["Class"]?.Value ?? curRootDefNode.Name, selectNodeImported, nodeName))
                 {
                     yield return translation with
                     {
@@ -200,7 +204,7 @@ internal static class PatchOperations
             foreach (XmlNode valueChildNode in value.ChildNodes)
             {
                 XmlNode selectNodeImported = selectNode.AppendChild(Extractor.CombinedDefs!.ImportNode(valueChildNode, true))!;
-                rootDefNode ??= selectNodeImported;
+                var curRootDefNode = rootDefNode ?? selectNodeImported;
 
                 if (xpath is "Defs" or "Defs/")
                 {
@@ -208,7 +212,7 @@ internal static class PatchOperations
                     continue;
                 }
 
-                var defName = rootDefNode["defName"]?.InnerText;
+                var defName = curRootDefNode["defName"]?.InnerText;
                 if (defName == null)
                 {
 
@@ -217,7 +221,7 @@ internal static class PatchOperations
                 }
 
                 foreach (var translation in Extractor.FindExtractableNodes(defName,
-                             rootDefNode.Attributes?["Class"]?.Value ?? rootDefNode.Name, selectNodeImported, nodeName))
+                             curRootDefNode.Attributes?["Class"]?.Value ?? curRootDefNode.Name, selectNodeImported, nodeName))
                 {
                     if (translation.ClassName == "Keyed")
                     {

@@ -12,7 +12,7 @@ using System.Windows.Controls;
 using System.Windows.Forms;
 using Microsoft.Win32;
 using RimworldExtractorInternal;
-using RimworldExtractorInternal.Records;
+using RimworldExtractorInternal.DataTypes;
 using ListBox = System.Windows.Controls.ListBox;
 using OpenFileDialog = System.Windows.Forms.OpenFileDialog;
 using ToolTip = System.Windows.Forms.ToolTip;

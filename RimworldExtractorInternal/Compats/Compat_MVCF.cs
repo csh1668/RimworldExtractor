@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using RimworldExtractorInternal.Records;
+using RimworldExtractorInternal.DataTypes;
 
 namespace RimworldExtractorInternal.Compats
 {

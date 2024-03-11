@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 using RimworldExtractorInternal.Compats;
-using RimworldExtractorInternal.Records;
+using RimworldExtractorInternal.DataTypes;
 
 namespace RimworldExtractorInternal
 {

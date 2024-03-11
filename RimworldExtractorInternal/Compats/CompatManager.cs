@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
-using RimworldExtractorInternal.Records;
+using RimworldExtractorInternal.DataTypes;
 
 namespace RimworldExtractorInternal.Compats
 {

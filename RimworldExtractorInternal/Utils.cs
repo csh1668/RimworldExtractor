@@ -7,7 +7,7 @@ using System.Xml;
 using ClosedXML.Excel;
 using DocumentFormat.OpenXml.Office.PowerPoint.Y2021.M06.Main;
 using DocumentFormat.OpenXml.Office.Word;
-using RimworldExtractorInternal.Records;
+using RimworldExtractorInternal.DataTypes;
 
 namespace RimworldExtractorInternal
 {
