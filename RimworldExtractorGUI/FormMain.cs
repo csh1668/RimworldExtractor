@@ -253,7 +253,7 @@ namespace RimworldExtractorGUI
 
         private void buttonJpgPackager_Click(object sender, EventArgs e)
         {
-            var form = new FormJpgExport();
+            var form = new FormImageFileCombiner();
             form.StartPosition = FormStartPosition.CenterParent;
             if (form.ShowDialog(this) == DialogResult.OK)
             {

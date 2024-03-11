@@ -1,6 +1,6 @@
 ﻿namespace RimworldExtractorGUI
 {
-    partial class FormJpgExport
+    partial class FormImageFileCombiner
     {
         /// <summary>
         /// Required designer variable.
@@ -41,7 +41,7 @@
             // 
             // buttonDone
             // 
-            buttonDone.Location = new Point(12, 128);
+            buttonDone.Location = new Point(12, 150);
             buttonDone.Name = "buttonDone";
             buttonDone.Size = new Size(563, 23);
             buttonDone.TabIndex = 13;
@@ -105,9 +105,9 @@
             // 
             label3.Location = new Point(12, 71);
             label3.Name = "label3";
-            label3.Size = new Size(563, 54);
+            label3.Size = new Size(563, 76);
             label3.TabIndex = 16;
-            label3.Text = "합칠 파일/폴더가 위치한 경로에 파일이 저장됩니다.\r\n이미지 경로가 지정되지 않으면 기본 이미지가 사용됩니다.\r\n폴더가 선택되었다면 자동으로 압축 후 합쳐집니다.";
+            label3.Text = "이미지 파일과 압축 파일(.zip)을 합치는 툴입니다.\r\n이미지의 확장자를 '.zip'으로 바꾸면 압축 파일 내부를 볼 수 있습니다.\r\n이미지 경로가 지정되지 않으면 기본 이미지가 사용됩니다.\r\n폴더가 선택되었다면 자동으로 압축 후 합쳐집니다.";
             label3.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // buttonSelectPathDir
@@ -120,11 +120,11 @@
             buttonSelectPathDir.UseVisualStyleBackColor = true;
             buttonSelectPathDir.Click += buttonSelectPathDir_Click;
             // 
-            // FormJpgExport
+            // FormImageFileCombiner
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(587, 163);
+            ClientSize = new Size(587, 185);
             Controls.Add(buttonSelectPathDir);
             Controls.Add(label3);
             Controls.Add(buttonDone);
@@ -134,8 +134,8 @@
             Controls.Add(buttonSelectPathImage);
             Controls.Add(textBoxPathFile);
             Controls.Add(textBoxPathImage);
-            Name = "FormJpgExport";
-            Text = "이미지(JPG) + 파일 합치기 툴 (디시 업로드용)";
+            Name = "FormImageFileCombiner";
+            Text = "이미지 + 파일 합치기 툴 (디시 업로드용)";
             ResumeLayout(false);
             PerformLayout();
         }

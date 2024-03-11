@@ -17,7 +17,7 @@ namespace RimworldExtractorInternal
         /// Prefabs.dat의 호환성을 위해 존재합니다. Prefabs의 필드가 수정되었을 때 이 숫자를 1 증가시켜,
         /// Prefabs.dat에 저장된 숫자가 이와 다르다면, 해당 데이터를 읽지 않도록 합니다.
         /// </summary>
-        private static readonly string Version = "4";
+        private static readonly string Version = "5";
 
         public static string PathRimworld = string.Empty;
         public static string PathWorkshop = string.Empty;
@@ -80,8 +80,8 @@ namespace RimworldExtractorInternal
             TranslationHandles = new()
             {
                 // "label", // 200
-                // "customLabel", "name", 
-                "inSignal", "def", "labelMale", // 100
+                // "customLabel", "name", "def",
+                "inSignal", "labelMale", // 100
                 "labelFemale", "*verbClass", "*compClass", "hediff"
             };
             Policy = DuplicatesPolicy.Overwrite;

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace RimworldExtractorGUI.Export
 {
-    internal static class JpgPackageHelper
+    internal static class ImageFilePackageHelper
     {
         public static void ZipDir(string sourcePath, string destPath)
         {

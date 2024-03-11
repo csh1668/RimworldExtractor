@@ -13,9 +13,9 @@ using System.Diagnostics;
 
 namespace RimworldExtractorGUI
 {
-    public partial class FormJpgExport : Form
+    public partial class FormImageFileCombiner : Form
     {
-        public FormJpgExport()
+        public FormImageFileCombiner()
         {
             InitializeComponent();
         }
@@ -23,9 +23,9 @@ namespace RimworldExtractorGUI
         private void buttonSelectPathImage_Click(object sender, EventArgs e)
         {
             var dialog = new OpenFileDialog();
-            dialog.Title = "JPG 이미지 파일을 지정해주세요.";
+            dialog.Title = "이미지 파일을 지정해주세요.";
             dialog.FileName = "";
-            dialog.Filter = "JPG 파일|*.jpg";
+            dialog.Filter = "이미지 파일|*.jpg;*.png;*.gif";
             dialog.CheckFileExists = true;
             dialog.CheckPathExists = false;
 
@@ -52,6 +52,9 @@ namespace RimworldExtractorGUI
         {
             var filePath = textBoxPathFile.Text;
             var imgPath = string.IsNullOrEmpty(textBoxPathImage.Text) ? null : textBoxPathImage.Text;
+            var imgExtension = Path.GetExtension(imgPath);
+            if (imgExtension == null)
+                imgExtension = ".jpg";
 
             if (imgPath != null && !File.Exists(imgPath))
             {
@@ -60,12 +63,33 @@ namespace RimworldExtractorGUI
                 return;
             }
 
+
+            string? OpenDialogSelectDestPath()
+            {
+                var dialog = new SaveFileDialog();
+                dialog.Title = "저장할 파일의 위치를 지정해주세요";
+                dialog.InitialDirectory = Path.GetDirectoryName(filePath) ?? "";
+                dialog.FileName = Path.GetFileNameWithoutExtension(filePath) + imgExtension;
+                dialog.Filter = "이미지 파일|*" + imgExtension;
+
+                if (dialog.ShowDialog() == DialogResult.OK)
+                {
+                    return dialog.FileName;
+                }
+
+                return null;
+            }
+
             if (File.Exists(filePath))
             {
 
-                var destPath = Path.Combine(Path.GetDirectoryName(filePath) ?? "",
-                    Path.GetFileNameWithoutExtension(filePath) + ".jpg");
-                JpgPackageHelper.Package(filePath, destPath, imgPath);
+                var destPath = OpenDialogSelectDestPath();
+                if (destPath == null)
+                {
+                    MessageBox.Show("파일 위치 지정을 다시 해주세요.");
+                    return;
+                }
+                ImageFilePackageHelper.Package(filePath, destPath, imgPath);
                 if (MessageBox.Show("완료되었습니다! 패키징된 파일의 위치를 탐색기로 열까요?", "완료", MessageBoxButtons.YesNo) == DialogResult.Yes)
                 {
                     Process.Start("explorer.exe", Path.GetDirectoryName(destPath) ?? "");
@@ -80,11 +104,15 @@ namespace RimworldExtractorGUI
             {
                 var newFilePath = Path.Combine(Path.GetDirectoryName(filePath) ?? "",
                     Path.GetFileNameWithoutExtension(filePath) + ".zip");
-                JpgPackageHelper.ZipDir(filePath, newFilePath);
+                ImageFilePackageHelper.ZipDir(filePath, newFilePath);
 
-                var destPath = Path.Combine(Path.GetDirectoryName(filePath) ?? "",
-                    Path.GetFileNameWithoutExtension(filePath) + ".jpg");
-                JpgPackageHelper.Package(newFilePath, destPath, imgPath);
+                var destPath = OpenDialogSelectDestPath();
+                if (destPath == null)
+                {
+                    MessageBox.Show("파일 위치 지정을 다시 해주세요.");
+                    return;
+                }
+                ImageFilePackageHelper.Package(newFilePath, destPath, imgPath);
                 File.Delete(newFilePath);
                 if (MessageBox.Show("완료되었습니다! 패키징된 파일의 위치를 탐색기로 열까요?", "완료", MessageBoxButtons.YesNo) == DialogResult.Yes)
                 {

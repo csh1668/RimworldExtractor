@@ -156,7 +156,7 @@
             buttonJpgPackager.Name = "buttonJpgPackager";
             buttonJpgPackager.Size = new Size(97, 46);
             buttonJpgPackager.TabIndex = 12;
-            buttonJpgPackager.Text = "이미지(JPG) + 파일 합치기";
+            buttonJpgPackager.Text = "이미지 + 파일 합치기";
             buttonJpgPackager.UseVisualStyleBackColor = true;
             buttonJpgPackager.Click += buttonJpgPackager_Click;
             // 
