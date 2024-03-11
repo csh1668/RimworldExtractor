@@ -90,24 +90,26 @@ namespace RimworldExtractorInternal
 
         public static void Save(string fileName = "Prefabs.dat")
         {
-            List<string> lines = new List<string>();
-            lines.Add("DO NOT EDIT THIS MANUALLY");
-            lines.Add(Version);
-            lines.Add(PathRimworld);
-            lines.Add(PathWorkshop);
-            lines.Add(PathBaseRefList);
-            lines.Add(CurrentVersion);
-            lines.Add(PatternVersion);
-            lines.Add(PatternVersionWithV);
-            lines.Add(OriginalLanguage);
-            lines.Add(TranslationLanguage);
-            lines.Add(CommentOriginal.ToString());
-            lines.Add(string.Join('/', ExtractableTags));
-            lines.Add(string.Join('/', FullListTranslationTags));
-            lines.Add(string.Join('/', NodeReplacement.Select(x => $"{x.Key}|{x.Value}")));
-            lines.Add(string.Join('/', TranslationHandles));
-            lines.Add(Policy.ToString());
-            lines.Add(Method.ToString());
+            List<string> lines = new List<string>
+            {
+                "DO NOT EDIT THIS MANUALLY",
+                Version,
+                PathRimworld,
+                PathWorkshop,
+                PathBaseRefList,
+                CurrentVersion,
+                PatternVersion,
+                PatternVersionWithV,
+                OriginalLanguage,
+                TranslationLanguage,
+                CommentOriginal.ToString(),
+                string.Join('/', ExtractableTags),
+                string.Join('/', FullListTranslationTags),
+                string.Join('/', NodeReplacement.Select(x => $"{x.Key}|{x.Value}")),
+                string.Join('/', TranslationHandles),
+                Policy.ToString(),
+                Method.ToString()
+            };
             File.WriteAllLines(fileName, lines);
         }
 

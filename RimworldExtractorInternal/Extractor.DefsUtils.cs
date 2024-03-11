@@ -1,12 +1,7 @@
 ﻿using RimworldExtractorInternal.Records;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
-using DocumentFormat.OpenXml.Office2010.Excel;
 using System.Text.RegularExpressions;
+using System.Xml;
 
 namespace RimworldExtractorInternal
 {
@@ -81,7 +76,7 @@ namespace RimworldExtractorInternal
             }
             else
             {
-                q.Enqueue((rootNode, curNormalizedPath + "." + (rootNode.IsListNode() 
+                q.Enqueue((rootNode, curNormalizedPath + "." + (rootNode.IsListNode()
                     ? GetIdxOfListNode(rootNode).ToString() : rootNode.Name)));
             }
 
@@ -216,7 +211,7 @@ namespace RimworldExtractorInternal
                     var name = childNode.Name;
                     if (childNode.ChildNodes.Count == 1 && childNode.FirstChild!.NodeType == XmlNodeType.Text && translationHandleMatcher == name)
                     {
-                        translationHandleResult = isTypeField ? 
+                        translationHandleResult = isTypeField ?
                             childNode.InnerText.Split('.').Last() : NormalizedHandle(childNode.InnerText);
                         if (string.IsNullOrWhiteSpace(translationHandleResult))
                         {
@@ -289,9 +284,9 @@ namespace RimworldExtractorInternal
             }
 
             var newDoc = new XmlDocument();
-            newDoc.AppendChild(newDoc.CreateElement("Defs"));
+            var defs = newDoc.AppendElement("Defs");
 
-            customNodes ??= CombinedDefs.DocumentElement!.ChildNodes.OfType<XmlNode>().ToList();
+            customNodes ??= defs.ChildNodes.OfType<XmlNode>().ToList();
 
             foreach (XmlNode node in customNodes)
             {
@@ -303,10 +298,10 @@ namespace RimworldExtractorInternal
                 var parentName = node.Attributes["ParentName"]?.Value;
                 if (parentName == null)
                 {
-                    newDoc.DocumentElement!.AppendChild(newDoc.ImportNode(node, true));
+                    defs.AppendChild(newDoc.ImportNode(node, true));
                     continue;
                 }
-                Stack<XmlNode> parentNodes = new Stack<XmlNode>();
+                var parentNodes = new Stack<XmlNode>();
                 parentNodes.Push(node);
                 while (true)
                 {
@@ -329,19 +324,19 @@ namespace RimworldExtractorInternal
                     }
                 }
 
-                var mergedNode = newDoc.ImportNode(node, true);
+                var mergedNode = (XmlElement)newDoc.ImportNode(node, true);
                 while (mergedNode.FirstChild != null)
                 {
                     mergedNode.RemoveChild(mergedNode.FirstChild);
                 }
-                mergedNode.Attributes?.RemoveNamedItem("ParentName");
+                mergedNode.Attributes.RemoveNamedItem("ParentName");
                 while (parentNodes.Count > 0)
                 {
                     var parentNode = parentNodes.Pop();
                     XmlOverwriteRecursive(mergedNode, parentNode);
                 }
 
-                var requiredPackageId = node.Attributes?["RequiredPackageId"]?.Value;
+                var requiredPackageId = node.Attributes["RequiredPackageId"]?.Value;
                 if (requiredPackageId != null)
                 {
                     var attribute = mergedNode.Attributes.Append(newDoc.CreateAttribute("RequiredPackageId"));
@@ -354,7 +349,7 @@ namespace RimworldExtractorInternal
                     attribute.Value = "True";
                 }
 
-                newDoc.DocumentElement!.AppendChild(mergedNode);
+                defs.AppendChild(mergedNode);
             }
 
             CombinedDefs = newDoc;

@@ -50,7 +50,6 @@ namespace RimworldExtractorInternal
                                 var newAttribute = newNode.Attributes?.Append(CombinedDefs.CreateAttribute("RequiredPackageId"))!;
                                 newAttribute.Value = requiredPackageId;
                             }
-
                             CombinedDefs.DocumentElement!.AppendChild(newNode);
                             var attributeName = node.Attributes?["Name"]?.Value;
                             if (attributeName != null)
@@ -224,7 +223,7 @@ namespace RimworldExtractorInternal
             }
 
             var doc = new XmlDocument();
-            doc.AppendChild(doc.CreateElement("Patch"));
+            doc.AppendElement("Patch");
             foreach (var filePath in IO.DescendantFiles(patchesRoot).Where(x => x.ToLower().EndsWith(".xml")))
             {
                 var childDoc = IO.ReadXml(filePath);

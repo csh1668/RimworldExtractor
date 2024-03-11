@@ -164,7 +164,7 @@ namespace RimworldExtractorInternal
                 var outputPath = PathCombineCreateDir(rootDirPath, "Patches");
 
                 var docPatch = new XmlDocument();
-                docPatch.AppendChild(docPatch.CreateElement("Patch"));
+                docPatch.AppendElement("Patch");
                 var root = docPatch.DocumentElement ?? throw new InvalidOperationException();
 
                 // RequiredMods에 따라 뼈대 사전 생성
@@ -294,7 +294,7 @@ namespace RimworldExtractorInternal
                     {
                         doc = new XmlDocument();
                         xmls[translation.ClassName] = doc;
-                        doc.AppendChild(doc.CreateElement("LanguageData"));
+                        doc.AppendElement("LanguageData");
                     }
 
                     doc.DocumentElement!.Append(languageData =>
@@ -342,7 +342,7 @@ namespace RimworldExtractorInternal
                     {
                         doc = new XmlDocument();
                         xmls[(translation.ClassName, nodeParent)] = doc;
-                        doc.AppendChild(doc.CreateElement("LanguageData"));
+                        doc.AppendElement("LanguageData");
                     }
 
                     doc.DocumentElement!.Append(languageData =>
@@ -392,7 +392,7 @@ namespace RimworldExtractorInternal
                     {
                         doc = new XmlDocument();
                         xmls[key] = doc;
-                        doc.AppendChild(doc.CreateElement("LanguageData"));
+                        doc.AppendElement("LanguageData");
                     }
 
                     doc.DocumentElement!.Append(languageData =>
@@ -594,7 +594,7 @@ namespace RimworldExtractorInternal
                     removedNodesDic[nodeName] = removedList;
                 }
 
-                var li = fullList.AppendChild(defInjectedDoc.CreateElement("li"))!;
+                var li = fullList.AppendElement("li");
                 li.InnerText = childNode.InnerText;
                 removedList.Add(childNode);
             }
