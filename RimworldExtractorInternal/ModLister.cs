@@ -123,11 +123,6 @@ namespace RimworldExtractorInternal
             return new ModMetadata(modRoot, id, name, packageId, false, modDependencies);
         }
 
-        public static ModMetadata? GetModMetadataByModName(string modName)
-        {
-            return AllMods.FirstOrDefault(x => x.ModName == modName);
-        }
-
         public static List<ExtractableFolder> GetExtractableFolders(ModMetadata modMetadata)
         {
             var root = modMetadata.RootDir;
@@ -299,7 +294,19 @@ namespace RimworldExtractorInternal
             }
         }
 
+        internal static ModMetadata? GetModMetadataByModName(string modName)
+        {
+            if (modMetadataByModNameLookUp.TryGetValue(modName, out var value))
+            {
+                return value;
+            }
+            var result = AllMods.FirstOrDefault(x => string.Equals(x.ModName, modName, StringComparison.CurrentCultureIgnoreCase));
+            modMetadataByModNameLookUp.Add(modName, result);
+            return result;
+        }
+
         private static readonly Dictionary<string, ModMetadata?> modMetadataByPackageIdLookUp = new();
+        private static readonly Dictionary<string, ModMetadata?> modMetadataByModNameLookUp = new();
 
     }
 }
