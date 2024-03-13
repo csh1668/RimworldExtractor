@@ -9,7 +9,7 @@
     /// <param name="Translated">번역문</param>
     /// <param name="RequiredMods">요구 모드</param>
     public record TranslationEntry(string ClassName, string Node, string Original, string? Translated,
-        HashSet<string>? RequiredMods = null)
+        RequiredMods? RequiredMods)
     {
         public TranslationEntry(TranslationEntry other)
         {
@@ -17,13 +17,9 @@
             Node = other.Node;
             Original = other.Original;
             Translated = other.Translated;
-            RequiredMods = new HashSet<string>();
             if (other.RequiredMods != null)
             {
-                foreach (var otherRequiredMod in other.RequiredMods)
-                {
-                    RequiredMods.Add(otherRequiredMod);
-                }
+                this.RequiredMods = new RequiredMods(other.RequiredMods);
             }
 
             _extensions = new Dictionary<string, object>();
@@ -43,6 +39,11 @@
             }
 
             return false;
+        }
+
+        public bool HasRequiredMods()
+        {
+            return RequiredMods == null || RequiredMods.CountAllowed > 0 || RequiredMods.CountDisallowed > 0;
         }
 
         public TranslationEntry AddExtension(string key, object extension)

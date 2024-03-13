@@ -13,11 +13,6 @@ namespace RimworldExtractorInternal
 {
     public static class Utils
     {
-        public static XmlNode Append(this XmlNode parent, Action<XmlNode> work)
-        {
-            work(parent);
-            return parent;
-        }
         public static XmlElement Append(this XmlElement parent, Action<XmlElement> work)
         {
             work(parent);
@@ -48,13 +43,7 @@ namespace RimworldExtractorInternal
             return child;
         }
 
-        public static XmlElement AppendElement(this XmlNode parent, string name, Action<XmlNode> work)
-        {
-            var child = parent.AppendElement(name);
-            work(child);
-            return child;
-        }
-        public static XmlElement AppendElement(this XmlElement parent, string name, Action<XmlElement> work)
+        public static XmlElement AppendElement(this XmlNode parent, string name, Action<XmlElement> work)
         {
             var child = parent.AppendElement(name);
             work(child);

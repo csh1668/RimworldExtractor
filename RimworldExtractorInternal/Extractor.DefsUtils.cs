@@ -62,7 +62,10 @@ namespace RimworldExtractorInternal
                 yield break;
             }
 
-            var requiredMods = rootNode["REQUIREDMODS"]?.ChildNodes.OfType<XmlNode>().Select(x => x.InnerText).ToHashSet();
+            var requiredModsInnerText = rootNode["REQUIREDMODS"]?.InnerText;
+            var requiredMods = requiredModsInnerText != null
+                ? RequiredMods.FromStringByModNames(requiredModsInnerText)
+                : null;
 
             // (CurrentNode, CurrentPath)
             var q = new Queue<(XmlNode, string)>();
@@ -164,15 +167,15 @@ namespace RimworldExtractorInternal
                         var tKeyTip = curNode.ParentNode?["tKeyTip"]?.InnerText;
                         if (lastTag is "label" or "text" && tKey != null)
                         {
-                            yield return new TranslationEntry("Keyed", tKey, curNode.InnerText, null);
+                            yield return new TranslationEntry("Keyed", tKey, curNode.InnerText, null, null);
                         }
                         else if (lastTag == "tooltip" && tKeyTip != null)
                         {
-                            yield return new TranslationEntry("Keyed", tKeyTip, curNode.InnerText, null);
+                            yield return new TranslationEntry("Keyed", tKeyTip, curNode.InnerText, null, null);
                         }
                         else
                         {
-                            yield return new TranslationEntry(className, $"{defName}.{curPath}", curNode.InnerText, null);
+                            yield return new TranslationEntry(className, $"{defName}.{curPath}", curNode.InnerText, null, null);
                         }
                     }
 
@@ -286,7 +289,7 @@ namespace RimworldExtractorInternal
             var newDoc = new XmlDocument();
             var defs = newDoc.AppendElement("Defs");
 
-            customNodes ??= defs.ChildNodes.OfType<XmlNode>().ToList();
+            customNodes ??= CombinedDefs.DocumentElement!.ChildNodes.OfType<XmlNode>().ToList();
 
             foreach (XmlNode node in customNodes)
             {

@@ -9,9 +9,9 @@ internal static class PatchOperations
     /// Defs added by Patch operations, to be extracted after Patch operations end.
     /// Item1) required mods, Item2) Xml Node
     /// </summary>
-    public static readonly List<(List<string>?, XmlNode)> DefsAddedByPatches = new();
+    public static readonly List<(RequiredMods?, XmlNode)> DefsAddedByPatches = new();
 
-    public static IEnumerable<TranslationEntry> PatchOperationRecursive(XmlNode curNode, List<string>? requiredMods)
+    public static IEnumerable<TranslationEntry> PatchOperationRecursive(XmlNode curNode, RequiredMods? requiredMods)
     {
         if (Extractor.CombinedDefs == null)
             yield break;
@@ -20,16 +20,8 @@ internal static class PatchOperations
 
         if (curNode.TryGetAttritube("MayRequire", out string? mayRequire) && mayRequire != null)
         {
-            requiredMods = requiredMods != null ? 
-                new List<string>(requiredMods) : new List<string>();
-            if (ModLister.TryGetModMetadataByPackageId(mayRequire, out var requiredMod) && requiredMod != null)
-            {
-                requiredMods.Add(requiredMod.ModName);
-            }
-            else
-            {
-                requiredMods.Add("##packageId##" + mayRequire);
-            }
+            requiredMods = requiredMods != null ? new RequiredMods(requiredMods) : new RequiredMods();
+            requiredMods.AddAllowedByPackageIds(mayRequire.Split(','));
         }
 
         XmlNode? success = curNode["success"];
@@ -64,7 +56,7 @@ internal static class PatchOperations
         yield break;
     }
 
-    private static IEnumerable<TranslationEntry> PatchOperationInsert(XmlNode curNode, List<string>? requiredMods)
+    private static IEnumerable<TranslationEntry> PatchOperationInsert(XmlNode curNode, RequiredMods? requiredMods)
     {
         var xpath = curNode["xpath"]?.InnerText;
         XmlNode? value = curNode["value"];
@@ -95,14 +87,14 @@ internal static class PatchOperations
                     yield return translation with
                     {
                         ClassName = $"Patches.{translation.ClassName}",
-                        RequiredMods = requiredMods?.ToHashSet()
+                        RequiredMods = requiredMods
                     };
                 }
             }
         }
     }
 
-    private static IEnumerable<TranslationEntry> PatchOperationAddModExtension(XmlNode curNode, List<string>? requiredMods)
+    private static IEnumerable<TranslationEntry> PatchOperationAddModExtension(XmlNode curNode, RequiredMods? requiredMods)
     {
         if (Extractor.CombinedDefs == null) yield break;
 
@@ -137,14 +129,14 @@ internal static class PatchOperations
                     yield return translation with
                     {
                         ClassName = $"Patches.{translation.ClassName}",
-                        RequiredMods = requiredMods?.ToHashSet()
+                        RequiredMods = requiredMods
                     };
                 }
             }
         }
     }
 
-    private static IEnumerable<TranslationEntry> PatchOperationReplace(XmlNode curNode, List<string>? requiredMods)
+    private static IEnumerable<TranslationEntry> PatchOperationReplace(XmlNode curNode, RequiredMods? requiredMods)
     {
         var xpath = curNode["xpath"]?.InnerText;
         XmlNode? value = curNode["value"];
@@ -178,7 +170,7 @@ internal static class PatchOperations
                     yield return translation with
                     {
                         ClassName = $"Patches.{translation.ClassName}",
-                        RequiredMods = requiredMods?.ToHashSet()
+                        RequiredMods = requiredMods
                     };
                 }
             }
@@ -186,7 +178,7 @@ internal static class PatchOperations
         }
     }
 
-    private static IEnumerable<TranslationEntry> PatchOperationAdd(XmlNode curNode, List<string>? requiredMods) 
+    private static IEnumerable<TranslationEntry> PatchOperationAdd(XmlNode curNode, RequiredMods? requiredMods) 
     {
         var xpath = curNode["xpath"]?.InnerText;
         XmlNode? value = curNode["value"];
@@ -227,21 +219,21 @@ internal static class PatchOperations
                     {
                         yield return translation with
                         {
-                            RequiredMods = requiredMods?.ToHashSet()
+                            RequiredMods = requiredMods
                         };
                         continue;
                     }
                     yield return translation with
                     {
                         ClassName = $"Patches.{translation.ClassName}",
-                        RequiredMods = requiredMods?.ToHashSet()
+                        RequiredMods = requiredMods
                     };
                 }
             }
         }
     }
 
-    private static IEnumerable<TranslationEntry> PatchOperationSequence(XmlNode curNode, List<string>? requiredMods)
+    private static IEnumerable<TranslationEntry> PatchOperationSequence(XmlNode curNode, RequiredMods? requiredMods)
     {
         var operations = curNode["operations"];
         if (operations == null)
@@ -255,18 +247,19 @@ internal static class PatchOperations
         }
     }
 
-    private static IEnumerable<TranslationEntry> PatchOperationFindMod(XmlNode curNode, List<string>? requiredMods)
+    private static IEnumerable<TranslationEntry> PatchOperationFindMod(XmlNode curNode, RequiredMods? requiredMods)
     {
-        requiredMods ??= new List<string>();
-        var noMatchRequiredMods = new List<string>(requiredMods);
+        requiredMods = new RequiredMods(requiredMods);
+        var noMatchRequiredMods = new RequiredMods(requiredMods);
         var requiredModNodes = curNode["mods"]?.ChildNodes;
+        var requiredModsList = requiredModNodes?.Select(n => n.InnerText).ToList();
 
         var match = curNode["match"];
         if (match != null)
         {
-            if (requiredModNodes != null)
+            if (requiredModsList != null)
             {
-                requiredMods.AddRange(from XmlNode requiredModsNode in requiredModNodes select requiredModsNode.InnerText);
+                requiredMods.AddAllowedByModNames(requiredModsList);
             }
             foreach (var translationEntry in PatchOperationRecursive(match, requiredMods))
             {
@@ -277,11 +270,12 @@ internal static class PatchOperations
         var noMatch = curNode["nomatch"];
         if (noMatch != null)
         {
+            if (requiredModsList != null)
+            {
+                noMatchRequiredMods.AddDisallowedByModNames(requiredModsList);
+            }
             foreach (var translationEntry in PatchOperationRecursive(noMatch, noMatchRequiredMods))
             {
-                Log.WrnOnce("PatchOperationFindMod가 noMatch인 경우는 제한적으로 지원합니다. " +
-                            "XML로 변환하는 과정 중 Patches의 자동 생성(특히 PatchOperationFindMod 부분)이 완전하지 않을 수 있으므로 배포 전 재확인이 필요합니다. " +
-                            $"문제가 될 수도 있는 부분: {noMatch.InnerXml.Substring(0, Math.Min(noMatch.InnerXml.Length, 100))}...", noMatch.InnerXml.GetHashCode());
                 yield return translationEntry;
             }
         }

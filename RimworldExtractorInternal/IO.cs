@@ -95,10 +95,23 @@ namespace RimworldExtractorInternal
                 var row = rows[i];
                 var className = row.Cell(colClass).StrVal();
                 var node = row.Cell(colNode).StrVal();
-                HashSet<string>? requiredMods = null;
+                RequiredMods? requiredMods = null;
                 if (colRequiredMods != -1 && row.Cell(colRequiredMods).Value is { IsText: true } cellRequiredMods)
                 {
-                    requiredMods = cellRequiredMods.GetText().Split('\n').ToHashSet();
+                    var textRequiredMods = cellRequiredMods.GetText();
+                    // 하위 호환성
+                    if (textRequiredMods != null && textRequiredMods.Contains('\n'))
+                    {
+                        requiredMods = new RequiredMods();
+                        foreach (var s in textRequiredMods.Split('\n'))
+                        {
+                            requiredMods.AddAllowedByModName(s);
+                        }
+                    }
+                    else if (textRequiredMods != null)
+                    {
+                        requiredMods = RequiredMods.FromStringByModNames(textRequiredMods);
+                    }
                 }
                 var original = row.Cell(colOriginal).Value.IsBlank ? "" : row.Cell(colOriginal).StrVal();
                 var cellTranslated = row.Cell(colTranslated).Value;
@@ -167,57 +180,70 @@ namespace RimworldExtractorInternal
                 docPatch.AppendElement("Patch");
                 var root = docPatch.DocumentElement ?? throw new InvalidOperationException();
 
+                var entryDict = new Dictionary<string, XmlElement>();
+
                 // RequiredMods에 따라 뼈대 사전 생성
                 foreach (var translation in CompatManager.DoPostProcessing(patches))
                 {
                     var requiredMods = translation.RequiredMods;
-                    if (requiredMods == null)
+                    if (requiredMods == null || entryDict.ContainsKey(requiredMods.ToString()))
                         continue;
-                    var a = root.ChildNodes.Where(x => x.HasAttribute("Class", "PatchOperationFindMod")).ToList();
-                    foreach (var xmlNode in a)
+
+                    var aboveNode = root.AppendElement("Operation");
+                    foreach (var allowedMod in requiredMods.AllowedMods)
                     {
-                        var mods = xmlNode["mods"]?.ChildNodes.Select(y => y.InnerText).ToList();
-                        var b =  mods?.HasSameElements(requiredMods) == true;
-                    }
-                    if (root.ChildNodes.Where(x => x.HasAttribute("Class", "PatchOperationFindMod"))
-                        .Any(x =>
+                        aboveNode.Append(operationFindMod =>
                         {
-                            var mods = x["mods"]?.ChildNodes.Select(y => y.InnerText).ToList();
-                            return mods?.HasSameElements(requiredMods) == true;
-                        }))
-                        continue;
-                    root.AppendElement("Operation", operationFindMod =>
-                    {
-                        operationFindMod.AppendAttribute("Class", "PatchOperationFindMod");
-                        operationFindMod.AppendElement("mods", mods =>
-                        {
-                            requiredMods.ToList().ForEach(requiredMod =>
+                            operationFindMod.AppendAttribute("Class", "PatchOperationFindMod");
+                            operationFindMod.AppendElement("mods", mods =>
                             {
-                                if (requiredMod.Contains("##packageId##"))
+                                var allowedModSplited = allowedMod.Split(RequiredMods.OR_IDENTIFIER);
+                                foreach (var allowedModToken in allowedModSplited)
                                 {
-                                    Log.ErrOnce(
-                                        $"Required Mods 열에 잘못된 값이 존재합니다. Patches의 올바른 생성을 위해 엑셀 파일에 있는 해당 문구: \"{requiredMod}\" 를 직접 모드 이름으로 바꿔야 합니다.",
-                                        $"잘못된{requiredMod}에러".GetHashCode());
+                                    if (allowedModToken.Contains("##packageId##"))
+                                    {
+                                        Log.ErrOnce(
+                                            $"Required Mods 열에 잘못된 값이 존재합니다. Patches의 올바른 생성을 위해 엑셀 파일에 있는 해당 문구: \"{allowedModToken}\" 를 직접 모드 이름으로 바꿔야 합니다.",
+                                            $"잘못된{allowedModToken}에러".GetHashCode());
+                                    }
+
+                                    mods.AppendElement("li", allowedModToken);
                                 }
-
-                                mods.AppendElement("li", requiredMod);
                             });
+                            aboveNode = operationFindMod.AppendElement("match");
                         });
-                        operationFindMod.AppendElement("match", match =>
+                    }
+
+                    foreach (var disallowedMod in requiredMods.DisallowedMods)
+                    {
+                        aboveNode.Append(operationFindMod =>
                         {
-                            match.AppendAttribute("Class", "PatchOperationSequence");
-                            match.AppendElement("success", "Always");
-                            match.AppendElement("operations");
+                            operationFindMod.AppendAttribute("Class", "PatchOperationFindMod");
+                            operationFindMod.AppendElement("mods", mods =>
+                            {
+                                var disallowedModSplited = disallowedMod.Split(RequiredMods.OR_IDENTIFIER);
+                                foreach (var disallowedModToken in disallowedModSplited)
+                                {
+                                    if (disallowedModToken.Contains("##packageId##"))
+                                    {
+                                        Log.ErrOnce(
+                                            $"Required Mods 열에 잘못된 값이 존재합니다. Patches의 올바른 생성을 위해 엑셀 파일에 있는 해당 문구: \"{disallowedModToken}\" 를 직접 모드 이름으로 바꿔야 합니다.",
+                                            $"잘못된{disallowedModToken}에러".GetHashCode());
+                                    }
+
+                                    mods.AppendElement("li", disallowedModToken);
+                                }
+                            });
+                            aboveNode = operationFindMod.AppendElement("nomatch");
                         });
-                        operationFindMod.AppendElement("nomatch", nomatch =>
-                        {
-                            nomatch.AppendAttribute("Class", "PatchOperationSequence");
-                            nomatch.AppendElement("success", "Always");
-                            nomatch.AppendElement("operations");
-                        });
+                    }
+
+                    aboveNode.Append(operationSequence =>
+                    {
+                        operationSequence.AppendAttribute("Class", "PatchOperationSequence");
+                        operationSequence.AppendElement("success", "Always");
+                        entryDict[requiredMods.ToString()] = operationSequence.AppendElement("operations");
                     });
-
-
                 }
 
                 foreach (var translation in patches)
@@ -226,34 +252,7 @@ namespace RimworldExtractorInternal
                     XmlElement operation;
                     if (requiredMods != null)
                     {
-                        var operationFindMod = root.ChildNodes.FirstOrDefault(x =>
-                            x.HasAttribute("Class", "PatchOperationFindMod") && 
-                            x["mods"]!.ChildNodes.Select(x => x.InnerText)
-                                .ToList().HasSameElements(requiredMods))!;
-
-                        operation = operationFindMod["match"]!["operations"]!.AppendElement("li");
-
-
-                        if (defInjected.Any(x => x.Node == translation.Node))
-                        {
-                            var noMatchTranslation = defInjected.First(x => x.Node == translation.Node);
-                            operationFindMod["nomatch"]!["operations"]!.AppendElement("li", li =>
-                            {
-                                li.AppendAttribute("Class", "PatchOperationReplace");
-                                li.AppendElement("success", "Always");
-                                if (commentOriginal)
-                                    li.AppendComment($"Original={SecurityElement.Escape(translation.Original).Replace('-', 'ー')}");
-                                li.AppendElement("xpath", Utils.GetXpath(translation.ClassName[(translation.ClassName.IndexOf('.') + 1)..], translation.Node));
-                                li.AppendElement("value", value =>
-                                {
-                                    var noMatchLastNode = translation.Node.Split('.').Last();
-                                    if (int.TryParse(noMatchLastNode, out _)) noMatchLastNode = "li";
-                                    value.AppendElement(noMatchLastNode,
-                                        noMatchTranslation.Translated ?? noMatchTranslation.Original);
-                                });
-                            });
-                            patchedNodeSet.Add(translation.Node);
-                        }
+                        operation = entryDict[requiredMods.ToString()];
                     }
                     else
                     {
@@ -455,7 +454,7 @@ namespace RimworldExtractorInternal
                     foreach (XmlElement node in doc.DocumentElement!.ChildNodes)
                     {
                         var name = node.Name;
-                        translations.Add(new TranslationEntry(className, name, string.Empty, node.InnerText));
+                        translations.Add(new TranslationEntry(className, name, string.Empty, node.InnerText, null));
                     }
                 }
                 catch (Exception e)

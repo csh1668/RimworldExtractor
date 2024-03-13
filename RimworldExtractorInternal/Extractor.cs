@@ -47,8 +47,7 @@ namespace RimworldExtractorInternal
 
                             if (requiredPackageId != null)
                             {
-                                var newAttribute = newNode.Attributes?.Append(CombinedDefs.CreateAttribute("RequiredPackageId"))!;
-                                newAttribute.Value = requiredPackageId;
+                                newNode.AppendAttribute("RequiredPackageId", requiredPackageId);
                             }
                             CombinedDefs.DocumentElement!.AppendChild(newNode);
                             var attributeName = node.Attributes?["Name"]?.Value;
@@ -95,21 +94,11 @@ namespace RimworldExtractorInternal
                     continue;
                 }
 
+                var requiredMods = new RequiredMods();
                 var requiredPackageIds = node.Attributes?["RequiredPackageId"]?.Value.Split(',');
                 if (requiredPackageIds != null)
                 {
-                    for (int i = 0; i < requiredPackageIds.Length; i++)
-                    {
-                        
-                        if (ModLister.TryGetModMetadataByPackageId(requiredPackageIds[i], out var requiredMod) && requiredMod != null)
-                        {
-                            requiredPackageIds[i] = requiredMod.ModName;
-                        }
-                        else
-                        {
-                            requiredPackageIds[i] = "##packageId##" + requiredPackageIds;
-                        }
-                    }
+                    requiredMods.AddAllowedByPackageIds(requiredPackageIds);
                 }
 
 
@@ -119,8 +108,7 @@ namespace RimworldExtractorInternal
                 {
                     yield return translationEntry with
                     {
-                        RequiredMods = translationEntry.RequiredMods?
-                            .Concat(requiredPackageIds ?? Array.Empty<string>()).ToHashSet()
+                        RequiredMods = translationEntry.RequiredMods + requiredMods
                     };
                 }
             }
@@ -129,18 +117,15 @@ namespace RimworldExtractorInternal
         public static IEnumerable<TranslationEntry> ExtractKeyed(ExtractableFolder keyed)
         {
             var keyedRoot = keyed.FullPath;
-            HashSet<string>? requiredMods = null;
+            RequiredMods? requiredMods = null;
             if (keyed.RequiredPackageId == null)
             {
                 requiredMods = null;
             }
-            else if (ModLister.TryGetModMetadataByPackageId(keyed.RequiredPackageId, out var modMetadata) && modMetadata != null)
-            {
-                requiredMods = new HashSet<string> { modMetadata.ModName };
-            }
             else
             {
-                requiredMods = new HashSet<string> { $"##packageId##{keyed.RequiredPackageId}" };
+                requiredMods = new RequiredMods();
+                requiredMods.AddAllowedByPackageIds(keyed.RequiredPackageId.Split(','));
             }
             
             foreach (var filePath in IO.DescendantFiles(keyedRoot).Where(x => x.ToLower().EndsWith(".xml")))
@@ -159,18 +144,15 @@ namespace RimworldExtractorInternal
         public static IEnumerable<TranslationEntry> ExtractStrings(ExtractableFolder strings)
         {
             var stringsRoot = strings.FullPath;
-            HashSet<string>? requiredMods = null;
+            RequiredMods? requiredMods = null;
             if (strings.RequiredPackageId == null)
             {
                 requiredMods = null;
             }
-            else if (ModLister.TryGetModMetadataByPackageId(strings.RequiredPackageId, out var modMetadata) && modMetadata != null)
-            {
-                requiredMods = new HashSet<string> { modMetadata.ModName };
-            }
             else
             {
-                requiredMods = new HashSet<string> { $"##packageId##{strings.RequiredPackageId}" };
+                requiredMods = new RequiredMods();
+                requiredMods.AddAllowedByPackageIds(strings.RequiredPackageId.Split(','));
             }
             foreach (var filePath in IO.DescendantFiles(stringsRoot).Where(x => x.ToLower().EndsWith(".txt")))
             {
@@ -208,18 +190,15 @@ namespace RimworldExtractorInternal
 
             var patchesRoot = patches.FullPath;
 
-            List<string>? requiredMods = null;
+            RequiredMods? requiredMods = null;
             if (patches.RequiredPackageId == null)
             {
                 requiredMods = null;
             }
-            else if (ModLister.TryGetModMetadataByPackageId(patches.RequiredPackageId, out var modMetadata) && modMetadata != null)
-            {
-                requiredMods = new List<string> { modMetadata.ModName };
-            }
             else
             {
-                requiredMods = new List<string> { $"##packageId##{patches.RequiredPackageId}" };
+                requiredMods = new RequiredMods();
+                requiredMods.AddAllowedByPackageIds(patches.RequiredPackageId.Split(','));
             }
 
             var doc = new XmlDocument();
@@ -243,11 +222,7 @@ namespace RimworldExtractorInternal
                 {
                     yield return translationEntry with
                     {
-                        RequiredMods = translationEntry.RequiredMods == null
-                            ? requiredMods?.ToHashSet()
-                            : (requiredMods == null
-                                ? translationEntry.RequiredMods
-                                : translationEntry.RequiredMods.Concat(requiredMods).ToHashSet())
+                        RequiredMods = translationEntry.RequiredMods + requiredMods
                     };
                 }
             }
@@ -256,18 +231,12 @@ namespace RimworldExtractorInternal
             if (PatchOperations.DefsAddedByPatches.Count == 0)
                 yield break;
             CompatManager.DoPreProcessing(doc);
-            foreach (var (listRequiredMods, node) in PatchOperations.DefsAddedByPatches)
+            foreach (var (requiredModsPatches, node) in PatchOperations.DefsAddedByPatches)
             {
                 var name = node.Attributes?["Name"]?.Value;
-                if (listRequiredMods != null)
+                if (requiredModsPatches != null)
                 {
-                    node.AppendElement("REQUIREDMODS", tmpNode =>
-                    {
-                        foreach (var requiredMod in listRequiredMods)
-                        {
-                            tmpNode.AppendElement("li", requiredMod);
-                        }
-                    });
+                    node.AppendElement("REQUIREDMODS", requiredModsPatches.ToString());
                 }
                 if (name != null)
                 {
@@ -281,11 +250,7 @@ namespace RimworldExtractorInternal
                 yield return translation with
                 {
                     ClassName = $"Patches.{translation.ClassName}",
-                    RequiredMods = translation.RequiredMods == null
-                        ? requiredMods?.ToHashSet()
-                        : requiredMods == null
-                            ? translation.RequiredMods
-                            : translation.RequiredMods.Concat(requiredMods).ToHashSet()
+                    RequiredMods = translation.RequiredMods + requiredMods
                 };
             }
             yield break;
