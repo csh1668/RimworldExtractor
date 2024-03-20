@@ -465,10 +465,10 @@ namespace RimworldExtractorInternal
             }
 
             var keyed = new ExtractableFolder(ModMetadata.Emptry, keyedDir, null);
-            translations.AddRange(Extractor.ExtractKeyed(keyed));
+            translations.AddRange(Extractor.ExtractKeyed(keyed).Select(x => x with{Translated = x.Original, Original = ""}));
 
             var strings = new ExtractableFolder(ModMetadata.Emptry, stringsDir, null);
-            translations.AddRange(Extractor.ExtractStrings(strings));
+            translations.AddRange(Extractor.ExtractStrings(strings).Select(x => x with{Translated = x.Original, Original = ""}));
 
             return translations;
         }
