@@ -34,7 +34,7 @@ namespace RimworldExtractorInternal
                 sheet.Cell(2 + i, 3).Value = entry.Node;
                 if (entry.RequiredMods != null)
                 {
-                    var combinedRequiredMods = string.Join('\n', entry.RequiredMods);
+                    var combinedRequiredMods = entry.RequiredMods.ToString();
                     sheet.Cell(2 + i, 4).Value = combinedRequiredMods;
                     if (combinedRequiredMods.Contains("##packageId##") && entry.ClassName.StartsWith("Patches."))
                     {
