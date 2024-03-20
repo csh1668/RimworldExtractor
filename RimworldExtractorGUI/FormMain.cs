@@ -63,33 +63,6 @@ namespace RimworldExtractorGUI
                     Log.Wrn($"최신 버전 확인에 실패하였습니다: {e.Message}");
                 }
             });
-
-            var mods = new RequiredMods();
-            mods.AddAllowedByPackageIds(ModLister.AllMods.Take(2).Select(x => x.PackageId));
-            mods.AddAllowedByModNames(ModLister.LocalMods.Take(1).Select(x => x.ModName));
-            mods.AddDisallowedByModNames(ModLister.OfficialMods.Take(3).Select(x => x.ModName));
-            mods.AddAllowedByModName("Biotech");
-            mods.AddDisallowedByModName("Ideology");
-            foreach (var requiredMod in mods.AllowedMods)
-            {
-                Log.Msg($"ALLOWED {requiredMod}");
-            }
-
-            foreach (var modsDisallowedMod in mods.DisallowedMods)
-            {
-                Log.Msg($"DISALLOWED {modsDisallowedMod}");
-            }
-            var other = mods.ToString();
-            var other2 = RequiredMods.FromStringByModNames(other);
-            foreach (var other2AllowedMod in other2.AllowedMods)
-            {
-                Log.Msg($"ALLOWED {other2AllowedMod}");
-            }
-
-            foreach (var other2DisallowedMod in other2.DisallowedMods)
-            {
-                Log.Msg($"DISALLOWED {other2DisallowedMod}");
-            }
         }
 
         private static bool HasErrorAfter(string keyword)
