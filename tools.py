@@ -93,7 +93,8 @@ def convert_utf8(file_path):
                 content = f.read()
             with codecs.open(file_path, 'w', encoding='utf-8') as f:
                 f.write(content)
-            print(f"Successfully converted from {encoding} to UTF-8.")
+            if encoding != 'utf-8':
+                print(f"Successfully converted from {encoding} to utf-8.")
             return
         except UnicodeDecodeError as err:
             print(f"Failed to decode with {encoding}: {err}")

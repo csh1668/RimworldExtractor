@@ -11,6 +11,7 @@ namespace RimworldExtractorGUI
     {
         internal static readonly string ReleasesUrl = "https://github.com/csh1668/RimworldExtractor/releases";
         internal static readonly string LatestUrl = Path.Combine(ReleasesUrl, "latest");
+        internal static readonly string IssueUrl = "https://github.com/csh1668/RimworldExtractor/issues/new/choose";
 
         public static string GetLatest()
         {

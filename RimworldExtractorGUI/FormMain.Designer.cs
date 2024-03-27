@@ -140,6 +140,7 @@
             button1.TabIndex = 10;
             button1.Text = "경고나 에러 발생 시";
             button1.UseVisualStyleBackColor = true;
+            button1.Click += button1_Click;
             // 
             // linkLabelLatestVersion
             // 

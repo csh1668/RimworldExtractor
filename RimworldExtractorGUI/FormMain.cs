@@ -38,7 +38,8 @@ namespace RimworldExtractorGUI
                 {
                     var latest = GithubVersionCheker.GetLatest();
                     var current = Program.VERSION;
-                    var action = () =>
+
+                    void UpdateVersionText()
                     {
                         if (latest == current)
                         {
@@ -48,14 +49,15 @@ namespace RimworldExtractorGUI
                         {
                             linkLabelLatestVersion.Text = $"{current} < {latest} 최신 버전 사용가능";
                         }
-                    };
+                    }
+
                     if (linkLabelLatestVersion.InvokeRequired)
                     {
-                        linkLabelLatestVersion.Invoke(action);
+                        linkLabelLatestVersion.Invoke(UpdateVersionText);
                     }
                     else
                     {
-                        action();
+                        UpdateVersionText();
                     }
                 }
                 catch (Exception e)
@@ -259,6 +261,11 @@ namespace RimworldExtractorGUI
             {
 
             }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            Process.Start("explorer.exe", GithubVersionCheker.IssueUrl);
         }
     }
 }
