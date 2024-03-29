@@ -48,7 +48,7 @@ namespace RimworldExtractorInternal
                     sheet.Cell(2 + i, 6).Value = entry.Translated;
                 }
 
-                if (entry.TryGetExtension(Prefabs.ExtensionKeyExtraComment, out object? extension) &&
+                if (entry.TryGetExtension(Prefabs.ExtensionKeyExtraCommentTranslated, out object? extension) &&
                     extension is string extensionStr)
                 {
                     var comment = sheet.Cell(2 + i, 6).CreateComment();
@@ -58,6 +58,87 @@ namespace RimworldExtractorInternal
 
             sheet.Style.Font.FontName = "맑은 고딕";
             xlsx.SaveSafely(outPath + ".xlsx");
+        }
+        public static void AppendExcel(List<TranslationEntry> newTranslations, string inputPath = "result", Dictionary<string, string>? updateInstructions = null)
+        {
+            var xlsx = new XLWorkbook(inputPath);
+            var sheet = xlsx.Worksheets.Worksheet(1);
+            var rows = sheet.RowsUsed().ToList();
+            var offset = rows.Count;
+            var headers = rows.First().Cells();
+
+            var colClassNode =
+                headers.FirstOrDefault(x => x.StrVal() == HeaderClassNode)?.WorksheetColumn().ColumnNumber() ??
+                throw new XlsxHeaderReadingException(HeaderClass);
+            var colClass = headers.FirstOrDefault(x => x.StrVal() == HeaderClass)
+                               ?.WorksheetColumn().ColumnNumber() ??
+                           throw new XlsxHeaderReadingException(HeaderClass);
+            var colNode = headers.FirstOrDefault(x => x.StrVal() == HeaderNode)
+                              ?.WorksheetColumn().ColumnNumber() ??
+                          throw new XlsxHeaderReadingException(HeaderNode);
+            var colRequiredMods = headers
+                .FirstOrDefault(x => x.StrVal() == HeaderRequiredMods)
+                ?.WorksheetColumn().ColumnNumber() ?? -1;
+            var colOriginal = headers.FirstOrDefault(x => x.StrVal() == HeaderOriginal)
+                                  ?.WorksheetColumn().ColumnNumber() ??
+                              headers.FirstOrDefault(x => x.StrVal() == "EN [Source string]")
+                                  ?.WorksheetColumn().ColumnNumber() ??
+                              throw new XlsxHeaderReadingException(HeaderOriginal);
+            var colTranslated = headers.FirstOrDefault(x => x.StrVal() == HeaderTranslated)
+                                    ?.WorksheetColumn().ColumnNumber() ??
+                                headers.FirstOrDefault(x => x.StrVal() == "KO [Translation]")
+                                    ?.WorksheetColumn().ColumnNumber() ??
+                                throw new XlsxHeaderReadingException(HeaderTranslated);
+
+            if (updateInstructions != null)
+            {
+                for (int i = 0; i < rows.Count; i++)
+                {
+                    var row = rows[i];
+                    var classNode = sheet.Cell(2 + i, colClassNode).StrVal();
+                    if (updateInstructions.TryGetValue(classNode, out var value))
+                    {
+                        var originalCell = sheet.Cell(2 + i, colOriginal);
+                        originalCell.GetComment().AddText($"이전 원문: {originalCell.StrVal()}");
+                        originalCell.Value = value;
+                    } 
+                }
+            }
+
+
+            for (int i = 0; i < newTranslations.Count; i++)
+            {
+                var entry = newTranslations[i];
+                sheet.Cell(2 + i + offset, colClassNode).Value = $"{entry.ClassName}+{entry.Node}";
+                sheet.Cell(2 + i + offset, colClass).Value = entry.ClassName;
+                sheet.Cell(2 + i + offset, colNode).Value = entry.Node;
+                if (entry.RequiredMods != null && colRequiredMods != -1)
+                {
+                    var combinedRequiredMods = entry.RequiredMods.ToString();
+                    sheet.Cell(2 + i + offset, colRequiredMods).Value = combinedRequiredMods;
+                    if (combinedRequiredMods.Contains("##packageId##") && entry.ClassName.StartsWith("Patches."))
+                    {
+                        Log.WrnOnce($"Required Mods 열에 잘못된 값이 존재합니다. 추후 Patches의 올바른 생성을 위해 엑셀 파일에 있는 해당 문구: \"{combinedRequiredMods}\" 를 직접 모드 이름으로 바꿔야 합니다.",
+                            $"잘못된{combinedRequiredMods}경고".GetHashCode());
+                    }
+                }
+                sheet.Cell(2 + i + offset, colOriginal).Value = entry.Original;
+                if (entry.Translated != null)
+                {
+                    sheet.Cell(2 + i + offset, colTranslated).Value = entry.Translated;
+                    sheet.Cell(2 + i + offset, colTranslated).Select();
+                }
+
+                if (entry.TryGetExtension(Prefabs.ExtensionKeyExtraCommentTranslated, out var extension) &&
+                    extension is string extensionStr)
+                {
+                    var comment = sheet.Cell(2 + i + offset, colTranslated).CreateComment();
+                    comment.AddText(extensionStr);
+                }
+            }
+
+            sheet.Style.Font.FontName = "맑은 고딕";
+            xlsx.SaveSafely(inputPath + ".xlsx");
         }
 
         public static List<TranslationEntry> FromExcel(string inputPath)
@@ -70,10 +151,10 @@ namespace RimworldExtractorInternal
 
             var colClass = headers.FirstOrDefault(x => x.StrVal() == HeaderClass)
                                ?.WorksheetColumn().ColumnNumber() ??
-                           throw new XlsxReadingException(HeaderClass);
+                           throw new XlsxHeaderReadingException(HeaderClass);
             var colNode = headers.FirstOrDefault(x => x.StrVal() == HeaderNode)
                 ?.WorksheetColumn().ColumnNumber() ??
-                          throw new XlsxReadingException(HeaderNode);
+                          throw new XlsxHeaderReadingException(HeaderNode);
             var colRequiredMods = headers
                 .FirstOrDefault(x => x.StrVal() == HeaderRequiredMods)
                 ?.WorksheetColumn().ColumnNumber() ?? -1;
@@ -81,12 +162,12 @@ namespace RimworldExtractorInternal
                                   ?.WorksheetColumn().ColumnNumber() ??
                               headers.FirstOrDefault(x => x.StrVal() == "EN [Source string]")
                                   ?.WorksheetColumn().ColumnNumber() ??
-                              throw new XlsxReadingException(HeaderOriginal);
+                              throw new XlsxHeaderReadingException(HeaderOriginal);
             var colTranslated = headers.FirstOrDefault(x => x.StrVal() == HeaderTranslated)
                                     ?.WorksheetColumn().ColumnNumber() ??
                                 headers.FirstOrDefault(x => x.StrVal() == "KO [Translation]")
                                     ?.WorksheetColumn().ColumnNumber() ??
-                                throw new XlsxReadingException(HeaderTranslated);
+                                throw new XlsxHeaderReadingException(HeaderTranslated);
 
 
 
@@ -472,6 +553,7 @@ namespace RimworldExtractorInternal
 
             return translations;
         }
+
 
         private static void SaveSafely(this XLWorkbook xlsx, string path)
         {

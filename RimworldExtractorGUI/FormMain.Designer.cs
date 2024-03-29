@@ -41,6 +41,7 @@
             button1 = new Button();
             linkLabelLatestVersion = new LinkLabel();
             buttonJpgPackager = new Button();
+            buttonOpenTranslationAnalyzer = new Button();
             SuspendLayout();
             // 
             // buttonSelectMod
@@ -66,9 +67,9 @@
             // 
             // button2
             // 
-            button2.Location = new Point(12, 168);
+            button2.Location = new Point(12, 220);
             button2.Name = "button2";
-            button2.Size = new Size(97, 46);
+            button2.Size = new Size(200, 46);
             button2.TabIndex = 2;
             button2.Text = "옵션";
             button2.UseVisualStyleBackColor = true;
@@ -105,7 +106,7 @@
             // 
             // label2
             // 
-            label2.Location = new Point(12, 217);
+            label2.Location = new Point(12, 271);
             label2.Name = "label2";
             label2.Size = new Size(776, 23);
             label2.TabIndex = 7;
@@ -115,7 +116,7 @@
             // richTextBoxLog
             // 
             richTextBoxLog.BackColor = SystemColors.ControlText;
-            richTextBoxLog.Location = new Point(12, 246);
+            richTextBoxLog.Location = new Point(12, 297);
             richTextBoxLog.Name = "richTextBoxLog";
             richTextBoxLog.ReadOnly = true;
             richTextBoxLog.ScrollBars = RichTextBoxScrollBars.ForcedVertical;
@@ -134,7 +135,7 @@
             // 
             // button1
             // 
-            button1.Location = new Point(650, 220);
+            button1.Location = new Point(650, 268);
             button1.Name = "button1";
             button1.Size = new Size(138, 23);
             button1.TabIndex = 10;
@@ -144,7 +145,7 @@
             // 
             // linkLabelLatestVersion
             // 
-            linkLabelLatestVersion.Location = new Point(12, 217);
+            linkLabelLatestVersion.Location = new Point(12, 269);
             linkLabelLatestVersion.Name = "linkLabelLatestVersion";
             linkLabelLatestVersion.Size = new Size(200, 23);
             linkLabelLatestVersion.TabIndex = 11;
@@ -161,11 +162,22 @@
             buttonJpgPackager.UseVisualStyleBackColor = true;
             buttonJpgPackager.Click += buttonJpgPackager_Click;
             // 
+            // buttonOpenTranslationAnalyzer
+            // 
+            buttonOpenTranslationAnalyzer.Location = new Point(12, 168);
+            buttonOpenTranslationAnalyzer.Name = "buttonOpenTranslationAnalyzer";
+            buttonOpenTranslationAnalyzer.Size = new Size(97, 46);
+            buttonOpenTranslationAnalyzer.TabIndex = 13;
+            buttonOpenTranslationAnalyzer.Text = "번역 분석기\r\n열기";
+            buttonOpenTranslationAnalyzer.UseVisualStyleBackColor = true;
+            buttonOpenTranslationAnalyzer.Click += buttonOpenTranslationAnalyzer_Click;
+            // 
             // FormMain
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(800, 450);
+            ClientSize = new Size(800, 496);
+            Controls.Add(buttonOpenTranslationAnalyzer);
             Controls.Add(buttonJpgPackager);
             Controls.Add(linkLabelLatestVersion);
             Controls.Add(button1);
@@ -197,5 +209,6 @@
         private Button button1;
         private LinkLabel linkLabelLatestVersion;
         private Button buttonJpgPackager;
+        private Button buttonOpenTranslationAnalyzer;
     }
 }

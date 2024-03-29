@@ -46,9 +46,39 @@ namespace RimworldExtractorInternal
 
         public static IEnumerable<string> ModRootsAll => ModRootsOfficial.Concat(ModRootsLocal).Concat(ModRootsWorkshop);
         public static IEnumerable<ModMetadata> OfficialMods => ModRootsOfficial.Select(GetModMetadataByModRoot).OrderBy(x => x.ModName);
-        public static IEnumerable<ModMetadata> LocalMods => ModRootsLocal.Select(GetModMetadataByModRoot).OrderBy(x => x.ModName);
-        public static IEnumerable<ModMetadata> WorkshopMods => ModRootsWorkshop.Select(GetModMetadataByModRoot).OrderBy(x => x.ModName);
+
+        public static IEnumerable<ModMetadata> LocalMods
+        {
+            get
+            {
+                if (LocalModsCache == null)
+                {
+                    LocalModsCache = ModRootsLocal.Select(GetModMetadataByModRoot).OrderBy(x => x.ModName).ToList();
+                }
+
+                return LocalModsCache;
+            }
+        }
+
+        public static IEnumerable<ModMetadata> WorkshopMods
+        {
+            get
+            {
+                if (WorkshopModsCache == null)
+                {
+                    WorkshopModsCache = ModRootsWorkshop.Select(GetModMetadataByModRoot).OrderBy(x => x.ModName)
+                        .ToList();
+                }
+
+                return WorkshopModsCache;
+            }
+        }
         public static IEnumerable<ModMetadata> AllMods => OfficialMods.Concat(LocalMods).Concat(WorkshopMods);
+
+        public static void ResetCache()
+        {
+
+        }
 
         public static ModMetadata GetModMetadataByModRoot(string modRoot)
         {
@@ -208,7 +238,7 @@ namespace RimworldExtractorInternal
             }
 
             var set = new HashSet<ModMetadata>();
-            modMetadataByPackageIdLookUp.Clear();
+            ModMetadataByPackageIdLookUp.Clear();
 
             IEnumerable<ModMetadata> FindAllReferenceModsInternal(ModMetadata modMetadata)
             {
@@ -257,7 +287,7 @@ namespace RimworldExtractorInternal
                 yield return modMetadata;
             }
 
-            modMetadataByPackageIdLookUp.Clear();
+            ModMetadataByPackageIdLookUp.Clear();
         }
 
         internal static bool TryGetModMetadataByPackageId(string packageId, out ModMetadata? modMetadata)
@@ -267,7 +297,7 @@ namespace RimworldExtractorInternal
                 modMetadata = null;
                 return false;
             }
-            if (modMetadataByPackageIdLookUp.TryGetValue(packageId, out var value))
+            if (ModMetadataByPackageIdLookUp.TryGetValue(packageId, out var value))
             {
                 modMetadata = value;
                 return value != null;
@@ -279,16 +309,16 @@ namespace RimworldExtractorInternal
             {
                 case < 1:
                     modMetadata = null;
-                    modMetadataByPackageIdLookUp[packageId] = null;
+                    ModMetadataByPackageIdLookUp[packageId] = null;
                     Log.Wrn($"모드 폴더에서 packageId가 {packageId}인 모드를 찾을 수 없었습니다.");
                     return false;
                 case 1:
                     modMetadata = matches[0];
-                    modMetadataByPackageIdLookUp[packageId] = modMetadata;
+                    ModMetadataByPackageIdLookUp[packageId] = modMetadata;
                     return true;
                 case > 1:
                     modMetadata = matches[0];
-                    modMetadataByPackageIdLookUp[packageId] = modMetadata;
+                    ModMetadataByPackageIdLookUp[packageId] = modMetadata;
                     Log.Msg($"중복되는 packageId={packageId}, 중복 갯수={matches.Count}.");
                     return true;
             }
@@ -296,17 +326,18 @@ namespace RimworldExtractorInternal
 
         internal static ModMetadata? GetModMetadataByModName(string modName)
         {
-            if (modMetadataByModNameLookUp.TryGetValue(modName, out var value))
+            if (ModMetadataByModNameLookUp.TryGetValue(modName, out var value))
             {
                 return value;
             }
             var result = AllMods.FirstOrDefault(x => string.Equals(x.ModName, modName, StringComparison.CurrentCultureIgnoreCase));
-            modMetadataByModNameLookUp.Add(modName, result);
+            ModMetadataByModNameLookUp.Add(modName, result);
             return result;
         }
 
-        private static readonly Dictionary<string, ModMetadata?> modMetadataByPackageIdLookUp = new();
-        private static readonly Dictionary<string, ModMetadata?> modMetadataByModNameLookUp = new();
-
+        private static readonly Dictionary<string, ModMetadata?> ModMetadataByPackageIdLookUp = new();
+        private static readonly Dictionary<string, ModMetadata?> ModMetadataByModNameLookUp = new();
+        private static List<ModMetadata>? LocalModsCache = null;
+        private static List<ModMetadata>? WorkshopModsCache = null;
     }
 }

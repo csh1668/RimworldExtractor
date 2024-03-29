@@ -267,5 +267,21 @@ namespace RimworldExtractorGUI
         {
             Process.Start("explorer.exe", GithubVersionCheker.IssueUrl);
         }
+
+        private void buttonOpenTranslationAnalyzer_Click(object sender, EventArgs e)
+        {
+            var form = new FormTranslationAnalyzerPathSelect();
+            form.StartPosition = FormStartPosition.CenterParent;
+            if (form.ShowDialog(this) == DialogResult.OK)
+            {
+                var paths = form.Paths;
+                var analyzer = new FormTranslationAnalyzer(paths);
+                analyzer.StartPosition = FormStartPosition.CenterParent;
+                if (analyzer.ShowDialog(this) == DialogResult.OK)
+                {
+
+                }
+            }
+        }
     }
 }

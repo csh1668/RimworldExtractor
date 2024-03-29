@@ -117,16 +117,4 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="labelSelectedMods.Text" xml:space="preserve">
-    <value>선택된 모드가 없습니다.
-
-===기본적인 사용방법===
-1) '1. 추출할 모드 선택'을 통해 번역할 모드를 선택하세요.
-선택) 번역할 모드를 우클릭 후, '이 모드와 관련된 모든 모드를 참조 모드로 선택'을 클릭하세요.
-2) '2. 번역 데이터 추출'을 통해 번역 텍스트를 추출하세요.
-3) 추출된 파일들을 번역하세요.
-5) 끝!
-
-팁) 옵션에서 출력 형식을 엑셀 파일로 변경할 수 있습니다. (권장, 기본은 XML 형식)</value>
-  </data>
 </root>

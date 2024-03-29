@@ -49,7 +49,7 @@ namespace RimworldExtractorInternal
         public static Action<IEnumerable<string>, string>? StopCallbackTxt = null;
 
 
-        public const string ExtensionKeyExtraComment = "ExtraComment";
+        public const string ExtensionKeyExtraCommentTranslated = "ExtraCommentTranslated";
 
         public static void Init()
         {

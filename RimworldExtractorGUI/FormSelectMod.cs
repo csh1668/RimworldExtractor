@@ -33,6 +33,7 @@ namespace RimworldExtractorGUI
         public FormSelectMod()
         {
             InitializeComponent();
+            ModLister.ResetCache();
             _officialModsCached = ModLister.OfficialMods.ToList();
             _localModsCached = ModLister.LocalMods.ToList();
             _workshopModsCached = ModLister.WorkshopMods.ToList();
