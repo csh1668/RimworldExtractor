@@ -1,8 +1,4 @@
-﻿/*
- * 디자인 출처: https://hyokim.tistory.com/16
- */
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -11,81 +7,179 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using RimworldExtractorInternal;
+using RimworldExtractorInternal.DataTypes;
 
 namespace RimworldExtractorGUI
 {
     public partial class FormTranslationAnalyzer : Form
     {
-        private string[] _paths;
+        private readonly List<ListViewItem> _items;
+
+        public IEnumerable<TranslationAnalyzerEntry> Entries
+        {
+            get
+            {
+                return _items.Where(x => x.Checked && ((TranslationAnalyzerEntry)x.Tag).HasChanges)
+                    .Select(x => (TranslationAnalyzerEntry)x.Tag);
+            }
+        }
         public FormTranslationAnalyzer(string[] paths)
         {
             InitializeComponent();
-            _paths = paths;
-            listViewResults.CheckBoxes = true;
-            var testItem1 = new ListViewItem(new[] { string.Empty, "Hello", "World" });
-            var testItem2 = new ListViewItem(new[] { string.Empty, "Hello2", "World2" });
-            var testItem3 = new ListViewItem(new[] { string.Empty, "Hello3", "World3" });
-            listViewResults.Items.AddRange(new[] { testItem1, testItem2, testItem3 });
-            var columnCheck = new ColumnHeader();
-            var columnHeader1 = new ColumnHeader();
-            var columnHeader2 = new ColumnHeader();
-            columnHeader1.Text = "항목1";
-            columnHeader1.Width = 200;
-            columnHeader2.Text = "항목2";
-            columnHeader2.Width = 200;
-
-
-            listViewResults.Columns.AddRange(new[] { columnCheck, columnHeader1, columnHeader2 });
+            _items = new List<ListViewItem>();
+            Task.Factory.StartNew(() => { AnalyzeTranslation(paths); });
         }
 
-        private void listViewResults_DrawItem(object sender, DrawListViewItemEventArgs e)
+        private void AnalyzeTranslation(string[] paths)
         {
-            e.DrawDefault = true;
-        }
-
-        private void listViewResults_DrawSubItem(object sender, DrawListViewSubItemEventArgs e)
-        {
-            e.DrawDefault = true;
-        }
-
-        private void listViewResults_DrawColumnHeader(object sender, DrawListViewColumnHeaderEventArgs e)
-        {
-            if (e.ColumnIndex == 0)
+            for (var i = 0; i < paths.Length; i++)
             {
-                e.DrawBackground();
-                bool value = false;
-                try
+                if (labelTitle.InvokeRequired)
                 {
-                    value = Convert.ToBoolean(e.Header?.Tag);
+                    labelTitle.Invoke(() => { labelTitle.Text = $"번역 데이터를 분석하고 있습니다... {i}/{paths.Length}"; });
                 }
-                catch (Exception)
+                else
                 {
-                    // ignored
+                    labelTitle.Text = $"번역 데이터를 분석하고 있습니다... {i}/{paths.Length}";
                 }
 
-                CheckBoxRenderer.DrawCheckBox(e.Graphics, new Point(e.Bounds.Left + 4, e.Bounds.Top + 4),
-                    value ? System.Windows.Forms.VisualStyles.CheckBoxState.CheckedNormal :
-                        System.Windows.Forms.VisualStyles.CheckBoxState.UncheckedNormal);
+                var path = paths[i];
+                var item = ConvertToItem(path);
+                _items.Add(item);
+                if (listViewResults.InvokeRequired)
+                {
+                    listViewResults.Invoke(() => { listViewResults.Items.Add(item); });
+                }
+                else
+                {
+                    listViewResults.Items.Add(item);
+                }
             }
-            else e.DrawDefault = true;
+
+            if (labelTitle.InvokeRequired)
+            {
+                labelTitle.Invoke(() => { labelTitle.Text = "분석 완료!"; });
+            }
+            else
+            {
+                labelTitle.Text = "분석 완료!";
+            }
         }
 
-        private void listViewResults_ColumnClick(object sender, ColumnClickEventArgs e)
+        private static ListViewItem ConvertToItem(string filePath)
         {
-            if (e.Column == 0)
+            var item = new ListViewItem();
+            var analyzerEntry = new TranslationAnalyzerEntry(filePath);
+            if (analyzerEntry.Metadata != null)
             {
-                bool value = false;
-                try
+                var autoSelectedExtractableFolders = ModLister.GetExtractableFolders(analyzerEntry.Metadata)
+                    .Where(x => x.IsAutoSelectable()).ToList();
+
+                var autoSelectedReferenceMods = new List<ModMetadata>();
+                foreach (var modMetadata in ModLister.FindAllReferenceMods(analyzerEntry.Metadata))
                 {
-                    value = Convert.ToBoolean(listViewResults.Columns[e.Column].Tag);
+                    if (autoSelectedReferenceMods.Contains(modMetadata))
+                        continue;
+                    autoSelectedReferenceMods.Add(modMetadata);
                 }
-                catch (Exception)
-                {
-                }
-                listViewResults.Columns[e.Column].Tag = !value;
-                foreach (ListViewItem item in listViewResults.Items) item.Checked = !value;
-                listViewResults.Invalidate();
+                analyzerEntry.ReExtract(autoSelectedExtractableFolders, autoSelectedReferenceMods);
             }
+            item.Tag = analyzerEntry;
+            var rowTextData = new[]
+            {
+                analyzerEntry.Metadata?.Identifier ?? "UNKNOWN",
+                filePath, analyzerEntry.OriginalTranslations.Count.ToString(),
+                analyzerEntry.ChangesString, "자동", "덧붙이기"
+            };
+            item.SubItems.AddRange(rowTextData);
+            item.Checked = analyzerEntry.HasChanges;
+            return item;
+        }
+
+        private void listViewResults_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (listViewResults.SelectedItems.Count == 0)
+            {
+                buttonOpenSelectMod.Enabled = false;
+                labelModTitle.Text = "수정할 모드를 선택하세요.";
+                return;
+            }
+
+            buttonOpenSelectMod.Enabled = true;
+            var selected = listViewResults.SelectedItems[0];
+            var analyzerEntry = (TranslationAnalyzerEntry)selected.Tag;
+            labelModTitle.Text = analyzerEntry.Metadata?.ToString() ?? "원본 모드를 찾을 수 없었습니다. 수동으로 지정해주세요.";
+
+        }
+
+        private void buttonOpenSelectMod_Click(object sender, EventArgs e)
+        {
+            var curSelected = listViewResults.SelectedItems[0];
+            var curEntry = (TranslationAnalyzerEntry)curSelected.Tag;
+            var curMetaData = curEntry.Metadata;
+            var form = new FormSelectMod(curMetaData);
+            form.StartPosition = FormStartPosition.CenterParent;
+            if (form.ShowDialog() == DialogResult.OK)
+            {
+                curEntry.Metadata = form.SelectedMod;
+                curEntry.ResetChanges();
+                curEntry.ReExtract(form.SelectedFolders, form.ReferenceMods);
+                curSelected.SubItems[(int)Column.ModName] = new ListViewItem.ListViewSubItem()
+                { Text = curEntry.Metadata?.Identifier ?? "UNKNOWN" };
+                curSelected.SubItems[(int)Column.OriginalCount] = new ListViewItem.ListViewSubItem()
+                { Text = curEntry.OriginalTranslations.Count.ToString() };
+                curSelected.SubItems[(int)Column.ChangesCount] = new ListViewItem.ListViewSubItem()
+                { Text = curEntry.ChangesString };
+                curSelected.SubItems[(int)Column.ExtractionMethod] = new ListViewItem.ListViewSubItem()
+                { Text = "수동" };
+                curSelected.Selected = true;
+            }
+        }
+
+        private void listViewResults_ItemChecked(object sender, ItemCheckedEventArgs e)
+        {
+            if (e.Item.Checked && ((TranslationAnalyzerEntry)e.Item.Tag).Metadata == null)
+            {
+                MessageBox.Show("이 파일의 원본 모드를 알 수 없으므로 재추출 할 수 없습니다.");
+                e.Item.Checked = false;
+            }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            DialogResult = DialogResult.OK;
+            Close();
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            foreach (ListViewItem listViewItem in listViewResults.Items)
+            {
+                var entry = ((TranslationAnalyzerEntry)listViewItem.Tag);
+                if (entry.Metadata == null || !entry.HasChanges)
+                {
+                    continue;
+                }
+                else
+                {
+                    listViewItem.Checked = true;
+                }
+            }
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            foreach (ListViewItem listViewItem in listViewResults.Items)
+            {
+                listViewItem.Checked = false;
+            }
+
+        }
+
+        private enum Column
+        {
+            ModName = 1, FilePath, OriginalCount, ChangesCount, ExtractionMethod, SaveMethod
         }
     }
 }

@@ -168,7 +168,7 @@
             buttonOpenTranslationAnalyzer.Name = "buttonOpenTranslationAnalyzer";
             buttonOpenTranslationAnalyzer.Size = new Size(97, 46);
             buttonOpenTranslationAnalyzer.TabIndex = 13;
-            buttonOpenTranslationAnalyzer.Text = "번역 분석기\r\n열기";
+            buttonOpenTranslationAnalyzer.Text = "번역 분석기\r\n열기 (WIP)";
             buttonOpenTranslationAnalyzer.UseVisualStyleBackColor = true;
             buttonOpenTranslationAnalyzer.Click += buttonOpenTranslationAnalyzer_Click;
             // 

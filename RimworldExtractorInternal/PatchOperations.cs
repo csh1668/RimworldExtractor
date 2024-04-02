@@ -81,6 +81,11 @@ internal static class PatchOperations
             {
                 XmlNode selectNodeImported = parentNode.InsertAfter(Extractor.CombinedDefs!.ImportNode(valueChildNode, true), selectNode)!;
                 var curRootDefNode = rootDefNode ?? selectNodeImported;
+                var defName = curRootDefNode["defName"]?.InnerText;
+                if (defName == null)
+                {
+                    continue;
+                }
                 foreach (var translation in Extractor.FindExtractableNodes(curRootDefNode["defName"]!.InnerText,
                              curRootDefNode.Attributes?["Class"]?.Value ?? curRootDefNode.Name, selectNodeImported, nodeName))
                 {

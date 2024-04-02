@@ -96,7 +96,6 @@ namespace RimworldExtractorGUI
                 ReferenceMods = formSelectMod.ReferenceMods.Except(Enumerable.Repeat(SelectedMod, 1)).ToList();
                 SelectedFolders = formSelectMod.SelectedFolders;
                 buttonExtract.Enabled = true;
-                Extractor.Reset();
 
                 labelSelectedMods.Text = $"선택된 모드: {SelectedMod.ModName}";
                 if (ReferenceMods?.Count > 1)
@@ -119,43 +118,7 @@ namespace RimworldExtractorGUI
 
             Log.Msg("추출 시작...");
 
-            var refDefs = new List<string>();
-            foreach (var referenceMod in ReferenceMods)
-            {
-                refDefs.AddRange(from extractableFolder in ModLister.GetExtractableFolders(referenceMod)
-                                 where (extractableFolder.VersionInfo == "default" || extractableFolder.VersionInfo == Prefabs.CurrentVersion)
-                                       && Path.GetFileName(extractableFolder.FolderName) == "Defs"
-                                 select Path.Combine(referenceMod.RootDir, extractableFolder.FolderName));
-            }
-
-            var extraction = new List<TranslationEntry>();
-            Extractor.Reset();
-            var defs = SelectedFolders.Where(x => Path.GetFileName(x.FolderName) == "Defs").ToList();
-            if (defs.Count > 0)
-            {
-                Extractor.PrepareDefs(defs, refDefs);
-                extraction.AddRange(Extractor.ExtractDefs());
-            }
-            foreach (var extractableFolder in SelectedFolders)
-            {
-                switch (Path.GetFileName(extractableFolder.FolderName))
-                {
-                    case "Defs":
-                        break;
-                    case "Keyed":
-                        extraction.AddRange(Extractor.ExtractKeyed(extractableFolder));
-                        break;
-                    case "Strings":
-                        extraction.AddRange(Extractor.ExtractStrings(extractableFolder));
-                        break;
-                    case "Patches":
-                        extraction.AddRange(Extractor.ExtractPatches(extractableFolder));
-                        break;
-                    default:
-                        Log.Wrn($"지원하지 않는 폴더입니다. {extractableFolder.FolderName}");
-                        continue;
-                }
-            }
+            var extraction = Extractor.ExtractTranslationData(SelectedFolders, ReferenceMods);
 
             var outPath = SelectedMod.Identifier.StripInvaildChars();
             switch (Prefabs.Method)
@@ -279,7 +242,11 @@ namespace RimworldExtractorGUI
                 analyzer.StartPosition = FormStartPosition.CenterParent;
                 if (analyzer.ShowDialog(this) == DialogResult.OK)
                 {
-
+                    var analyzerEntries = analyzer.Entries.ToList();
+                    foreach (var analyzerEntry in analyzerEntries)
+                    {
+                        IO.AppendExcel(analyzerEntry.Changes.ToList(), analyzerEntry.FilePath);
+                    }
                 }
             }
         }

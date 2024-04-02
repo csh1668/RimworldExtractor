@@ -5,6 +5,8 @@ using System.Xml;
 using RimworldExtractorInternal.Compats;
 using RimworldExtractorInternal.DataTypes;
 using RimworldExtractorInternal.Exceptions;
+using DocumentFormat.OpenXml.Spreadsheet;
+using DocumentFormat.OpenXml.Office2016.Excel;
 
 namespace RimworldExtractorInternal
 {
@@ -35,11 +37,16 @@ namespace RimworldExtractorInternal
                 if (entry.RequiredMods != null)
                 {
                     var combinedRequiredMods = entry.RequiredMods.ToString();
-                    sheet.Cell(2 + i, 4).Value = combinedRequiredMods;
+                    var cellRequiredMods = sheet.Cell(2 + i, 4);
+                    cellRequiredMods.Value = combinedRequiredMods;
                     if (combinedRequiredMods.Contains("##packageId##") && entry.ClassName.StartsWith("Patches."))
                     {
                         Log.WrnOnce($"Required Mods 열에 잘못된 값이 존재합니다. 추후 Patches의 올바른 생성을 위해 엑셀 파일에 있는 해당 문구: \"{combinedRequiredMods}\" 를 직접 모드 이름으로 바꿔야 합니다.",
                             $"잘못된{combinedRequiredMods}경고".GetHashCode());
+                        var comment = cellRequiredMods.GetComment();
+                        comment.AddText(
+                            $"모드 이름 대신 패키지 이름({RequiredMods.PACKAGE_ID_PREFIX})이 있습니다. 모드 이름으로 올바르게 수정해주세요.");
+                        comment.Visible = true;
                     }
                 }
                 sheet.Cell(2 + i, 5).Value = entry.Original;
@@ -53,17 +60,18 @@ namespace RimworldExtractorInternal
                 {
                     var comment = sheet.Cell(2 + i, 6).CreateComment();
                     comment.AddText(extensionStr);
+                    comment.Visible = true;
                 }
             }
 
             sheet.Style.Font.FontName = "맑은 고딕";
             xlsx.SaveSafely(outPath + ".xlsx");
         }
-        public static void AppendExcel(List<TranslationEntry> newTranslations, string inputPath = "result", Dictionary<string, string>? updateInstructions = null)
+        public static void AppendExcel(List<TranslationAnalyzerEntry.ChangeRecord> changes, string targetPath)
         {
-            var xlsx = new XLWorkbook(inputPath);
-            var sheet = xlsx.Worksheets.Worksheet(1);
-            var rows = sheet.RowsUsed().ToList();
+            var xlsx = new XLWorkbook(targetPath);
+            var mainSheet = xlsx.Worksheets.Worksheet(1);
+            var rows = mainSheet.RowsUsed().ToList();
             var offset = rows.Count;
             var headers = rows.First().Cells();
 
@@ -89,56 +97,143 @@ namespace RimworldExtractorInternal
                                 headers.FirstOrDefault(x => x.StrVal() == "KO [Translation]")
                                     ?.WorksheetColumn().ColumnNumber() ??
                                 throw new XlsxHeaderReadingException(HeaderTranslated);
+            
+            var changedOriginals = new List<TranslationAnalyzerEntry.ChangeRecord>();
+            var fillOriginals = new List<TranslationAnalyzerEntry.ChangeRecord>();
+            var removeNodes = new List<TranslationAnalyzerEntry.ChangeRecord>();
+            var addedNewlys = new List<TranslationAnalyzerEntry.ChangeRecord>();
+            var dateString = DateTime.Today.ToShortDateString();
 
-            if (updateInstructions != null)
+            foreach (var changeRecord in changes)
+            {
+                switch (changeRecord.Reason)
+                {
+                    case TranslationAnalyzerEntry.ChangeReason.ChangedOriginal:
+                        changedOriginals.Add(changeRecord);
+                        break;
+                    case TranslationAnalyzerEntry.ChangeReason.FillOriginal:
+                        fillOriginals.Add(changeRecord);
+                        break;
+                    case TranslationAnalyzerEntry.ChangeReason.RemoveNode:
+                        removeNodes.Add(changeRecord);
+                        break;
+                    case TranslationAnalyzerEntry.ChangeReason.AddedNewly:
+                        addedNewlys.Add(changeRecord);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+
+            if (removeNodes.Count > 0)
+            {
+                var subSheet = xlsx.AddWorksheet($"{dateString}_삭제된 노드 목록");
+                subSheet.Cell(1, 1).Value = HeaderClassNode;
+                subSheet.Cell(1, 2).Value = HeaderClass;
+                subSheet.Cell(1, 3).Value = HeaderNode;
+                subSheet.Cell(1, 4).Value = HeaderRequiredMods;
+                subSheet.Cell(1, 5).Value = HeaderOriginal;
+                subSheet.Cell(1, 6).Value = HeaderTranslated;
+                var nxtRow = subSheet.Row(2);
+                for (int i = rows.Count - 1; i >= 0; i--)
+                {
+                    var curRow = rows[i];
+                    var curClassNode = curRow.Cell(colClassNode).StrVal();
+                    if (removeNodes.Any(x => $"{x.Orig!.ClassName}+{x.Orig!.Node}" == curClassNode))
+                    {
+                        curRow.Cell(colClassNode).CopyTo(nxtRow.Cell(1));
+                        curRow.Cell(colClass).CopyTo(nxtRow.Cell(2));
+                        curRow.Cell(colNode).CopyTo(nxtRow.Cell(3));
+                        if (colRequiredMods != -1)
+                            curRow.Cell(colRequiredMods).CopyTo(nxtRow.Cell(4));
+                        curRow.Cell(colOriginal).CopyTo(nxtRow.Cell(5));
+                        curRow.Cell(colTranslated).CopyTo(nxtRow.Cell(6));
+                        curRow.Cells(colTranslated + 1, mainSheet.ColumnsUsed().Count());
+                        
+                        nxtRow = nxtRow.RowBelow();
+                        curRow.Delete();
+                    }
+                }
+
+                rows = mainSheet.RowsUsed().ToList();
+            }
+
+            if (changedOriginals.Count > 0)
             {
                 for (int i = 0; i < rows.Count; i++)
                 {
-                    var row = rows[i];
-                    var classNode = sheet.Cell(2 + i, colClassNode).StrVal();
-                    if (updateInstructions.TryGetValue(classNode, out var value))
+                    var curRow = rows[i];
+                    var curClassNode = curRow.Cell(colClassNode).StrVal();
+                    var pairEntry =
+                        changedOriginals.FirstOrDefault(x => $"{x.Orig!.ClassName}+{x.Orig!.Node}" == curClassNode);
+                    if (pairEntry != null)
                     {
-                        var originalCell = sheet.Cell(2 + i, colOriginal);
-                        originalCell.GetComment().AddText($"이전 원문: {originalCell.StrVal()}");
-                        originalCell.Value = value;
-                    } 
-                }
-            }
-
-
-            for (int i = 0; i < newTranslations.Count; i++)
-            {
-                var entry = newTranslations[i];
-                sheet.Cell(2 + i + offset, colClassNode).Value = $"{entry.ClassName}+{entry.Node}";
-                sheet.Cell(2 + i + offset, colClass).Value = entry.ClassName;
-                sheet.Cell(2 + i + offset, colNode).Value = entry.Node;
-                if (entry.RequiredMods != null && colRequiredMods != -1)
-                {
-                    var combinedRequiredMods = entry.RequiredMods.ToString();
-                    sheet.Cell(2 + i + offset, colRequiredMods).Value = combinedRequiredMods;
-                    if (combinedRequiredMods.Contains("##packageId##") && entry.ClassName.StartsWith("Patches."))
-                    {
-                        Log.WrnOnce($"Required Mods 열에 잘못된 값이 존재합니다. 추후 Patches의 올바른 생성을 위해 엑셀 파일에 있는 해당 문구: \"{combinedRequiredMods}\" 를 직접 모드 이름으로 바꿔야 합니다.",
-                            $"잘못된{combinedRequiredMods}경고".GetHashCode());
+                        var origCell = curRow.Cell(colOriginal);
+                        origCell.GetComment().AddText($"{dateString} 이전의 원문: '{curRow.Cell(colOriginal).StrVal()}'\n");
+                        origCell.Value = pairEntry.New!.Original;
+                        origCell.GetComment().Visible = true;
+                        origCell.Style.Fill.SetBackgroundColor(XLColor.Red);
                     }
                 }
-                sheet.Cell(2 + i + offset, colOriginal).Value = entry.Original;
-                if (entry.Translated != null)
-                {
-                    sheet.Cell(2 + i + offset, colTranslated).Value = entry.Translated;
-                    sheet.Cell(2 + i + offset, colTranslated).Select();
-                }
+            }
 
-                if (entry.TryGetExtension(Prefabs.ExtensionKeyExtraCommentTranslated, out var extension) &&
-                    extension is string extensionStr)
+            if (fillOriginals.Count > 0)
+            {
+                for (int i = 0; i < rows.Count; i++)
                 {
-                    var comment = sheet.Cell(2 + i + offset, colTranslated).CreateComment();
-                    comment.AddText(extensionStr);
+                    var curRow = rows[i];
+                    var curClassNode = curRow.Cell(colClassNode).StrVal();
+                    var pairEntry =
+                        fillOriginals.FirstOrDefault(x => $"{x.Orig!.ClassName}+{x.Orig!.Node}" == curClassNode);
+                    if (pairEntry != null)
+                    {
+                        var origCell = curRow.Cell(colOriginal);
+                        origCell.GetComment()
+                            .AddText($"{dateString}에 소실되었던 원문이 추가되었습니다.\n");
+                        origCell.Value = pairEntry.New!.Original;
+                        origCell.GetComment().Visible = true;
+                        origCell.Style.Fill.SetBackgroundColor(XLColor.Red);
+                    }
                 }
             }
 
-            sheet.Style.Font.FontName = "맑은 고딕";
-            xlsx.SaveSafely(inputPath + ".xlsx");
+            if (addedNewlys.Count > 0)
+            {
+                for (int i = 0; i < addedNewlys.Count; i++)
+                {
+                    var entry = addedNewlys[i].New;
+                    mainSheet.Cell(2 + i + rows.Count, colClassNode).Value = $"{entry.ClassName}+{entry.Node}";
+                    mainSheet.Cell(2 + i + rows.Count, colClass).Value = entry.ClassName;
+                    mainSheet.Cell(2 + i + rows.Count, colNode).Value = entry.Node;
+                    if (colRequiredMods != -1 && entry.RequiredMods != null)
+                    {
+                        var combinedRequiredMods = entry.RequiredMods.ToString();
+                        mainSheet.Cell(2 + i + rows.Count, colRequiredMods).Value = combinedRequiredMods;
+                        if (combinedRequiredMods.Contains("##packageId##") && entry.ClassName.StartsWith("Patches."))
+                        {
+                            Log.WrnOnce($"Required Mods 열에 잘못된 값이 존재합니다. 추후 Patches의 올바른 생성을 위해 엑셀 파일에 있는 해당 문구: \"{combinedRequiredMods}\" 를 직접 모드 이름으로 바꿔야 합니다.",
+                                $"잘못된{combinedRequiredMods}경고".GetHashCode());
+                        }
+                    }
+                    mainSheet.Cell(2 + i + rows.Count, colOriginal).Value = entry.Original;
+                    if (entry.Translated != null)
+                    {
+                        mainSheet.Cell(2 + i + rows.Count, colTranslated).Value = entry.Translated;
+                    }
+
+                    if (entry.TryGetExtension(Prefabs.ExtensionKeyExtraCommentTranslated, out object? extension) &&
+                        extension is string extensionStr)
+                    {
+                        var comment = mainSheet.Cell(2 + i + rows.Count, 6).GetComment();
+                        comment.AddText(extensionStr);
+                        comment.Visible = true;
+                    }
+                    mainSheet.Row(2 + i + rows.Count).Select();
+                }
+            }
+
+            mainSheet.Style.Font.FontName = "맑은 고딕";
+            xlsx.SaveSafely(targetPath);
         }
 
         public static List<TranslationEntry> FromExcel(string inputPath)
@@ -176,6 +271,8 @@ namespace RimworldExtractorInternal
                 var row = rows[i];
                 var className = row.Cell(colClass).StrVal();
                 var node = row.Cell(colNode).StrVal();
+                if (className.Length == 0 || node.Length == 0)
+                    continue;
                 RequiredMods? requiredMods = null;
                 if (colRequiredMods != -1 && row.Cell(colRequiredMods).Value is { IsText: true } cellRequiredMods)
                 {

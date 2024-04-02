@@ -57,6 +57,21 @@ namespace RimworldExtractorGUI
             ResetListBoxMods();
         }
 
+        public FormSelectMod(ModMetadata? initSelectedMod) : this()
+        {
+            if (initSelectedMod == null)
+                return;
+            SelectedMod = initSelectedMod;
+            listBoxMods.SelectedItem = initSelectedMod;
+            listBoxMods.TopIndex = listBoxMods.SelectedIndex;
+            var autoSelected = listBoxExtractableFolders.Items.OfType<ExtractableFolder>().Where(x => x.IsAutoSelectable()).ToList();
+
+            foreach (ExtractableFolder extractableFolder in autoSelected)
+            {
+                listBoxExtractableFolders.SelectedItems.Add(extractableFolder);
+            }
+        }
+
         private void ResetListBoxMods(bool filterSelected = false)
         {
             listBoxMods.Items.Clear();
@@ -110,12 +125,7 @@ namespace RimworldExtractorGUI
                 {
                     listBoxExtractableFolders.Items.Add(extractableFolder);
                 }
-                var autoSelected = new List<ExtractableFolder>();
-                foreach (ExtractableFolder extractableFolder in listBoxExtractableFolders.Items)
-                {
-                    if (extractableFolder.VersionInfo is "default" or "Common" || extractableFolder.VersionInfo == Prefabs.CurrentVersion)
-                        autoSelected.Add(extractableFolder);
-                }
+                var autoSelected = listBoxExtractableFolders.Items.OfType<ExtractableFolder>().Where(x => x.IsAutoSelectable()).ToList();
 
                 foreach (ExtractableFolder extractableFolder in autoSelected)
                 {

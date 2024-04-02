@@ -16,14 +16,60 @@ namespace RimworldExtractorInternal
         internal static XmlDocument? CombinedDefs;
         public static readonly Dictionary<string, XmlNode> ParentNodeLookUp = new();
 
-        public static void Reset()
+        public static List<TranslationEntry> ExtractTranslationData(List<ExtractableFolder> SelectedFolders, List<ModMetadata>? ReferenceMods)
+        {
+            var refDefs = new List<string>();
+            if (ReferenceMods != null)
+            {
+                foreach (var referenceMod in ReferenceMods)
+                {
+                    refDefs.AddRange(from extractableFolder in ModLister.GetExtractableFolders(referenceMod)
+                        where (extractableFolder.VersionInfo == "default" || extractableFolder.VersionInfo == Prefabs.CurrentVersion)
+                              && Path.GetFileName(extractableFolder.FolderName) == "Defs"
+                        select Path.Combine(referenceMod.RootDir, extractableFolder.FolderName));
+                }
+            }
+
+            var extraction = new List<TranslationEntry>();
+            Reset();
+            var defs = SelectedFolders.Where(x => Path.GetFileName(x.FolderName) == "Defs").ToList();
+            if (defs.Count > 0)
+            {
+                PrepareDefs(defs, refDefs);
+                extraction.AddRange(ExtractDefs());
+            }
+            foreach (var extractableFolder in SelectedFolders)
+            {
+                switch (Path.GetFileName(extractableFolder.FolderName))
+                {
+                    case "Defs":
+                        break;
+                    case "Keyed":
+                        extraction.AddRange(ExtractKeyed(extractableFolder));
+                        break;
+                    case "Strings":
+                        extraction.AddRange(ExtractStrings(extractableFolder));
+                        break;
+                    case "Patches":
+                        extraction.AddRange(ExtractPatches(extractableFolder));
+                        break;
+                    default:
+                        Log.Wrn($"지원하지 않는 폴더입니다. {extractableFolder.FolderName}");
+                        continue;
+                }
+            }
+
+            return extraction;
+        }
+
+        private static void Reset()
         {
             CombinedDefs = new XmlDocument();
             CombinedDefs.AppendElement("Defs");
             ParentNodeLookUp.Clear();
         }
 
-        public static void PrepareDefs(List<ExtractableFolder> extracableFolders, List<string>? referenceDefsRoots)
+        private static void PrepareDefs(List<ExtractableFolder> extracableFolders, List<string>? referenceDefsRoots)
         {
 
             if (CombinedDefs == null)
@@ -66,7 +112,7 @@ namespace RimworldExtractorInternal
             DoXmlInheritance();
         }
 
-        public static IEnumerable<TranslationEntry> ExtractDefs()
+        internal static IEnumerable<TranslationEntry> ExtractDefs()
         {
             var rawExtraction = ExtractDefsInternal().ToList();
             foreach (var entry in CompatManager.DoPostProcessing(rawExtraction))
@@ -114,7 +160,7 @@ namespace RimworldExtractorInternal
             }
         }
 
-        public static IEnumerable<TranslationEntry> ExtractKeyed(ExtractableFolder keyed)
+        internal static IEnumerable<TranslationEntry> ExtractKeyed(ExtractableFolder keyed)
         {
             var keyedRoot = keyed.FullPath;
             RequiredMods? requiredMods = null;
@@ -141,7 +187,7 @@ namespace RimworldExtractorInternal
             }
         }
 
-        public static IEnumerable<TranslationEntry> ExtractStrings(ExtractableFolder strings)
+        internal static IEnumerable<TranslationEntry> ExtractStrings(ExtractableFolder strings)
         {
             var stringsRoot = strings.FullPath;
             RequiredMods? requiredMods = null;
@@ -169,7 +215,7 @@ namespace RimworldExtractorInternal
         }
 
 
-        public static IEnumerable<TranslationEntry> ExtractPatches(ExtractableFolder patches)
+        internal static IEnumerable<TranslationEntry> ExtractPatches(ExtractableFolder patches)
         {
             var rawExtraction = ExtractPatchesInternal(patches).ToList();
             foreach (var entry in CompatManager.DoPostProcessing(rawExtraction))
@@ -178,7 +224,7 @@ namespace RimworldExtractorInternal
             }
         }
 
-        public static IEnumerable<TranslationEntry> ExtractPatchesInternal(ExtractableFolder patches)
+        private static IEnumerable<TranslationEntry> ExtractPatchesInternal(ExtractableFolder patches)
         {
             if (CombinedDefs == null)
             {

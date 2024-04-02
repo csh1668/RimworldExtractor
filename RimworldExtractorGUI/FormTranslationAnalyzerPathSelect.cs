@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using RimworldExtractorInternal;
 
 namespace RimworldExtractorGUI
 {
@@ -54,7 +55,12 @@ namespace RimworldExtractorGUI
         private void button1_Click(object sender, EventArgs e)
         {
             DialogResult = DialogResult.OK;
-            Paths = textBox1.Text.Split('|');
+            var tokens = textBox1.Text.Split('|');
+            if (tokens.Length > 0 && Directory.Exists(tokens[0]))
+            {
+                tokens = tokens.SelectMany(TranslationAnalyzerTool.GetXlsxPaths).ToArray();
+            }
+            Paths = tokens;
             Close();
         }
     }

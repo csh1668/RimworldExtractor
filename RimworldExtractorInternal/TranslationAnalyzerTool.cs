@@ -9,7 +9,7 @@ namespace RimworldExtractorInternal
 {
     public static class TranslationAnalyzerTool
     {
-        internal static string[] GetXlsxPaths(string rootPath) =>
+        public static string[] GetXlsxPaths(string rootPath) =>
             IO.DescendantFiles(rootPath).Where(x => x.ToLower().EndsWith(".xlsx")).ToArray();
 
         public static ModMetadata? GetModMetadataFromFilePath(string filePath)

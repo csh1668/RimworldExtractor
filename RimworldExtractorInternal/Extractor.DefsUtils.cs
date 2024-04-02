@@ -7,7 +7,7 @@ namespace RimworldExtractorInternal
 {
     public static partial class Extractor
     {
-        public static void LoadReferenceDefs(List<string> referenceDefsRoots)
+        private static void LoadReferenceDefs(List<string> referenceDefsRoots)
         {
             if (CombinedDefs == null)
             {

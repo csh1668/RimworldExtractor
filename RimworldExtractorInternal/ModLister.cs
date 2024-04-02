@@ -290,6 +290,12 @@ namespace RimworldExtractorInternal
             ModMetadataByPackageIdLookUp.Clear();
         }
 
+        public static bool IsAutoSelectable(this ExtractableFolder extractableFolder)
+        {
+            return extractableFolder.VersionInfo is "default" or "Common" ||
+                   extractableFolder.VersionInfo == Prefabs.CurrentVersion;
+        }
+
         internal static bool TryGetModMetadataByPackageId(string packageId, out ModMetadata? modMetadata)
         {
             if (packageId == null)
