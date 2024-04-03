@@ -148,6 +148,10 @@ namespace RimworldExtractorInternal
                             curRow.Cell(colRequiredMods).CopyTo(nxtRow.Cell(4));
                         curRow.Cell(colOriginal).CopyTo(nxtRow.Cell(5));
                         curRow.Cell(colTranslated).CopyTo(nxtRow.Cell(6));
+                        for (int j = 0; j < mainSheet.ColumnsUsed().Count() - colTranslated + 1; j++)
+                        {
+                            curRow.Cell(j + colTranslated + 1).CopyTo(nxtRow.Cell(j + 6 + 1));
+                        }
                         curRow.Cells(colTranslated + 1, mainSheet.ColumnsUsed().Count());
                         
                         nxtRow = nxtRow.RowBelow();
@@ -233,6 +237,14 @@ namespace RimworldExtractorInternal
             }
 
             mainSheet.Style.Font.FontName = "맑은 고딕";
+            foreach (var cell in mainSheet.CellsUsed().Where(x => x.HasComment))
+            {
+                cell.GetComment().Position.ColumnOffset = 5d;
+                cell.GetComment().Position.RowOffset = 5d;
+                cell.GetComment().Position.Row = cell.Address.RowNumber + 1;
+                cell.GetComment().Position.Column = cell.Address.ColumnNumber + 1;
+                cell.GetComment().Style.Alignment.SetAutomaticSize();
+            }
             xlsx.SaveSafely(targetPath);
         }
 

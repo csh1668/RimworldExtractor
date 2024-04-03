@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -89,8 +90,8 @@ namespace RimworldExtractorGUI
             var rowTextData = new[]
             {
                 analyzerEntry.Metadata?.Identifier ?? "UNKNOWN",
-                filePath, analyzerEntry.OriginalTranslations.Count.ToString(),
-                analyzerEntry.ChangesString, "자동", "덧붙이기"
+                "...\\" + Path.Combine(Path.GetFileName(Path.GetDirectoryName(filePath) ?? ""), Path.GetFileName(filePath)), analyzerEntry.OriginalTranslations.Count.ToString(),
+                analyzerEntry.ChangesString, analyzerEntry.Metadata == null ? "지정 필요": "자동", "덧붙이기"
             };
             item.SubItems.AddRange(rowTextData);
             item.Checked = analyzerEntry.HasChanges;
@@ -175,6 +176,36 @@ namespace RimworldExtractorGUI
                 listViewItem.Checked = false;
             }
 
+        }
+
+        private void listViewResults_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button != MouseButtons.Right)
+                return;
+            var item = listViewResults.FocusedItem;
+            if (item == null || !item.Bounds.Contains(e.Location))
+                return;
+            var entry = (TranslationAnalyzerEntry)item.Tag;
+            var contextMenu = new ContextMenuStrip();
+
+            var menuItem1 = new ToolStripMenuItem("엑셀 파일을 파일 탐색기에서 열기");
+            menuItem1.Click += (o, args) =>
+            {
+                Process.Start("explorer.exe", Path.GetDirectoryName(entry.FilePath) ?? "");
+            };
+            contextMenu.Items.Add(menuItem1);
+
+            if (entry.Metadata != null)
+            {
+                var menuItem2 = new ToolStripMenuItem("모드 루트 폴더를 파일 탐색기에서 열기");
+                menuItem2.Click += (o, args) =>
+                {
+                    Process.Start("explorer.exe", Path.GetDirectoryName(entry.Metadata!.RootDir) ?? "");
+                };
+                contextMenu.Items.Add(menuItem2);
+            }
+
+            contextMenu.Show(MousePosition);
         }
 
         private enum Column

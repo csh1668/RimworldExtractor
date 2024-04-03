@@ -77,7 +77,8 @@ namespace RimworldExtractorInternal
 
         public static void ResetCache()
         {
-
+            WorkshopModsCache = null;
+            LocalModsCache = null;
         }
 
         public static ModMetadata GetModMetadataByModRoot(string modRoot)
@@ -296,7 +297,7 @@ namespace RimworldExtractorInternal
                    extractableFolder.VersionInfo == Prefabs.CurrentVersion;
         }
 
-        internal static bool TryGetModMetadataByPackageId(string packageId, out ModMetadata? modMetadata)
+        internal static bool TryGetModMetadataByPackageId(string? packageId, out ModMetadata? modMetadata)
         {
             if (packageId == null)
             {

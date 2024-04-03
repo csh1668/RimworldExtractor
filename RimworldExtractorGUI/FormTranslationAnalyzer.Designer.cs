@@ -59,6 +59,7 @@
             listViewResults.View = View.Details;
             listViewResults.ItemChecked += listViewResults_ItemChecked;
             listViewResults.SelectedIndexChanged += listViewResults_SelectedIndexChanged;
+            listViewResults.MouseDown += listViewResults_MouseDown;
             // 
             // columnHeader1
             // 
@@ -72,7 +73,7 @@
             // 
             // columnHeader4
             // 
-            columnHeader4.Text = "파일 경로";
+            columnHeader4.Text = "파일 이름";
             columnHeader4.Width = 140;
             // 
             // columnHeader5

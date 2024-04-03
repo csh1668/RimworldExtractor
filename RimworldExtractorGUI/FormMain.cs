@@ -243,10 +243,14 @@ namespace RimworldExtractorGUI
                 if (analyzer.ShowDialog(this) == DialogResult.OK)
                 {
                     var analyzerEntries = analyzer.Entries.ToList();
-                    foreach (var analyzerEntry in analyzerEntries)
+                    for (var i = 0; i < analyzerEntries.Count; i++)
                     {
+                        var analyzerEntry = analyzerEntries[i];
                         IO.AppendExcel(analyzerEntry.Changes.ToList(), analyzerEntry.FilePath);
+                        Log.Msg($"{i + 1}/{analyzerEntries.Count}::수정 완료: {analyzerEntry.FilePath}");
                     }
+
+                    MessageBox.Show($"{analyzerEntries.Count}개의 파일에 대한 수정이 완료되었습니다.");
                 }
             }
         }
