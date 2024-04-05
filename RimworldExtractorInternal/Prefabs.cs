@@ -84,8 +84,10 @@ namespace RimworldExtractorInternal
             {
                 // "label", // 200
                 // "customLabel", "name", "def",
-                "inSignal", "labelMale", // 100
-                "labelFemale", "*verbClass", "*compClass", "hediff"
+                // "inSignal", "labelMale", // 100
+                // "labelFemale", 
+                "*verbClass", "*compClass", 
+                // "hediff"
             };
             Policy = DuplicatesPolicy.Overwrite;
             Method = ExtractionMethod.Languages;
