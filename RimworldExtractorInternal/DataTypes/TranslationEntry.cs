@@ -51,5 +51,6 @@
             _extensions.Add(key, extension);
             return this;
         }
+
     }
 }

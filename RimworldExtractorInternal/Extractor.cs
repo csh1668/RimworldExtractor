@@ -16,12 +16,12 @@ namespace RimworldExtractorInternal
         internal static XmlDocument? CombinedDefs;
         public static readonly Dictionary<string, XmlNode> ParentNodeLookUp = new();
 
-        public static List<TranslationEntry> ExtractTranslationData(List<ExtractableFolder> SelectedFolders, List<ModMetadata>? ReferenceMods)
+        public static List<TranslationEntry> ExtractTranslationData(List<ExtractableFolder> selectedFolders, List<ModMetadata>? referenceMods)
         {
             var refDefs = new List<string>();
-            if (ReferenceMods != null)
+            if (referenceMods != null)
             {
-                foreach (var referenceMod in ReferenceMods)
+                foreach (var referenceMod in referenceMods)
                 {
                     refDefs.AddRange(from extractableFolder in ModLister.GetExtractableFolders(referenceMod)
                         where (extractableFolder.VersionInfo == "default" || extractableFolder.VersionInfo == Prefabs.CurrentVersion)
@@ -32,13 +32,13 @@ namespace RimworldExtractorInternal
 
             var extraction = new List<TranslationEntry>();
             Reset();
-            var defs = SelectedFolders.Where(x => Path.GetFileName(x.FolderName) == "Defs").ToList();
+            var defs = selectedFolders.Where(x => Path.GetFileName(x.FolderName) == "Defs").ToList();
             if (defs.Count > 0)
             {
                 PrepareDefs(defs, refDefs);
                 extraction.AddRange(ExtractDefs());
             }
-            foreach (var extractableFolder in SelectedFolders)
+            foreach (var extractableFolder in selectedFolders)
             {
                 switch (Path.GetFileName(extractableFolder.FolderName))
                 {
@@ -59,7 +59,24 @@ namespace RimworldExtractorInternal
                 }
             }
 
-            return extraction;
+            var set = new HashSet<(string, string)>();
+            foreach (var entry in extraction)
+            {
+                var tuple = (entry.ClassName + "+" + entry.Node, entry.Original);
+                var pair = set.FirstOrDefault(x => x.Item1 == tuple.Item1);
+                if (pair != default)
+                {
+                    if (pair.Item2 != entry.Original)
+                    {
+                        Log.Wrn(
+                            $"원문이 다른 중복되는 노드가 있습니다. {entry.ClassName}+{entry.Original}| {pair.Item2} | {entry.Original} ");
+                    }
+                }
+
+                set.Add(tuple);
+            }
+
+            return extraction.DistinctBy(x => $"{x.ClassName}+{x.Node}").ToList();
         }
 
         private static void Reset()

@@ -246,7 +246,7 @@ namespace RimworldExtractorGUI
                     for (var i = 0; i < analyzerEntries.Count; i++)
                     {
                         var analyzerEntry = analyzerEntries[i];
-                        IO.AppendExcel(analyzerEntry.Changes.ToList(), analyzerEntry.FilePath);
+                        IO.ModifyExcel(analyzerEntry.Changes.ToList(), analyzerEntry.FilePath);
                         Log.Msg($"{i + 1}/{analyzerEntries.Count}::수정 완료: {analyzerEntry.FilePath}");
                     }
 

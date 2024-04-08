@@ -15,6 +15,7 @@ namespace RimworldExtractorInternal.DataTypes
         public List<TranslationEntry>? NewTranslations;
 
         public bool HasChanges => Metadata != null && Changes.Any();
+        public bool Invalid => OriginalTranslations.Count == 0;
 
         public IEnumerable<ChangeRecord> Changes
         {
@@ -110,8 +111,6 @@ namespace RimworldExtractorInternal.DataTypes
                 Log.Err($"이 파일은 올바른 림왈도 서식을 가진 엑셀 파일이 아닙니다: {path}, {e.Message}");
                 OriginalTranslations = new List<TranslationEntry>();
             }
-
-            ;
         }
 
         public void ResetChanges()

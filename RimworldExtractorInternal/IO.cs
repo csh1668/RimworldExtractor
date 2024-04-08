@@ -67,7 +67,7 @@ namespace RimworldExtractorInternal
             sheet.Style.Font.FontName = "맑은 고딕";
             xlsx.SaveSafely(outPath + ".xlsx");
         }
-        public static void AppendExcel(List<TranslationAnalyzerEntry.ChangeRecord> changes, string targetPath)
+        public static void ModifyExcel(List<TranslationAnalyzerEntry.ChangeRecord> changes, string targetPath)
         {
             var xlsx = new XLWorkbook(targetPath);
             var mainSheet = xlsx.Worksheets.Worksheet(1);
@@ -196,7 +196,7 @@ namespace RimworldExtractorInternal
                             .AddText($"{dateString}에 소실되었던 원문이 추가되었습니다.\n");
                         origCell.Value = pairEntry.New!.Original;
                         origCell.GetComment().Visible = true;
-                        origCell.Style.Fill.SetBackgroundColor(XLColor.Red);
+                        origCell.Style.Fill.SetBackgroundColor(XLColor.Orange);
                     }
                 }
             }
@@ -239,11 +239,12 @@ namespace RimworldExtractorInternal
             mainSheet.Style.Font.FontName = "맑은 고딕";
             foreach (var cell in mainSheet.CellsUsed().Where(x => x.HasComment))
             {
-                cell.GetComment().Position.ColumnOffset = 5d;
-                cell.GetComment().Position.RowOffset = 5d;
-                cell.GetComment().Position.Row = cell.Address.RowNumber + 1;
-                cell.GetComment().Position.Column = cell.Address.ColumnNumber + 1;
-                cell.GetComment().Style.Alignment.SetAutomaticSize();
+                var comment = cell.GetComment();
+                comment.Position.ColumnOffset = 5d;
+                comment.Position.RowOffset = 5d;
+                comment.Position.Row = cell.Address.RowNumber + 1;
+                comment.Position.Column = cell.Address.ColumnNumber + 1;
+                comment.Style.Alignment.SetAutomaticSize();
             }
             xlsx.SaveSafely(targetPath);
         }

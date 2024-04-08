@@ -69,8 +69,8 @@
             label1.Name = "label1";
             label1.Size = new Size(401, 107);
             label1.TabIndex = 3;
-            label1.Text = "Q. 번역 분석기가 뭔가요?\r\nA. 기존에 추출기로 추출했던 엑셀 파일(들)을 읽고 분석한 후, \r\n해당 모드의 번역이 모드 업데이트로 인해 새로 번역해야\r\n할 소요가 있는지 알려줍니다.\r\n번역을 해야 한다면, 기존의 엑셀 파일에다가 추가하는 방식으로,\r\n새로 번역해야 하는 노드를 추가해줍니다.\r\n";
-            label1.TextAlign = ContentAlignment.MiddleCenter;
+            label1.Text = "Q. 번역 분석기가 뭔가요?\r\nA. 기존에 추출기로 추출했던 엑셀 파일(들)을 읽고 분석한 후, \r\n모드 업데이트로 인해 원문이 변경되었거나, \r\n새로운 노드가 추가되어 새로 번역해야 할 소요가 있는지 알려줍니다.\r\n소요가 있다면, 선택을 통해 기존의 엑셀 파일을 자동으로 수정해줍니다.\r\n";
+            label1.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // button1
             // 
@@ -94,7 +94,7 @@
             Controls.Add(buttonSelectSingleFile);
             Controls.Add(textBox1);
             Name = "FormTranslationAnalyzerPathSelect";
-            Text = "엑셀 파일이 있는 파일 경로를 지정해주세요.";
+            Text = "엑셀 파일이 있는 파일 경로를 지정해주세요. (다중선택 가능)";
             ResumeLayout(false);
             PerformLayout();
         }
