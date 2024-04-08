@@ -13,6 +13,9 @@ namespace RimworldExtractorGUI
         internal static readonly string LatestUrl = Path.Combine(ReleasesUrl, "latest");
         internal static readonly string IssueUrl = "https://github.com/csh1668/RimworldExtractor/issues/new/choose";
 
+        internal static readonly string DiscussionUrl =
+            "https://github.com/RimWorldKorea/RMK/discussions/categories/%EC%9D%BC%EB%B0%98-%EB%A6%BC%EC%B6%94%EC%B6%9C%EA%B8%B0";
+
         public static string GetLatest()
         {
             using var hc = new HttpClient(new HttpClientHandler(){AllowAutoRedirect = false});

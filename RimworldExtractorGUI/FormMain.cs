@@ -228,7 +228,7 @@ namespace RimworldExtractorGUI
 
         private void button1_Click(object sender, EventArgs e)
         {
-            Process.Start("explorer.exe", GithubVersionCheker.IssueUrl);
+            Process.Start("explorer.exe", GithubVersionCheker.DiscussionUrl);
         }
 
         private void buttonOpenTranslationAnalyzer_Click(object sender, EventArgs e)
