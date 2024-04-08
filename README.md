@@ -12,10 +12,11 @@
 
 - `Defs`, `Keyed`, `Strings`, `Patches`의 추출 가능
   1. ParentDef을 고려하기 위한 `XML 상속`, `참조 모드` 기능 지원
-  2. 더 정확한 DefInjection을 위한 `TranslationHandle`, `Full-List Translation`, `TKey(SlateRef)` 기능 지원
+  2. 정확한 DefInjection을 위한 `TranslationHandle`, `Full-List Translation`, `TKey(SlateRef)` 기능 지원
   3. XML Extension 모드의 `tKey`, `tToopTip`, 바익 프레임워크의 `MVCF` 등 여러 기반 모드의 추가 기능 지원
-  4. 더 심화된 `Patches` 지원: nomatch 지원, 패치 과정에서 생성되는 Def의 추출 지원, 추출 및 XML로 변환 시 `Patches` 파일 자동 생성.
+  4. 심화된 `Patches` 지원: nomatch 지원, 패치 과정에서 생성되는 Def의 추출 지원, 추출 및 XML로 변환 시 요구 모드 등에 따라 `Patches` 파일 자동 생성.
 - 추출 시 `엑셀(림왈도 형식, .xlsx)`, `XML`, `XML(주석 포함)`의 저장 방식 지원
-- XML과 엑셀 파일 간 상호 변환 가능 (XLSX -> XML, XML -> XLSX)
+- XML과 엑셀 파일 간 상호 변환 기능 (XLSX -> XML, XML -> XLSX)
+- 번역 분석기 기능
 - 알파 추출기 형식 사용 가능
-- 커뮤니티 배포를 위한 이미지 파일과 압축 파일을 하나로 합치는 기능 제공
+- 커뮤니티 배포를 위한 이미지 파일과 압축 파일을 하나로 합치는 기능
