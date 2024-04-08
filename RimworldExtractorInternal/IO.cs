@@ -451,7 +451,7 @@ namespace RimworldExtractorInternal
                     XmlElement operation;
                     if (requiredMods != null)
                     {
-                        operation = entryDict[requiredMods.ToString()];
+                        operation = entryDict[requiredMods.ToString()].AppendElement("li");
                     }
                     else
                     {
