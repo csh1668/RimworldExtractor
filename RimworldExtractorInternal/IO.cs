@@ -102,7 +102,7 @@ namespace RimworldExtractorInternal
             var fillOriginals = new List<TranslationAnalyzerEntry.ChangeRecord>();
             var removeNodes = new List<TranslationAnalyzerEntry.ChangeRecord>();
             var addedNewlys = new List<TranslationAnalyzerEntry.ChangeRecord>();
-            var dateString = DateTime.Today.ToShortDateString();
+            var dateString = DateTime.Today.ToString("yyyy-mm-dd");
 
             foreach (var changeRecord in changes)
             {
