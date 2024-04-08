@@ -233,6 +233,14 @@ namespace RimworldExtractorInternal
                         comment.Visible = true;
                     }
                     mainSheet.Row(2 + i + rows.Count).Select();
+
+                    if (i == 0)
+                    {
+                        mainSheet.Cell(2 + i + rows.Count, colOriginal).Style.Fill.SetBackgroundColor(XLColor.SkyBlue);
+                        var comment = mainSheet.Cell(2 + i + rows.Count, colOriginal).GetComment();
+                        comment.AddText($"{dateString}에 새로 추가된 노드들 ({addedNewlys.Count}개)");
+                        comment.Visible = true;
+                    }
                 }
             }
 
