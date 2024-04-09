@@ -1,4 +1,5 @@
 using System.Xml;
+using DocumentFormat.OpenXml.Office2013.PowerPoint.Roaming;
 using RimworldExtractorInternal.DataTypes;
 
 namespace RimworldExtractorInternal;
@@ -11,7 +12,7 @@ internal static class PatchOperations
     /// </summary>
     public static readonly List<(RequiredMods?, XmlNode)> DefsAddedByPatches = new();
 
-    public static IEnumerable<TranslationEntry> PatchOperationRecursive(XmlNode curNode, RequiredMods? requiredMods)
+    public static IEnumerable<TranslationEntry> PatchOperationRecursive(XmlNode curNode, RequiredMods? requiredMods, bool prePatchMode = false)
     {
         if (Extractor.CombinedDefs == null)
             yield break;
@@ -28,27 +29,40 @@ internal static class PatchOperations
         switch (operation)
         {
             case "PatchOperationFindMod":
-                foreach (var translationEntry in PatchOperationFindMod(curNode, requiredMods))
+                foreach (var translationEntry in PatchOperationFindMod(curNode, requiredMods, prePatchMode))
                     yield return translationEntry;
                 break;
             case "PatchOperationSequence":
-                foreach (var translationEntry in PatchOperationSequence(curNode, requiredMods)) 
+                foreach (var translationEntry in PatchOperationSequence(curNode, requiredMods, prePatchMode)) 
                     yield return translationEntry;
                 break;
             case "PatchOperationAdd":
-                foreach (var translationEntry in PatchOperationAdd(curNode, requiredMods)) 
+                foreach (var translationEntry in PatchOperationAdd(curNode, requiredMods, prePatchMode)) 
                     yield return translationEntry;
                 break;
             case "PatchOperationReplace":
-                foreach (var translationEntry in PatchOperationReplace(curNode, requiredMods))
+                foreach (var translationEntry in PatchOperationReplace(curNode, requiredMods, prePatchMode))
                     yield return translationEntry;
                 break;
             case "PatchOperationAddModExtension":
-                foreach (var translationEntry in PatchOperationAddModExtension(curNode, requiredMods))
+                foreach (var translationEntry in PatchOperationAddModExtension(curNode, requiredMods, prePatchMode))
                     yield return translationEntry;
                 break;
             case "PatchOperationInsert":
-                foreach (var translationEntry in PatchOperationInsert(curNode, requiredMods))
+                foreach (var translationEntry in PatchOperationInsert(curNode, requiredMods, prePatchMode))
+                    yield return translationEntry;
+                break;
+            // PrePatches
+            case "PatchOperationAttributeAdd":
+                foreach (var translationEntry in PatchOperationAttribute(curNode, requiredMods, PatchOperationAttributeMode.Add, prePatchMode))
+                    yield return translationEntry;
+                break;
+            case "PatchOperationAttributeRemove":
+                foreach (var translationEntry in PatchOperationAttribute(curNode, requiredMods, PatchOperationAttributeMode.Remove, prePatchMode))
+                    yield return translationEntry;
+                break;
+            case "PatchOperationAttributeSet":
+                foreach (var translationEntry in PatchOperationAttribute(curNode, requiredMods, PatchOperationAttributeMode.Set, prePatchMode))
                     yield return translationEntry;
                 break;
         }
@@ -56,8 +70,12 @@ internal static class PatchOperations
         yield break;
     }
 
-    private static IEnumerable<TranslationEntry> PatchOperationInsert(XmlNode curNode, RequiredMods? requiredMods)
+
+    private static IEnumerable<TranslationEntry> PatchOperationInsert(XmlNode curNode, RequiredMods? requiredMods, bool prePatchMode = false)
     {
+        if (prePatchMode)
+            yield break;
+
         var xpath = curNode["xpath"]?.InnerText;
         XmlNode? value = curNode["value"];
         if (xpath == null || value == null)
@@ -99,9 +117,10 @@ internal static class PatchOperations
         }
     }
 
-    private static IEnumerable<TranslationEntry> PatchOperationAddModExtension(XmlNode curNode, RequiredMods? requiredMods)
+    private static IEnumerable<TranslationEntry> PatchOperationAddModExtension(XmlNode curNode, RequiredMods? requiredMods, bool prePatchMode = false)
     {
-        if (Extractor.CombinedDefs == null) yield break;
+        if (prePatchMode)
+            yield break;
 
         var xpath = curNode["xpath"]?.InnerText;
         XmlNode? value = curNode["value"];
@@ -141,8 +160,11 @@ internal static class PatchOperations
         }
     }
 
-    private static IEnumerable<TranslationEntry> PatchOperationReplace(XmlNode curNode, RequiredMods? requiredMods)
+    private static IEnumerable<TranslationEntry> PatchOperationReplace(XmlNode curNode, RequiredMods? requiredMods, bool prePatchMode = false)
     {
+        if (prePatchMode)
+            yield break;
+
         var xpath = curNode["xpath"]?.InnerText;
         XmlNode? value = curNode["value"];
         if (xpath == null || value == null)
@@ -183,8 +205,11 @@ internal static class PatchOperations
         }
     }
 
-    private static IEnumerable<TranslationEntry> PatchOperationAdd(XmlNode curNode, RequiredMods? requiredMods) 
+    private static IEnumerable<TranslationEntry> PatchOperationAdd(XmlNode curNode, RequiredMods? requiredMods, bool prePatchMode = false) 
     {
+        if (prePatchMode)
+            yield break;
+
         var xpath = curNode["xpath"]?.InnerText;
         XmlNode? value = curNode["value"];
         if (xpath == null || value == null)
@@ -238,21 +263,21 @@ internal static class PatchOperations
         }
     }
 
-    private static IEnumerable<TranslationEntry> PatchOperationSequence(XmlNode curNode, RequiredMods? requiredMods)
+    private static IEnumerable<TranslationEntry> PatchOperationSequence(XmlNode curNode, RequiredMods? requiredMods, bool prePatchMode = false)
     {
         var operations = curNode["operations"];
         if (operations == null)
             yield break;
         foreach (XmlNode childOperation in operations.ChildNodes)
         {
-            foreach (var translationEntry in PatchOperationRecursive(childOperation, requiredMods))
+            foreach (var translationEntry in PatchOperationRecursive(childOperation, requiredMods, prePatchMode))
             {
                 yield return translationEntry;
             }
         }
     }
 
-    private static IEnumerable<TranslationEntry> PatchOperationFindMod(XmlNode curNode, RequiredMods? requiredMods)
+    private static IEnumerable<TranslationEntry> PatchOperationFindMod(XmlNode curNode, RequiredMods? requiredMods, bool prePatchMode = false)
     {
         requiredMods = new RequiredMods(requiredMods);
         var noMatchRequiredMods = new RequiredMods(requiredMods);
@@ -266,7 +291,7 @@ internal static class PatchOperations
             {
                 requiredMods.AddAllowedByModNames(requiredModsList);
             }
-            foreach (var translationEntry in PatchOperationRecursive(match, requiredMods))
+            foreach (var translationEntry in PatchOperationRecursive(match, requiredMods, prePatchMode))
             {
                 yield return translationEntry;
             }
@@ -279,10 +304,61 @@ internal static class PatchOperations
             {
                 noMatchRequiredMods.AddDisallowedByModNames(requiredModsList);
             }
-            foreach (var translationEntry in PatchOperationRecursive(noMatch, noMatchRequiredMods))
+            foreach (var translationEntry in PatchOperationRecursive(noMatch, noMatchRequiredMods, prePatchMode))
             {
                 yield return translationEntry;
             }
         }
+    }
+
+    private static IEnumerable<TranslationEntry> PatchOperationAttribute(XmlNode curNode, RequiredMods? requiredMods, PatchOperationAttributeMode mode, bool prePatchMode = false)
+    {
+        var xpath = curNode["xpath"]?.InnerText;
+        var value = curNode["value"]?.InnerText;
+        var attribute = curNode["attribute"]?.InnerText;
+        if (xpath == null || (mode != PatchOperationAttributeMode.Remove && value == null) || attribute == null)
+        {
+            Log.Wrn($"xpath 또는 value의 값이 없습니다. 잘못된 림월드 XML 포맷.");
+            yield break; // yield break;
+        }
+
+        var selectNodes = Extractor.CombinedDefs.SelectNodesSafe(xpath);
+        if (selectNodes == null) yield break;
+        foreach (XmlNode selectNode in selectNodes)
+        {
+            switch (mode)
+            {
+                case PatchOperationAttributeMode.Add:
+                    if (selectNode.Attributes?[attribute] == null)
+                    {
+                        selectNode.AppendAttribute(attribute, value);
+                    }
+                    break;
+                case PatchOperationAttributeMode.Remove:
+                    if (selectNode.Attributes?[attribute] != null)
+                    {
+                        selectNode.Attributes.Remove(selectNode.Attributes?[attribute]);
+                    }
+                    break;
+                case PatchOperationAttributeMode.Set:
+                    if (selectNode.Attributes?[attribute] != null)
+                    {
+                        selectNode.Attributes[attribute]!.Value = value;
+                    }
+                    else
+                    {
+                        selectNode.AppendAttribute(attribute, value);
+                    }
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(mode), mode, null);
+            }
+        }
+
+    }
+
+    private enum PatchOperationAttributeMode
+    {
+        Add, Remove, Set
     }
 }

@@ -291,6 +291,8 @@ namespace RimworldExtractorInternal
 
             customNodes ??= CombinedDefs.DocumentElement!.ChildNodes.OfType<XmlNode>().ToList();
 
+            
+
             foreach (XmlNode node in customNodes)
             {
                 if (node.Attributes == null || node.Attributes["Abstract"]?.Value.ToLower() == "true"

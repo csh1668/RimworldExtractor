@@ -98,7 +98,7 @@ namespace RimworldExtractorGUI
                 buttonExtract.Enabled = true;
 
                 labelSelectedMods.Text = $"선택된 모드: {SelectedMod.ModName}";
-                if (ReferenceMods?.Count > 1)
+                if (ReferenceMods?.Count > 0)
                 {
                     var concatText = string.Join(", ", ReferenceMods.Select(x => x.ModName));
                     var stripedText = concatText.Substring(0, Math.Min(concatText.Length, 200));

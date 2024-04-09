@@ -35,7 +35,8 @@ namespace RimworldExtractorInternal
             var defs = selectedFolders.Where(x => Path.GetFileName(x.FolderName) == "Defs").ToList();
             if (defs.Count > 0)
             {
-                PrepareDefs(defs, refDefs);
+                var prePatches = selectedFolders.Where(x => Path.GetFileName(x.FolderName) == "Patches").ToList();
+                PrepareDefs(defs, refDefs, prePatches);
                 extraction.AddRange(ExtractDefs());
             }
             foreach (var extractableFolder in selectedFolders)
@@ -69,7 +70,7 @@ namespace RimworldExtractorInternal
                     if (pair.Item2 != entry.Original)
                     {
                         Log.Wrn(
-                            $"원문이 다른 중복되는 노드가 있습니다. {entry.ClassName}+{entry.Original}| {pair.Item2} | {entry.Original} ");
+                            $"원문이 다른 중복되는 노드가 있습니다. {entry.ClassName}+{entry.Node}| {pair.Item2} | {entry.Original} ");
                     }
                 }
 
@@ -86,7 +87,7 @@ namespace RimworldExtractorInternal
             ParentNodeLookUp.Clear();
         }
 
-        private static void PrepareDefs(List<ExtractableFolder> extracableFolders, List<string>? referenceDefsRoots)
+        private static void PrepareDefs(List<ExtractableFolder> extracableFolders, List<string>? referenceDefsRoots, List<ExtractableFolder> prePatches)
         {
 
             if (CombinedDefs == null)
@@ -126,7 +127,30 @@ namespace RimworldExtractorInternal
                     }
                 }
             });
+
+            DoPrePatch(prePatches);
+
             DoXmlInheritance();
+        }
+
+        private static void DoPrePatch(List<ExtractableFolder> prePatches)
+        {
+            foreach (var patchDir in prePatches)
+            {
+                foreach (var entry in ExtractPatches(patchDir, true))
+                {
+                    // do nothing
+                }
+            }
+
+            foreach (XmlNode node in CombinedDefs!.DocumentElement!.ChildNodes)
+            {
+                var attributeName = node.Attributes?["Name"]?.Value;
+                if (attributeName != null)
+                {
+                    ParentNodeLookUp[attributeName] = node;
+                }
+            }
         }
 
         internal static IEnumerable<TranslationEntry> ExtractDefs()
@@ -232,16 +256,16 @@ namespace RimworldExtractorInternal
         }
 
 
-        internal static IEnumerable<TranslationEntry> ExtractPatches(ExtractableFolder patches)
+        internal static IEnumerable<TranslationEntry> ExtractPatches(ExtractableFolder patches, bool prePatchMode = false)
         {
-            var rawExtraction = ExtractPatchesInternal(patches).ToList();
+            var rawExtraction = ExtractPatchesInternal(patches, prePatchMode).ToList();
             foreach (var entry in CompatManager.DoPostProcessing(rawExtraction))
             {
                 yield return entry;
             }
         }
 
-        private static IEnumerable<TranslationEntry> ExtractPatchesInternal(ExtractableFolder patches)
+        private static IEnumerable<TranslationEntry> ExtractPatchesInternal(ExtractableFolder patches, bool prePatchMode = false)
         {
             if (CombinedDefs == null)
             {
@@ -281,7 +305,7 @@ namespace RimworldExtractorInternal
 
             foreach (XmlNode node in doc.DocumentElement!.ChildNodes)
             {
-                foreach (var translationEntry in PatchOperations.PatchOperationRecursive(node, null))
+                foreach (var translationEntry in PatchOperations.PatchOperationRecursive(node, null, prePatchMode))
                 {
                     yield return translationEntry with
                     {
