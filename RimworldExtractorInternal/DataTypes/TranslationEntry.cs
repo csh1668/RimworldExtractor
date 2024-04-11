@@ -1,4 +1,6 @@
-﻿namespace RimworldExtractorInternal.DataTypes
+﻿using System.Diagnostics;
+
+namespace RimworldExtractorInternal.DataTypes
 {
     /// <summary>
     /// 번역 데이터
@@ -9,7 +11,7 @@
     /// <param name="Translated">번역문</param>
     /// <param name="RequiredMods">요구 모드</param>
     public record TranslationEntry(string ClassName, string Node, string Original, string? Translated,
-        RequiredMods? RequiredMods)
+        RequiredMods? RequiredMods, string? SourceFile)
     {
         public TranslationEntry(TranslationEntry other)
         {
@@ -21,6 +23,7 @@
             {
                 this.RequiredMods = new RequiredMods(other.RequiredMods);
             }
+            SourceFile = other.SourceFile;
 
             _extensions = new Dictionary<string, object>();
             foreach (var otherExtension in other._extensions)
@@ -51,6 +54,8 @@
             _extensions.Add(key, extension);
             return this;
         }
+
+        public string ClassNode => $"{ClassName}+{Node}";
 
     }
 }

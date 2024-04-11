@@ -118,7 +118,7 @@ namespace RimworldExtractorGUI
 
             Log.Msg("추출 시작...");
 
-            var extraction = Extractor.ExtractTranslationData(SelectedFolders, ReferenceMods);
+            var extraction = Extractor.ExtractTranslationData(SelectedMod, SelectedFolders, ReferenceMods);
 
             var outPath = SelectedMod.Identifier.StripInvaildChars();
             switch (Prefabs.Method)

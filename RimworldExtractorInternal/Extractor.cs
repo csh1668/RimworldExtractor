@@ -16,8 +16,13 @@ namespace RimworldExtractorInternal
         internal static XmlDocument? CombinedDefs;
         public static readonly Dictionary<string, XmlNode> ParentNodeLookUp = new();
 
-        public static List<TranslationEntry> ExtractTranslationData(List<ExtractableFolder> selectedFolders, List<ModMetadata>? referenceMods)
+        private static bool _isOfficialContent = false;
+
+        public static List<TranslationEntry> ExtractTranslationData(ModMetadata modMetadata, List<ExtractableFolder> selectedFolders, List<ModMetadata>? referenceMods)
         {
+            if (modMetadata.IsOfficialContent)
+                _isOfficialContent = true;
+
             var refDefs = new List<string>();
             if (referenceMods != null)
             {
@@ -77,6 +82,8 @@ namespace RimworldExtractorInternal
                 set.Add(tuple);
             }
 
+            _isOfficialContent = false;
+
             return extraction.DistinctBy(x => $"{x.ClassName}+{x.Node}").ToList();
         }
 
@@ -103,6 +110,7 @@ namespace RimworldExtractorInternal
                 {
                     try
                     {
+                        var fileName = Path.GetFileNameWithoutExtension(filePath);
                         var childDoc = IO.ReadXml(filePath);
 
                         foreach (XmlNode node in childDoc.DocumentElement!.ChildNodes)
@@ -112,6 +120,11 @@ namespace RimworldExtractorInternal
                             if (requiredPackageId != null)
                             {
                                 newNode.AppendAttribute("RequiredPackageId", requiredPackageId);
+                            }
+
+                            if (_isOfficialContent)
+                            {
+                                newNode.AppendAttribute("SourceFile", fileName);
                             }
                             CombinedDefs.DocumentElement!.AppendChild(newNode);
                             var attributeName = node.Attributes?["Name"]?.Value;
@@ -156,6 +169,10 @@ namespace RimworldExtractorInternal
         internal static IEnumerable<TranslationEntry> ExtractDefs()
         {
             var rawExtraction = ExtractDefsInternal().ToList();
+            foreach (var translationEntry in rawExtraction)
+            {
+                Console.WriteLine(translationEntry);
+            }
             foreach (var entry in CompatManager.DoPostProcessing(rawExtraction))
             {
                 yield return entry;
@@ -217,13 +234,13 @@ namespace RimworldExtractorInternal
             
             foreach (var filePath in IO.DescendantFiles(keyedRoot).Where(x => x.ToLower().EndsWith(".xml")))
             {
-                //var nodeName = Path.GetRelativePath(keyedRoot, filePath);
-                //nodeName = Path.GetFileNameWithoutExtension(nodeName).Replace('\\', '.');
+                var fileName = Path.GetFileNameWithoutExtension(filePath);
 
                 var doc = IO.ReadXml(filePath);
                 foreach (XmlNode node in doc.DocumentElement!.ChildNodes)
                 {
-                    yield return new TranslationEntry("Keyed", node.Name, node.InnerText, null, requiredMods);
+                    yield return new TranslationEntry("Keyed", node.Name, node.InnerText, null, requiredMods,
+                        _isOfficialContent ? fileName : null);
                 }
             }
         }
@@ -250,7 +267,7 @@ namespace RimworldExtractorInternal
                 for (var i = 0; i < lines.Length; i++)
                 {
                     var line = lines[i];
-                    yield return new TranslationEntry("Strings", $"{nodeName}.{i}", line, null, requiredMods);
+                    yield return new TranslationEntry("Strings", $"{nodeName}.{i}", line, null, requiredMods, null);
                 }
             }
         }

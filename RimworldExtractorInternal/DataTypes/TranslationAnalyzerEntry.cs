@@ -125,7 +125,7 @@ namespace RimworldExtractorInternal.DataTypes
                 throw new NullReferenceException();
             }
 
-            NewTranslations = Extractor.ExtractTranslationData(selectedFolders, referenceMods);
+            NewTranslations = Extractor.ExtractTranslationData(Metadata, selectedFolders, referenceMods);
         }
 
         public record ChangeRecord(TranslationEntry? Orig, TranslationEntry? New, ChangeReason Reason);

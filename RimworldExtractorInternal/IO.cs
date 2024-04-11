@@ -317,7 +317,7 @@ namespace RimworldExtractorInternal
                 var translated = cellTranslated.IsText ? (cellTranslated.GetText() == "" ? null : cellTranslated.GetText()) : null;
 
                 var translation = new TranslationEntry(className, node, original,
-                    translated, requiredMods);
+                    translated, requiredMods, null);
                 translations.Add(translation);
             }
             return translations;
@@ -333,6 +333,12 @@ namespace RimworldExtractorInternal
             var strings = new List<TranslationEntry>();
             var patches = new List<TranslationEntry>();
             var patchedNodeSet = new HashSet<string>();
+
+            var isOfficial = translations.Any(x => x.SourceFile != null);
+            if (isOfficial)
+            {
+                Log.Msg("공식 컨텐츠는 모드를 추출할 때와는 달리, 파일명을 보존해서 추출합니다.");
+            }
 
 
             foreach (var translation in translations)
@@ -356,7 +362,7 @@ namespace RimworldExtractorInternal
                         {
                             if (className.StartsWith("Patches."))
                                 patches.Add(translation);
-                            else if (Prefabs.FullListTranslationTags.Any(x => translation.Node.Contains(x)))
+                            else if (!isOfficial && Prefabs.FullListTranslationTags.Any(x => translation.Node.Contains(x)))
                                 defInjectedFullListTranslations.Add(translation);
                             else
                                 defInjected.Add(translation);
@@ -488,10 +494,10 @@ namespace RimworldExtractorInternal
                     if (patchedNodeSet.Contains(translation.Node))
                         continue;
                     PathCombineCreateDir(defInjectedDir, translation.ClassName);
-                    if (!xmls.TryGetValue(translation.ClassName, out var doc))
+                    if (!xmls.TryGetValue($"{translation.ClassName}|{translation.SourceFile}", out var doc))
                     {
                         doc = new XmlDocument();
-                        xmls[translation.ClassName] = doc;
+                        xmls[$"{translation.ClassName}|{translation.SourceFile}"] = doc;
                         doc.AppendElement("LanguageData");
                     }
 
@@ -517,9 +523,13 @@ namespace RimworldExtractorInternal
 
                 }
 
-                foreach (var (className, doc) in xmls)
+                foreach (var (key, doc) in xmls)
                 {
-                    var outputPath = Path.Combine(defInjectedDir, className, fileName + ".xml");
+                    var tokens = key.Split('|');
+                    var className = tokens[0];
+                    var outputPath = tokens.Length == 1
+                        ? Path.Combine(defInjectedDir, className, fileName + ".xml")
+                        : Path.Combine(defInjectedDir, className, tokens[1] + ".xml");
 
                     doc.DoFullListTranslation();
                     doc.SaveSafely(outputPath);
@@ -582,9 +592,7 @@ namespace RimworldExtractorInternal
                 var xmls = new Dictionary<string, XmlDocument>();
                 foreach (var translation in keyed)
                 {
-                    var idxSep = translation.Node.IndexOf('|');
-                    var key = idxSep != -1 ? translation.Node.Split('|')[0] : "default";
-                    var nodeName = idxSep != -1 ? translation.Node[(idxSep + 1)..] : translation.Node;
+                    var key = isOfficial ? translation.SourceFile! : "default";
 
                     if (!xmls.TryGetValue(key, out var doc))
                     {
@@ -597,13 +605,13 @@ namespace RimworldExtractorInternal
                     {
                         if (commentOriginal)
                             languageData.AppendComment($"{Prefabs.OriginalLanguage}={SecurityElement.Escape(translation.Original).Replace('-', 'ー')}");
-                        languageData.AppendElement(nodeName, translation.Translated ?? translation.Original);
+                        languageData.AppendElement(translation.Node, translation.Translated ?? translation.Original);
                     });
                 }
 
-                foreach (var (_, doc) in xmls)
+                foreach (var (key, doc) in xmls)
                 {
-                    var outputPath = Path.Combine(keyedDir, $"{fileName}.xml");
+                    var outputPath = isOfficial ? Path.Combine(keyedDir, $"{key}.xml"): Path.Combine(keyedDir, $"{fileName}.xml");
                     doc.SaveSafely(outputPath);
                 }
             }
@@ -653,7 +661,7 @@ namespace RimworldExtractorInternal
                     foreach (XmlElement node in doc.DocumentElement!.ChildNodes)
                     {
                         var name = node.Name;
-                        translations.Add(new TranslationEntry(className, name, string.Empty, node.InnerText, null));
+                        translations.Add(new TranslationEntry(className, name, string.Empty, node.InnerText, null, null));
                     }
                 }
                 catch (Exception e)

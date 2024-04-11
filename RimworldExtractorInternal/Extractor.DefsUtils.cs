@@ -67,6 +67,8 @@ namespace RimworldExtractorInternal
                 ? RequiredMods.FromStringByModNames(requiredModsInnerText)
                 : null;
 
+            var fileName = _isOfficialContent ? rootNode.Attributes?["SourceFile"]?.Value : null;
+
             // (CurrentNode, CurrentPath)
             var q = new Queue<(XmlNode, string)>();
 
@@ -104,7 +106,7 @@ namespace RimworldExtractorInternal
                             var tKey = curNode.Attributes["TKey"]!.Value;
                             nodeName = $"{defName}.{tKey}.slateRef";
                         }
-                        var translation = new TranslationEntry(className, nodeName, curNode.InnerText, null, requiredMods);
+                        var translation = new TranslationEntry(className, nodeName, curNode.InnerText, null, requiredMods, fileName);
                         yield return translation;
                     }
                     continue;
@@ -167,15 +169,15 @@ namespace RimworldExtractorInternal
                         var tKeyTip = curNode.ParentNode?["tKeyTip"]?.InnerText;
                         if (lastTag is "label" or "text" && tKey != null)
                         {
-                            yield return new TranslationEntry("Keyed", tKey, curNode.InnerText, null, null);
+                            yield return new TranslationEntry("Keyed", tKey, curNode.InnerText, null, null, null);
                         }
                         else if (lastTag == "tooltip" && tKeyTip != null)
                         {
-                            yield return new TranslationEntry("Keyed", tKeyTip, curNode.InnerText, null, null);
+                            yield return new TranslationEntry("Keyed", tKeyTip, curNode.InnerText, null, null, null);
                         }
                         else
                         {
-                            yield return new TranslationEntry(className, $"{defName}.{curPath}", curNode.InnerText, null, null);
+                            yield return new TranslationEntry(className, $"{defName}.{curPath}", curNode.InnerText, null, null, null);
                         }
                     }
 
@@ -344,8 +346,16 @@ namespace RimworldExtractorInternal
                 var requiredPackageId = node.Attributes["RequiredPackageId"]?.Value;
                 if (requiredPackageId != null)
                 {
-                    var attribute = mergedNode.Attributes.Append(newDoc.CreateAttribute("RequiredPackageId"));
-                    attribute.Value = requiredPackageId;
+                    mergedNode.AppendAttribute("RequiredPackageId", requiredPackageId);
+                }
+
+                if (_isOfficialContent)
+                {
+                    var sourceFile = node.Attributes["SourceFile"]?.Value;
+                    if (sourceFile != null)
+                    {
+                        mergedNode.AppendAttribute("SourceFile", sourceFile);
+                    }
                 }
 
                 if (node.Attributes["Reference"]?.Value.ToLower() == "true")
