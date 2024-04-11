@@ -24,14 +24,20 @@ namespace RimworldExtractorInternal
                 _isOfficialContent = true;
 
             var refDefs = new List<string>();
+            var prePatches = new List<ExtractableFolder>();
             if (referenceMods != null)
             {
                 foreach (var referenceMod in referenceMods)
                 {
                     refDefs.AddRange(from extractableFolder in ModLister.GetExtractableFolders(referenceMod)
-                        where (extractableFolder.VersionInfo == "default" || extractableFolder.VersionInfo == Prefabs.CurrentVersion)
+                        where (extractableFolder.VersionInfo == "default" ||
+                               extractableFolder.VersionInfo == "Common" ||
+                               extractableFolder.VersionInfo == Prefabs.CurrentVersion)
                               && Path.GetFileName(extractableFolder.FolderName) == "Defs"
                         select Path.Combine(referenceMod.RootDir, extractableFolder.FolderName));
+                    prePatches.AddRange(ModLister.GetExtractableFolders(referenceMod).Where(x =>
+                        (x.VersionInfo == "default" || x.VersionInfo == "Common" ||
+                         x.VersionInfo == Prefabs.CurrentVersion) && Path.GetFileName(x.FolderName) == "Patches"));
                 }
             }
 
@@ -40,7 +46,7 @@ namespace RimworldExtractorInternal
             var defs = selectedFolders.Where(x => Path.GetFileName(x.FolderName) == "Defs").ToList();
             if (defs.Count > 0)
             {
-                var prePatches = selectedFolders.Where(x => Path.GetFileName(x.FolderName) == "Patches").ToList();
+                prePatches.AddRange(selectedFolders.Where(x => Path.GetFileName(x.FolderName) == "Patches").ToList());
                 PrepareDefs(defs, refDefs, prePatches);
                 extraction.AddRange(ExtractDefs());
             }
@@ -168,6 +174,9 @@ namespace RimworldExtractorInternal
 
         internal static IEnumerable<TranslationEntry> ExtractDefs()
         {
+#if DEBUG
+            CombinedDefs.Save("test.xml");
+#endif
             var rawExtraction = ExtractDefsInternal().ToList();
             foreach (var translationEntry in rawExtraction)
             {
