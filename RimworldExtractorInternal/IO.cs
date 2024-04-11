@@ -645,6 +645,9 @@ namespace RimworldExtractorInternal
         public static List<TranslationEntry> FromLanguageXml(string rootPath)
         {
             var translationsDir = Path.Combine(rootPath, "Languages", Prefabs.TranslationLanguage);
+            if (!Directory.Exists(translationsDir))
+                translationsDir = Path.Combine(rootPath, "Languages", Prefabs.TranslationLanguage.Split(' ').First());
+
             var defInjectedDir = Path.Combine(translationsDir, "DefInjected");
             var keyedDir = Path.Combine(translationsDir, "Keyed");
             var stringsDir = Path.Combine(translationsDir, "Strings");
