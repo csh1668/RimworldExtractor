@@ -17,7 +17,7 @@ namespace RimworldExtractorInternal
         /// Prefabs.dat의 호환성을 위해 존재합니다. Prefabs의 필드가 수정되었을 때 이 숫자를 1 증가시켜,
         /// Prefabs.dat에 저장된 숫자가 이와 다르다면, 해당 데이터를 읽지 않도록 합니다.
         /// </summary>
-        private static readonly string Version = "6";
+        private static readonly string Version = "7";
 
         public static string PathRimworld = string.Empty;
         public static string PathWorkshop = string.Empty;
@@ -56,7 +56,7 @@ namespace RimworldExtractorInternal
             PathRimworld = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\RimWorld";
             PathWorkshop = "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100";
             PathBaseRefList = "";
-            CurrentVersion = "1.4";
+            CurrentVersion = "1.5";
             PatternVersion = @"^[1]\.\d+";
             PatternVersionWithV = @"^v[1]\.\d+";
             OriginalLanguage = "English";
