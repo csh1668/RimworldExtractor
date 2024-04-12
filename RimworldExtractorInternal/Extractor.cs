@@ -80,8 +80,8 @@ namespace RimworldExtractorInternal
                 {
                     if (pair.Item2 != entry.Original)
                     {
-                        Log.Wrn(
-                            $"원문이 다른 중복되는 노드가 있습니다. {entry.ClassName}+{entry.Node}| {pair.Item2} | {entry.Original} ");
+                        Log.Err(
+                            $"원문이 다른 중복되는 노드가 있습니다. 노드: {entry.ClassName}+{entry.Node}| {pair.Item2} | {entry.Original} ");
                     }
                 }
 

@@ -374,7 +374,7 @@ namespace RimworldExtractorInternal
             if (skipNoTranslation && patches.Count == 0 && defInjected.Count == 0 &&
                 keyed.Count == 0 && translations.Count > 0 && defInjectedFullListTranslations.Count == 0)
             {
-                Log.Wrn("번역 데이터가 존재하지 않아 아무것도 추출되지 않습니다.");
+                Log.Wrn("번역 데이터가 존재하지 않아 아무것도 추출되지 않습니다. 팁) XLSX -> XML 기능의 경우 번역된 내용이 없으면 아무것도 저장되지 않습니다.");
             }
 
             if (patches.Count > 0)

@@ -208,11 +208,15 @@ namespace RimworldExtractorGUI
             if (form.ShowDialog(this) == DialogResult.OK)
             {
                 var roots = form.FileNames;
-                foreach (var root in roots)
+                for (var i = 0; i < roots.Length; i++)
                 {
+                    var root = roots[i];
                     var translations = IO.FromLanguageXml(root);
                     IO.ToExcel(translations, Path.Combine(root, Path.GetFileNameWithoutExtension(root)));
+                    Log.Msg($"{i + 1}/{roots.Length}::수정 완료: {root}");
                 }
+
+                MessageBox.Show("변환이 완료되었습니다!");
             }
         }
 
