@@ -527,9 +527,9 @@ namespace RimworldExtractorInternal
                 {
                     var tokens = key.Split('|');
                     var className = tokens[0];
-                    var outputPath = tokens.Length == 1
-                        ? Path.Combine(defInjectedDir, className, fileName + ".xml")
-                        : Path.Combine(defInjectedDir, className, tokens[1] + ".xml");
+                    var outputPath = isOfficial
+                        ? Path.Combine(defInjectedDir, className, tokens[1] + ".xml")
+                        : Path.Combine(defInjectedDir, className, fileName + ".xml");
 
                     doc.DoFullListTranslation();
                     doc.SaveSafely(outputPath);
