@@ -81,7 +81,11 @@ namespace RimworldExtractorInternal
                 ["AlienRace.AlienBackstoryDef+*"] = "BackstoryDef+*",
                 ["RatkinGeneExpanded.FactionDefExtended+*"] = "FactionDef+*",
                 ["RatkinGeneExpanded.ThingDefExtended+*"] = "ThingDef+*",
-                ["AlienRace.ThingDef_AlienRace+*"] = "ThingDef+*"
+                ["AlienRace.ThingDef_AlienRace+*"] = "ThingDef+*",
+                ["Rimlaser.Building_LaserGunDef+*"] = "ThingDef+*",
+                ["Rimlaser.LaserBeamDef+*"] = "ThingDef+*",
+                ["Rimlaser.LaserGunDef+*"] = "ThingDef+*",
+                ["Rimlaser.SpinningLaserGunDef+*"] = "ThingDef+*",
             };
             TranslationHandles = new()
             {
