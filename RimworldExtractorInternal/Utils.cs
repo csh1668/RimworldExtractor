@@ -162,7 +162,8 @@ namespace RimworldExtractorInternal
         internal static bool IsListNode(this XmlNode? curNode) => curNode?.Name == "li";
 
         internal static bool IsTextNode(this XmlNode? curNode) =>
-            curNode?.ChildNodes.Count == 1 && curNode.FirstChild!.NodeType == XmlNodeType.Text;
+            curNode?.ChildNodes.Count == 1 && (curNode.FirstChild!.NodeType == XmlNodeType.Text ||
+                                               curNode.FirstChild!.NodeType == XmlNodeType.CDATA);
 
         public static XmlNodeList? SelectNodesSafe(this XmlDocument? doc, string? xpath)
         {
