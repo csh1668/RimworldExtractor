@@ -579,7 +579,7 @@ namespace RimworldExtractorInternal
                 {
                     var tokens = nodeParent.Split('.');
                     var outputPath = Path.Combine(defInjectedDir, className,
-                        fileName + $"-{tokens[0]}{tokens.Last()}" + ".xml");
+                        fileName + $"-{nodeParent}" + ".xml");
 
                     doc.DoFullListTranslation();
                     doc.SaveSafely(outputPath);
