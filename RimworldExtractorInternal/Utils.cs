@@ -153,9 +153,16 @@ namespace RimworldExtractorInternal
 
         public static string StrVal(this IXLCell cell)
         {
-            var value = cell.Value;
-            if (value.TryGetText(out string str))
-                return str;
+            try
+            {
+                var value = cell.Value;
+                if (value.TryGetText(out string str))
+                    return str;
+            }
+            catch (Exception e)
+            {
+                Log.Msg($"엑셀 파일 속 텍스트를 읽는 중 에러 발생: {cell.Address}-{e.Message}");
+            }
             return string.Empty;
         }
 
