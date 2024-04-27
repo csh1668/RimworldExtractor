@@ -34,6 +34,7 @@ namespace RimworldExtractorGUI
 
         private void AnalyzeTranslation(string[] paths)
         {
+            int invailedCnt = 0;
             for (var i = 0; i < paths.Length; i++)
             {
                 if (labelTitle.InvokeRequired)
@@ -47,6 +48,9 @@ namespace RimworldExtractorGUI
 
                 var path = paths[i];
                 var item = ConvertToItem(path);
+                var tag = (TranslationAnalyzerEntry)item.Tag;
+                if (tag.Invalid)
+                    invailedCnt += 1;
                 _items.Add(item);
                 if (listViewResults.InvokeRequired)
                 {
@@ -58,13 +62,19 @@ namespace RimworldExtractorGUI
                 }
             }
 
+            var doneText = "분석 완료!";
             if (labelTitle.InvokeRequired)
             {
-                labelTitle.Invoke(() => { labelTitle.Text = "분석 완료!"; });
+                labelTitle.Invoke(() => { labelTitle.Text = doneText; });
             }
             else
             {
-                labelTitle.Text = "분석 완료!";
+                labelTitle.Text = doneText;
+            }
+
+            if (invailedCnt > 0)
+            {
+                MessageBox.Show("몇몇 엑셀 파일들을 정상적으로 분석하지 못했습니다. 로그창 확인 후 다시 시도해주세요.");
             }
         }
 
@@ -103,14 +113,17 @@ namespace RimworldExtractorGUI
             if (listViewResults.SelectedItems.Count == 0)
             {
                 buttonOpenSelectMod.Enabled = false;
+                comboBox1.Enabled = false;
                 labelModTitle.Text = "수정할 모드를 선택하세요.";
                 return;
             }
 
             buttonOpenSelectMod.Enabled = true;
+            comboBox1.Enabled = true;
             var selected = listViewResults.SelectedItems[0];
             var analyzerEntry = (TranslationAnalyzerEntry)selected.Tag;
             labelModTitle.Text = analyzerEntry.Metadata?.ToString() ?? "원본 모드를 찾을 수 없었습니다. 수동으로 지정해주세요.";
+            comboBox1.SelectedIndex = (int)analyzerEntry.SaveMethod;
 
         }
 
@@ -206,6 +219,18 @@ namespace RimworldExtractorGUI
             }
 
             contextMenu.Show(MousePosition);
+        }
+
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            var curOption = (string)comboBox1.SelectedItem;
+            var curOptionIdx = comboBox1.SelectedIndex;
+            var curSelected = listViewResults.SelectedItems[0];
+            var curEntry = (TranslationAnalyzerEntry)curSelected.Tag;
+            var curMetaData = curEntry.Metadata;
+            curSelected.SubItems[(int)Column.SaveMethod] = new ListViewItem.ListViewSubItem()
+                { Text = curOption };
+            curEntry.SaveMethod = (TranslationAnalyzerEntry.SaveMethodEnum)curOptionIdx;
         }
 
         private enum Column

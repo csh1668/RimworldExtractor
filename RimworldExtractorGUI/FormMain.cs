@@ -249,8 +249,41 @@ namespace RimworldExtractorGUI
                     var analyzerEntries = analyzer.Entries.ToList();
                     for (var i = 0; i < analyzerEntries.Count; i++)
                     {
+                        string newPath;
                         var analyzerEntry = analyzerEntries[i];
-                        IO.ModifyExcel(analyzerEntry.Changes.ToList(), analyzerEntry.FilePath);
+                        switch (analyzerEntry.SaveMethod)
+                        {
+                            case TranslationAnalyzerEntry.SaveMethodEnum.Append:
+                                IO.ModifyExcel(analyzerEntry.Changes.ToList(), analyzerEntry.FilePath);
+                                break;
+                            case TranslationAnalyzerEntry.SaveMethodEnum.Overwrite:
+                                analyzerEntry.MergeTranslation();
+                                IO.ToExcel(analyzerEntry.NewTranslations!,
+                                    Path.Combine(Path.GetDirectoryName(analyzerEntry.FilePath),
+                                        Path.GetFileNameWithoutExtension(analyzerEntry.FilePath)));
+                                break;
+                            case TranslationAnalyzerEntry.SaveMethodEnum.RewriteNewFile:
+                                analyzerEntry.MergeTranslation();
+                                newPath = Path.Combine(
+                                    Path.GetDirectoryName(analyzerEntry.FilePath),
+                                    Path.GetFileNameWithoutExtension(analyzerEntry.FilePath) + "- 편집됨");
+                                IO.ToExcel(analyzerEntry.NewTranslations, newPath);
+                                Log.Msg($"{i + 1}/{analyzerEntries.Count}::수정 완료: {newPath}");
+                                continue;
+                            case TranslationAnalyzerEntry.SaveMethodEnum.New:
+                                newPath = Path.Combine(
+                                    Path.GetDirectoryName(analyzerEntry.FilePath),
+                                    Path.GetFileNameWithoutExtension(analyzerEntry.FilePath) + "- 편집됨");
+                                IO.ToExcel(
+                                    analyzerEntry.Changes
+                                        .Where(x => x.Reason == TranslationAnalyzerEntry.ChangeReason.AddedNewly)
+                                        .Select(x => x.New).ToList(), newPath);
+                                Log.Msg($"{i + 1}/{analyzerEntries.Count}::수정 완료: {newPath}");
+                                continue;
+                                break;
+                            default:
+                                throw new ArgumentOutOfRangeException();
+                        }
                         Log.Msg($"{i + 1}/{analyzerEntries.Count}::수정 완료: {analyzerEntry.FilePath}");
                     }
 

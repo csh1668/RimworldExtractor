@@ -13,6 +13,7 @@ namespace RimworldExtractorInternal.DataTypes
         public ModMetadata? Metadata;
         public List<TranslationEntry> OriginalTranslations;
         public List<TranslationEntry>? NewTranslations;
+        public SaveMethodEnum SaveMethod;
 
         public bool HasChanges => Metadata != null && Changes.Any();
         public bool Invalid => OriginalTranslations.Count == 0;
@@ -101,6 +102,7 @@ namespace RimworldExtractorInternal.DataTypes
         public TranslationAnalyzerEntry(string path)
         {
             FilePath = path;
+            SaveMethod = SaveMethodEnum.Append;
             Metadata = TranslationAnalyzerTool.GetModMetadataFromFilePath(path);
             try
             {
@@ -108,7 +110,12 @@ namespace RimworldExtractorInternal.DataTypes
             }
             catch (XlsxHeaderReadingException e)
             {
-                Log.Err($"이 파일은 올바른 림왈도 서식을 가진 엑셀 파일이 아닙니다: {path}, {e.Message}");
+                Log.Err($"올바른 림왈도 서식을 가진 엑셀 파일이 아닙니다: {path}, {e.Message}");
+                OriginalTranslations = new List<TranslationEntry>();
+            }
+            catch (IOException e)
+            {
+                Log.Err($"엑셀 파일이 열려 있어서 읽을 수 없었습니다. 닫고 다시 시도해주세요: {path}");
                 OriginalTranslations = new List<TranslationEntry>();
             }
         }
@@ -128,10 +135,32 @@ namespace RimworldExtractorInternal.DataTypes
             NewTranslations = Extractor.ExtractTranslationData(Metadata, selectedFolders, referenceMods);
         }
 
+        public void MergeTranslation()
+        {
+            if (NewTranslations == null)
+                throw new NullReferenceException();
+            var newLst = new List<TranslationEntry>();
+            foreach (var entry in NewTranslations)
+            {
+                var origEntry = OriginalTranslations.FirstOrDefault(x => x.ClassNode == entry.ClassNode);
+                if (origEntry != null)
+                    newLst.Add(entry with { Translated = origEntry.Translated });
+                else
+                    newLst.Add(entry);
+            }
+
+            NewTranslations = newLst;
+        }
+
         public record ChangeRecord(TranslationEntry? Orig, TranslationEntry? New, ChangeReason Reason);
         public enum ChangeReason : byte
         {
             ChangedOriginal = 0, FillOriginal, RemoveNode, AddedNewly
+        }
+
+        public enum SaveMethodEnum : byte
+        {
+            Append, Overwrite, RewriteNewFile, New
         }
 
         private List<ChangeRecord>? _changesCached;
