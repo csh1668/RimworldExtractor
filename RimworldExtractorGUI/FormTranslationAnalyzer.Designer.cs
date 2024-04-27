@@ -179,6 +179,7 @@
             // comboBox1
             // 
             comboBox1.DropDownStyle = ComboBoxStyle.DropDownList;
+            comboBox1.Enabled = false;
             comboBox1.FormattingEnabled = true;
             comboBox1.Items.AddRange(new object[] { "덧붙이기", "재구성하기(덮어씌우기)", "재구성하기(새로만들기)", "추가된 노드만 새로만들기" });
             comboBox1.Location = new Point(885, 147);

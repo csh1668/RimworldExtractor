@@ -18,7 +18,8 @@ namespace RimworldExtractorInternal
         private static readonly string HeaderRequiredMods = "Required Mods [Not chosen]";
         private static string HeaderOriginal => $"{Prefabs.OriginalLanguage} [Source string]";
         private static string HeaderTranslated => $"{Prefabs.TranslationLanguage} [Translation]";
-        public static void ToExcel(List<TranslationEntry> translations, string outPath = "result")
+        public static void ToExcel(List<TranslationEntry> translations, string outPath = "result",
+            bool markNoTranslation = false)
         {
             var xlsx = new XLWorkbook();
             var sheet = xlsx.AddWorksheet();
@@ -53,6 +54,10 @@ namespace RimworldExtractorInternal
                 if (entry.Translated != null)
                 {
                     sheet.Cell(2 + i, 6).Value = entry.Translated;
+                }
+                else if (markNoTranslation)
+                {
+                    sheet.Cell(2 + i, 6).Style.Fill.SetBackgroundColor(XLColor.SkyBlue);
                 }
 
                 if (entry.TryGetExtension(Prefabs.ExtensionKeyExtraCommentTranslated, out object? extension) &&

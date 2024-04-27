@@ -267,7 +267,7 @@ namespace RimworldExtractorGUI
                                 newPath = Path.Combine(
                                     Path.GetDirectoryName(analyzerEntry.FilePath),
                                     Path.GetFileNameWithoutExtension(analyzerEntry.FilePath) + "- 편집됨");
-                                IO.ToExcel(analyzerEntry.NewTranslations, newPath);
+                                IO.ToExcel(analyzerEntry.NewTranslations, newPath, true);
                                 Log.Msg($"{i + 1}/{analyzerEntries.Count}::수정 완료: {newPath}");
                                 continue;
                             case TranslationAnalyzerEntry.SaveMethodEnum.New:
