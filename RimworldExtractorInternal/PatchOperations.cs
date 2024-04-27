@@ -65,6 +65,14 @@ internal static class PatchOperations
                 foreach (var translationEntry in PatchOperationAttribute(curNode, requiredMods, PatchOperationAttributeMode.Set, prePatchMode))
                     yield return translationEntry;
                 break;
+            // Added by mods
+            case "JPTools.PatchOperationFindModById":
+                foreach (var translationEntry in JPTools_PatchOperationFindModById(curNode, requiredMods, prePatchMode))
+                    yield return translationEntry;
+                break;
+            default:
+                Log.Msg($"지원하지 않는 PatchOperation 타입입니다: {operation}");
+                break;
         }
 
         yield break;
@@ -360,5 +368,39 @@ internal static class PatchOperations
     private enum PatchOperationAttributeMode
     {
         Add, Remove, Set
+    }
+
+    private static IEnumerable<TranslationEntry> JPTools_PatchOperationFindModById(XmlNode curNode, RequiredMods? requiredMods, bool prePatchMode = false)
+    {
+        requiredMods = new RequiredMods(requiredMods);
+        var noMatchRequiredMods = new RequiredMods(requiredMods);
+        var requiredModNodes = curNode["mods"]?.ChildNodes;
+        var requiredModsList = requiredModNodes?.Select(n => n.InnerText).ToList();
+
+        var match = curNode["match"];
+        if (match != null)
+        {
+            if (requiredModsList != null)
+            {
+                requiredMods.AddAllowedByPackageIds(requiredModsList);
+            }
+            foreach (var translationEntry in PatchOperationRecursive(match, requiredMods, prePatchMode))
+            {
+                yield return translationEntry;
+            }
+        }
+
+        var noMatch = curNode["nomatch"];
+        if (noMatch != null)
+        {
+            if (requiredModsList != null)
+            {
+                noMatchRequiredMods.AddAllowedByPackageIds(requiredModsList);
+            }
+            foreach (var translationEntry in PatchOperationRecursive(noMatch, noMatchRequiredMods, prePatchMode))
+            {
+                yield return translationEntry;
+            }
+        }
     }
 }
