@@ -580,11 +580,12 @@ namespace RimworldExtractorInternal
 
                 }
 
+                int counter = 0;
                 foreach (var ((className, nodeParent), doc) in xmls)
                 {
                     var tokens = nodeParent.Split('.');
                     var outputPath = Path.Combine(defInjectedDir, className,
-                        fileName + $"-{nodeParent}" + ".xml");
+                        fileName + $"-{counter:D2}" + ".xml");
 
                     doc.DoFullListTranslation();
                     doc.SaveSafely(outputPath);
