@@ -86,6 +86,7 @@ namespace RimworldExtractorInternal
                 ["Rimlaser.LaserBeamDef+*"] = "ThingDef+*",
                 ["Rimlaser.LaserGunDef+*"] = "ThingDef+*",
                 ["Rimlaser.SpinningLaserGunDef+*"] = "ThingDef+*",
+                ["JecsTools.BackstoryDef+baseDesc"] = "JescTools.BackstoryDef+description",
             };
             TranslationHandles = new()
             {
