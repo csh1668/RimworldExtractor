@@ -585,7 +585,7 @@ namespace RimworldExtractorInternal
                 {
                     var tokens = nodeParent.Split('.');
                     var outputPath = Path.Combine(defInjectedDir, className,
-                        fileName + $"-{counter:D2}" + ".xml");
+                        fileName + $"-{counter++:D2}" + ".xml");
 
                     doc.DoFullListTranslation();
                     doc.SaveSafely(outputPath);
