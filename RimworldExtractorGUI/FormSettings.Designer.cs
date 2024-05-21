@@ -69,6 +69,7 @@
             label12 = new Label();
             textBoxTranslationHandles = new TextBox();
             textBoxExtractableTags = new TextBox();
+            checkBox1 = new CheckBox();
             groupBox1.SuspendLayout();
             groupBox2.SuspendLayout();
             groupBox3.SuspendLayout();
@@ -365,6 +366,7 @@
             // 
             // groupBox3
             // 
+            groupBox3.Controls.Add(checkBox1);
             groupBox3.Controls.Add(buttonHelp4);
             groupBox3.Controls.Add(buttonHelp3);
             groupBox3.Controls.Add(buttonHelp2);
@@ -482,6 +484,16 @@
             textBoxExtractableTags.Size = new Size(233, 92);
             textBoxExtractableTags.TabIndex = 25;
             // 
+            // checkBox1
+            // 
+            checkBox1.AutoSize = true;
+            checkBox1.Location = new Point(6, 309);
+            checkBox1.Name = "checkBox1";
+            checkBox1.Size = new Size(143, 19);
+            checkBox1.TabIndex = 35;
+            checkBox1.Text = "(임시) TKey 추출 사용";
+            checkBox1.UseVisualStyleBackColor = true;
+            // 
             // FormSettings
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -550,5 +562,6 @@
         private Label label14;
         private TextBox textBoxBaseRefList;
         private Button buttonBaseRefList;
+        private CheckBox checkBox1;
     }
 }

@@ -66,6 +66,8 @@ namespace RimworldExtractorGUI
 
         public void FromPrefabs()
         {
+            checkBox1.Checked = Prefabs.EnableTkey; // TODO: REMOVE THIS AFTER
+
             textBoxPathRimworld.Text = Prefabs.PathRimworld;
             textBoxPathWorkshop.Text = Prefabs.PathWorkshop;
             textBoxVersionPattern.Text = Prefabs.PatternVersion;
@@ -85,6 +87,8 @@ namespace RimworldExtractorGUI
 
         public void ToPrefabs()
         {
+            Prefabs.EnableTkey = checkBox1.Checked; // TODO: REMOVE THIS AFTER
+
             Prefabs.PathRimworld = textBoxPathRimworld.Text;
             Prefabs.PathWorkshop = textBoxPathWorkshop.Text;
             Prefabs.PatternVersion = textBoxVersionPattern.Text;
