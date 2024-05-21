@@ -142,7 +142,6 @@ namespace RimworldExtractorInternal
                     {
                         var origCell = curRow.Cell(colOriginal);
                         origCell.GetComment().AddText($"{dateString}에 삭제됨. 삭제 이전 번역문: '{curRow.Cell(colTranslated).StrVal()}'\n");
-                        origCell.Value = pairEntry.New!.Original;
                         origCell.GetComment().Visible = true;
                         origCell.Style.Fill.SetBackgroundColor(XLColor.Red);
                         curRow.Cell(colTranslated).Clear();
@@ -197,7 +196,7 @@ namespace RimworldExtractorInternal
                         origCell.GetComment().AddText($"{dateString} 이전의 원문: '{curRow.Cell(colOriginal).StrVal()}'\n");
                         origCell.Value = pairEntry.New!.Original;
                         origCell.GetComment().Visible = true;
-                        origCell.Style.Fill.SetBackgroundColor(XLColor.Red);
+                        origCell.Style.Fill.SetBackgroundColor(XLColor.Orange);
                     }
                 }
             }
