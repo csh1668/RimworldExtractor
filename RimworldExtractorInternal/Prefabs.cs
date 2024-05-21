@@ -68,35 +68,20 @@ namespace RimworldExtractorInternal
             TranslationLanguage = "Korean (한국어)";
             CommentOriginal = false;
             ExtractableTags = new(
-                "label/rulesStrings/description/baseDesc/title/titleShort/customLabel/symbol/jobString/reportString/labelNoun/slateRef/verb/gerund/adjective/member/tips/ideoName/thoughtStageDescriptions/jobReportString/theme/labelShortAdj/labelPlural/letterText/deathMessage/labelShort/letterLabel/helpText/text/baseInspectLine/labelFemale/descriptionShort/beginLetter/ingestCommandString/ingestReportString/titleShortFemale/titleFemale/gerundLabel/pawnLabel/stageName/shortDescription/customEffectDescriptions/endMessage/leaderTitle/pawnSingular/pawnsPlural/desc/recoveryMessage/chargeNoun/cooldownGerund/type/potentialExtraOutcomeDesc/labelNounPretty/headerTip/rejectInputMessage/spectatorGerund/spectatorsLabel/fuelLabel/formatString/useLabel/RMBLabel/permanentLabel/name/missingDesc/worshipRoomLabel/labelAbstract/fuelGizmoLabel/destroyedLabel/outOfFuelMessage/summary/ritualExpectedDesc/customSummary/meatLabel/labelForFullStatList/tooltip/gizmoLabel/onMapInstruction/letterTitle/textEnemy/destroyedOutLabel/beginLetterLabel/labelMale/groupName/gizmoDescription/names/arrivalTextEnemy/letterLabelEnemy/arrivedLetter/calledOffMessage/finishedMessage/approachingReportString/approachOrderString/expectedThingLabelTip/skillLabel/extraPredictedOutcomeDescriptions/modNameReadable/descriptionFuture/textWillArrive/arrivalTextFriendly/letterLabelFriendly/helpTextController/successfullyRemovedHediffMessage/textFriendly/eventLabel/textController/descOverride/shortDescOverride/content/discoveredLetterText/discoveredLetterTitle/beginLetterContinue/resourceLabel/message/overrideLabel/extraTooltip/offMessage/successMessage/effectDesc/letterInfoText/categoryLabel/groupLabel/battleStateLabel/customizationTitle/fixedName/noun/lockedReason/descriptionExtra/labelPrefix/labelMechanoids/ingestReportStringEat/failMessage/valueFormat/structureLabel/labelSocial/labelInBracketsExtraForHediff/ChooseDesc/ChooseLabel/ritualExplanation/resourceDescription/discoverLetterText/countdownLabel/inspectString/completedLetterText/completedLetterTitle/leaderDescription/formatStringUnfinalized/jobReportOverride/discoverLetterLabel/instantlyPermanentLabel/notifyMessage/onCooldownString/invalidTargetPawn/noAssignablePawnsDesc/reportText/statLabel/visualLabel/commandDescriptions/successMessageNoNegativeThought/tipLabelOverride/mainPartAllThreatsLabel/customChildDisallowMessage/ritualExpectedDescNoAdjective/loweredName/cancelLabel/texName/labelOverride/messageText/proficiencyAdjective/stuffAdjective/unit/labelTendedWell/labelTendedWellInner/labelSolidTendedWell/overrideTooltip/royalFavorLabel/extraReportString/spawnInBackstories/customLetterLabel/customLetterText/confirmationDialogText/tip"
+                "label/rulesStrings/description/baseDesc/title/titleShort/customLabel/symbol/jobString/reportString/labelNoun/slateRef/verb/gerund/adjective/member/tips/ideoName/thoughtStageDescriptions/jobReportString/theme/labelShortAdj/labelPlural/letterText/deathMessage/labelShort/letterLabel/helpText/text/baseInspectLine/labelFemale/descriptionShort/beginLetter/ingestCommandString/ingestReportString/titleShortFemale/titleFemale/gerundLabel/pawnLabel/stageName/shortDescription/customEffectDescriptions/endMessage/leaderTitle/pawnSingular/pawnsPlural/desc/recoveryMessage/chargeNoun/cooldownGerund/type/potentialExtraOutcomeDesc/labelNounPretty/headerTip/rejectInputMessage/spectatorGerund/spectatorsLabel/fuelLabel/formatString/useLabel/RMBLabel/permanentLabel/name/missingDesc/worshipRoomLabel/labelAbstract/fuelGizmoLabel/destroyedLabel/outOfFuelMessage/summary/ritualExpectedDesc/customSummary/meatLabel/labelForFullStatList/tooltip/gizmoLabel/onMapInstruction/letterTitle/textEnemy/destroyedOutLabel/beginLetterLabel/labelMale/groupName/gizmoDescription/names/arrivalTextEnemy/letterLabelEnemy/arrivedLetter/calledOffMessage/finishedMessage/approachingReportString/approachOrderString/expectedThingLabelTip/skillLabel/extraPredictedOutcomeDescriptions/modNameReadable/descriptionFuture/textWillArrive/arrivalTextFriendly/letterLabelFriendly/helpTextController/successfullyRemovedHediffMessage/textFriendly/eventLabel/textController/descOverride/shortDescOverride/content/discoveredLetterText/discoveredLetterTitle/beginLetterContinue/resourceLabel/message/overrideLabel/extraTooltip/offMessage/successMessage/effectDesc/letterInfoText/categoryLabel/groupLabel/battleStateLabel/customizationTitle/fixedName/noun/lockedReason/descriptionExtra/labelPrefix/labelMechanoids/ingestReportStringEat/failMessage/valueFormat/structureLabel/labelSocial/labelInBracketsExtraForHediff/ChooseDesc/ChooseLabel/ritualExplanation/resourceDescription/discoverLetterText/countdownLabel/inspectString/completedLetterText/completedLetterTitle/leaderDescription/formatStringUnfinalized/jobReportOverride/discoverLetterLabel/instantlyPermanentLabel/notifyMessage/onCooldownString/invalidTargetPawn/noAssignablePawnsDesc/reportText/statLabel/visualLabel/commandDescriptions/successMessageNoNegativeThought/tipLabelOverride/mainPartAllThreatsLabel/customChildDisallowMessage/ritualExpectedDescNoAdjective/loweredName/cancelLabel/texName/labelOverride/messageText/proficiencyAdjective/stuffAdjective/unit/labelTendedWell/labelTendedWellInner/labelSolidTendedWell/overrideTooltip/royalFavorLabel/extraReportString/spawnInBackstories/customLetterLabel/customLetterText/confirmationDialogText/tip/outcomeDescription/generalDescription/generalTitle/dialogue/activateDescString/activateLabelString/completedLetter/completedLetterLabel/guiLabelString"
                     .Split('/'));
             FullListTranslationTags = new()
             {
                 "rulesFiles", "rulesStrings", "pathList"
             };
-            NodeReplacement = new()
-            {
-                ["ScenarioDef+label"] = "ScenarioDef+scenario.name",
-                ["ScenarioDef+description"] = "ScenarioDef+scenario.description",
-                ["CombatExtended.AmmoDef+*"] = "ThingDef+*",
-                ["VFECore.ExpandableProjectileDef+*"] = "ThingDef+*",
-                ["AbilityUser.ProjectileDef_AbilityLaser+*"] = "ThingDef+*",
-                ["AbilityUser.ProjectileDef_Ability+*"] = "ThingDef+*",
-                ["NewRatkin.CustomThingDef+*"] = "ThingDef+*",
-                ["AlienRace.AlienBackstoryDef+*"] = "BackstoryDef+*",
-                ["RatkinGeneExpanded.FactionDefExtended+*"] = "FactionDef+*",
-                ["RatkinGeneExpanded.ThingDefExtended+*"] = "ThingDef+*",
-                ["AlienRace.ThingDef_AlienRace+*"] = "ThingDef+*",
-                ["Rimlaser.Building_LaserGunDef+*"] = "ThingDef+*",
-                ["Rimlaser.LaserBeamDef+*"] = "ThingDef+*",
-                ["Rimlaser.LaserGunDef+*"] = "ThingDef+*",
-                ["Rimlaser.SpinningLaserGunDef+*"] = "ThingDef+*",
-                ["JecsTools.BackstoryDef+baseDesc"] = "JescTools.BackstoryDef+description",
-                ["AnestheticGunMod2.AnestheticBulletDef+*"] = "ThingDef+*",
-                ["BackstoryDef+baseDesc"] = "BackstoryDef+description",
-                ["DubsBadHygiene.WashingJobDef+*"] = "JobDef+*",
-                ["DubsBadHygiene.Needy+*"] = "NeedDef+*",
-            };
+            NodeReplacement = new Dictionary<string, string>(
+                "ScenarioDef+label|ScenarioDef+scenario.name/ScenarioDef+description|ScenarioDef+scenario.description/CombatExtended.AmmoDef+*|ThingDef+*/VFECore.ExpandableProjectileDef+*|ThingDef+*/AbilityUser.ProjectileDef_AbilityLaser+*|ThingDef+*/AbilityUser.ProjectileDef_Ability+*|ThingDef+*/NewRatkin.CustomThingDef+*|ThingDef+*/AlienRace.AlienBackstoryDef+*|BackstoryDef+*/RatkinGeneExpanded.FactionDefExtended+*|FactionDef+*/RatkinGeneExpanded.ThingDefExtended+*|ThingDef+*/AlienRace.ThingDef_AlienRace+*|ThingDef+*/Rimlaser.Building_LaserGunDef+*|ThingDef+*/Rimlaser.LaserBeamDef+*|ThingDef+*/Rimlaser.LaserGunDef+*|ThingDef+*/Rimlaser.SpinningLaserGunDef+*|ThingDef+*/JecsTools.BackstoryDef+baseDesc|JescTools.BackstoryDef+description/AnestheticGunMod2.AnestheticBulletDef+*|ThingDef+*/BackstoryDef+baseDesc|BackstoryDef+description/DubsBadHygiene.WashingJobDef+*|JobDef+*/DubsBadHygiene.Needy+*|NeedDef+*/VarietyMatters.FoodVariety_NeedDef+*|NeedDef+*/Kiiro.StorytellerDef_Custom+*|StorytellerDef+*/Vehicles.SkinDef+*|Vehicles.PatternDef+*/Vehicles.AntiAircraftDef+*|WorldObjectDef+*/Vehicles.AirdropDef+*|ThingDef+*"
+                    .Split().Select(
+                        x =>
+                        {
+                            var tokens = x.Split('|');
+                            return new KeyValuePair<string, string>(tokens[0].Trim(), tokens[1].Trim());
+                        }));
             TranslationHandles = new()
             {
                 // "label", // 200
