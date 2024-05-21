@@ -76,7 +76,7 @@ namespace RimworldExtractorInternal
             };
             NodeReplacement = new Dictionary<string, string>(
                 "ScenarioDef+label|ScenarioDef+scenario.name/ScenarioDef+description|ScenarioDef+scenario.description/CombatExtended.AmmoDef+*|ThingDef+*/VFECore.ExpandableProjectileDef+*|ThingDef+*/AbilityUser.ProjectileDef_AbilityLaser+*|ThingDef+*/AbilityUser.ProjectileDef_Ability+*|ThingDef+*/NewRatkin.CustomThingDef+*|ThingDef+*/AlienRace.AlienBackstoryDef+*|BackstoryDef+*/RatkinGeneExpanded.FactionDefExtended+*|FactionDef+*/RatkinGeneExpanded.ThingDefExtended+*|ThingDef+*/AlienRace.ThingDef_AlienRace+*|ThingDef+*/Rimlaser.Building_LaserGunDef+*|ThingDef+*/Rimlaser.LaserBeamDef+*|ThingDef+*/Rimlaser.LaserGunDef+*|ThingDef+*/Rimlaser.SpinningLaserGunDef+*|ThingDef+*/JecsTools.BackstoryDef+baseDesc|JescTools.BackstoryDef+description/AnestheticGunMod2.AnestheticBulletDef+*|ThingDef+*/BackstoryDef+baseDesc|BackstoryDef+description/DubsBadHygiene.WashingJobDef+*|JobDef+*/DubsBadHygiene.Needy+*|NeedDef+*/VarietyMatters.FoodVariety_NeedDef+*|NeedDef+*/Kiiro.StorytellerDef_Custom+*|StorytellerDef+*/Vehicles.SkinDef+*|Vehicles.PatternDef+*/Vehicles.AntiAircraftDef+*|WorldObjectDef+*/Vehicles.AirdropDef+*|ThingDef+*"
-                    .Split().Select(
+                    .Split("/").Select(
                         x =>
                         {
                             var tokens = x.Split('|');
