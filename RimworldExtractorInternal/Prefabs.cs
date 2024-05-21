@@ -20,7 +20,7 @@ namespace RimworldExtractorInternal
         private static readonly string Version = "8";
 
         // 임시 기능 TODO: REMOVE THIS AFTER
-        public static bool EnableTkey = true;
+        public static bool EnableTkey = false;
 
         public static string PathRimworld = string.Empty;
         public static string PathWorkshop = string.Empty;
@@ -57,7 +57,7 @@ namespace RimworldExtractorInternal
         public static void Init()
         {
             // 임시 기능 TODO: REMOVE THIS AFTER
-            EnableTkey = true;
+            EnableTkey = false;
             PathRimworld = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\RimWorld";
             PathWorkshop = "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100";
             PathBaseRefList = "";
