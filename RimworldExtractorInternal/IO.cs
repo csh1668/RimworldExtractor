@@ -132,39 +132,55 @@ namespace RimworldExtractorInternal
 
             if (removeNodes.Count > 0)
             {
-                var subSheet = xlsx.AddWorksheet($"{dateString}_삭제된 노드 목록");
-                subSheet.Cell(1, 1).Value = HeaderClassNode;
-                subSheet.Cell(1, 2).Value = HeaderClass;
-                subSheet.Cell(1, 3).Value = HeaderNode;
-                subSheet.Cell(1, 4).Value = HeaderRequiredMods;
-                subSheet.Cell(1, 5).Value = HeaderOriginal;
-                subSheet.Cell(1, 6).Value = HeaderTranslated;
-                var nxtRow = subSheet.Row(2);
-                for (int i = rows.Count - 1; i >= 0; i--)
+                for (int i = 0; i < rows.Count; i++)
                 {
                     var curRow = rows[i];
                     var curClassNode = curRow.Cell(colClassNode).StrVal();
-                    if (removeNodes.Any(x => $"{x.Orig!.ClassName}+{x.Orig!.Node}" == curClassNode))
+                    var pairEntry =
+                        removeNodes.FirstOrDefault(x => $"{x.Orig!.ClassName}+{x.Orig!.Node}" == curClassNode);
+                    if (pairEntry != null)
                     {
-                        curRow.Cell(colClassNode).CopyTo(nxtRow.Cell(1));
-                        curRow.Cell(colClass).CopyTo(nxtRow.Cell(2));
-                        curRow.Cell(colNode).CopyTo(nxtRow.Cell(3));
-                        if (colRequiredMods != -1)
-                            curRow.Cell(colRequiredMods).CopyTo(nxtRow.Cell(4));
-                        curRow.Cell(colOriginal).CopyTo(nxtRow.Cell(5));
-                        curRow.Cell(colTranslated).CopyTo(nxtRow.Cell(6));
-                        for (int j = 0; j < mainSheet.ColumnsUsed().Count() - colTranslated + 1; j++)
-                        {
-                            curRow.Cell(j + colTranslated + 1).CopyTo(nxtRow.Cell(j + 6 + 1));
-                        }
-                        curRow.Cells(colTranslated + 1, mainSheet.ColumnsUsed().Count());
-                        
-                        nxtRow = nxtRow.RowBelow();
-                        curRow.Delete();
+                        var origCell = curRow.Cell(colOriginal);
+                        origCell.GetComment().AddText($"{dateString}에 삭제됨. 삭제 이전 번역문: '{curRow.Cell(colTranslated).StrVal()}'\n");
+                        origCell.Value = pairEntry.New!.Original;
+                        origCell.GetComment().Visible = true;
+                        origCell.Style.Fill.SetBackgroundColor(XLColor.Red);
+                        curRow.Cell(colTranslated).Clear();
                     }
                 }
+                //var subSheet = xlsx.AddWorksheet($"{dateString}_삭제된 노드 목록");
+                //subSheet.Cell(1, 1).Value = HeaderClassNode;
+                //subSheet.Cell(1, 2).Value = HeaderClass;
+                //subSheet.Cell(1, 3).Value = HeaderNode;
+                //subSheet.Cell(1, 4).Value = HeaderRequiredMods;
+                //subSheet.Cell(1, 5).Value = HeaderOriginal;
+                //subSheet.Cell(1, 6).Value = HeaderTranslated;
+                //var nxtRow = subSheet.Row(2);
+                //for (int i = rows.Count - 1; i >= 0; i--)
+                //{
+                //    var curRow = rows[i];
+                //    var curClassNode = curRow.Cell(colClassNode).StrVal();
+                //    if (removeNodes.Any(x => $"{x.Orig!.ClassName}+{x.Orig!.Node}" == curClassNode))
+                //    {
+                //        curRow.Cell(colClassNode).CopyTo(nxtRow.Cell(1));
+                //        curRow.Cell(colClass).CopyTo(nxtRow.Cell(2));
+                //        curRow.Cell(colNode).CopyTo(nxtRow.Cell(3));
+                //        if (colRequiredMods != -1)
+                //            curRow.Cell(colRequiredMods).CopyTo(nxtRow.Cell(4));
+                //        curRow.Cell(colOriginal).CopyTo(nxtRow.Cell(5));
+                //        curRow.Cell(colTranslated).CopyTo(nxtRow.Cell(6));
+                //        for (int j = 0; j < mainSheet.ColumnsUsed().Count() - colTranslated + 1; j++)
+                //        {
+                //            curRow.Cell(j + colTranslated + 1).CopyTo(nxtRow.Cell(j + 6 + 1));
+                //        }
+                //        curRow.Cells(colTranslated + 1, mainSheet.ColumnsUsed().Count());
 
-                rows = mainSheet.RowsUsed().ToList();
+                //        nxtRow = nxtRow.RowBelow();
+                //        curRow.Delete();
+                //    }
+                //}
+
+                //rows = mainSheet.RowsUsed().ToList();
             }
 
             if (changedOriginals.Count > 0)
@@ -367,7 +383,7 @@ namespace RimworldExtractorInternal
                         {
                             if (className.StartsWith("Patches."))
                                 patches.Add(translation);
-                            else if (!isOfficial && Prefabs.FullListTranslationTags.Any(x => translation.Node.Contains(x)))
+                            else if (!isOfficial && Prefabs.FullListTranslationTags.Any(translation.Node.Contains))
                                 defInjectedFullListTranslations.Add(translation);
                             else
                                 defInjected.Add(translation);
