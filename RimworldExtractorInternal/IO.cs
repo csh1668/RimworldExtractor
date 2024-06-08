@@ -685,7 +685,19 @@ namespace RimworldExtractorInternal
                     foreach (XmlElement node in doc.DocumentElement!.ChildNodes)
                     {
                         var name = node.Name;
-                        translations.Add(new TranslationEntry(className, name, string.Empty, node.InnerText, null, null));
+                        // FullTranslation일 경우
+                        if (node.ChildNodes.OfType<XmlNode>().All(x => x.NodeType == XmlNodeType.Element))
+                        {
+                            for (int i = 0; i < node.ChildNodes.Count; i++)
+                            {
+                                translations.Add(new TranslationEntry(className, $"{name}.{i}", string.Empty,
+                                    node.InnerText, null, null));
+                            }
+                        }
+                        else
+                        {
+                            translations.Add(new TranslationEntry(className, name, string.Empty, node.InnerText, null, null));
+                        }
                     }
                 }
                 catch (Exception e)
