@@ -207,6 +207,7 @@ namespace RimworldExtractorInternal
                     continue;
                 }
 
+
                 var requiredMods = new RequiredMods();
                 var requiredPackageIds = node.Attributes?["RequiredPackageId"]?.Value.Split(',');
                 if (requiredPackageIds != null)
@@ -216,6 +217,7 @@ namespace RimworldExtractorInternal
 
 
                 var className = node.Attributes?["Class"]?.Value ?? node.Name;
+                className = className[..1].ToUpper() + className[1..];
 
                 foreach (var translationEntry in FindExtractableNodes(defName, className, node))
                 {
