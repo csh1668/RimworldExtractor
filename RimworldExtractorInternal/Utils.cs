@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
 using ClosedXML.Excel;
@@ -11,7 +12,7 @@ using RimworldExtractorInternal.DataTypes;
 
 namespace RimworldExtractorInternal
 {
-    public static class Utils
+    public static partial class Utils
     {
         public static XmlElement Append(this XmlElement parent, Action<XmlElement> work)
         {
@@ -192,7 +193,7 @@ namespace RimworldExtractorInternal
             {
                 str = str.Replace(c.ToString(), "");
             }
-            return str;
+            return StripSpace().Replace(str.Trim(), " ");
         }
 
         public static (int cntDefs, int cntKeyed, int cntStrings, int cntPatches) Count(
@@ -212,5 +213,8 @@ namespace RimworldExtractorInternal
             }
             return (cntDefs, cntKeyed, cntStrings, cntPatches);
         }
+
+        [GeneratedRegex("\\s+")]
+        private static partial Regex StripSpace();
     }
 }
