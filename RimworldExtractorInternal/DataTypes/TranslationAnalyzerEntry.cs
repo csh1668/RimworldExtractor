@@ -47,7 +47,7 @@ namespace RimworldExtractorInternal.DataTypes
                             usedSet.Add(pairEntry);
                         }
                         // 원문이 없다면
-                        else if (NewTranslations != null)
+                        else if (NewTranslations != null && !string.IsNullOrEmpty(origEntry.Translated))
                         {
                             _changesCached.Add(new ChangeRecord(origEntry, null, ChangeReason.RemoveNode));
                         }
