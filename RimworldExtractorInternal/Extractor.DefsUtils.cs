@@ -370,9 +370,9 @@ namespace RimworldExtractorInternal
             CombinedDefs = newDoc;
         }
 
-        private static void XmlOverwriteRecursive(XmlNode original, XmlNode other)
+        private static void XmlOverwriteRecursive(XmlNode current, XmlNode other)
         {
-            if (original.Name != other.Name)
+            if (current.Name != other.Name)
             {
                 // Log.Wrn($"Different name, Original={Original.Name}|{Original.OuterXml}, other={other.Name}|{other.OuterXml}");
                 return;
@@ -380,26 +380,38 @@ namespace RimworldExtractorInternal
 
             foreach (XmlNode otherChildNode in other.ChildNodes)
             {
-                var existingChildNode = original[otherChildNode.Name];
+
+
+                var existingChildNode = current[otherChildNode.Name];
+                // 1. 존재하지 않을 경우
                 if (existingChildNode == null)
                 {
-                    original.AppendChild(original.OwnerDocument!.ImportNode(otherChildNode, true));
+                    current.AppendChild(current.OwnerDocument!.ImportNode(otherChildNode, true));
                     continue;
                 }
-                // 이미 존재할 경우
-                // 1. 텍스트 노드 하나일 경우
+
+                // 2. 상속을 원하지 않을 경우
+                var inherit = otherChildNode.Attributes?["Inherit"]?.Value.ToLower() != "false";
+                if (!inherit)
+                {
+                    current.RemoveChild(existingChildNode);
+                    current.AppendChild(current.OwnerDocument!.ImportNode(otherChildNode, true));
+                    continue;
+                }
+
+                // 3. 텍스트 노드 하나일 경우
                 if (existingChildNode.IsTextNode())
                 {
-                    original.RemoveChild(existingChildNode);
-                    original.AppendChild(original.OwnerDocument!.ImportNode(otherChildNode, true));
+                    current.RemoveChild(existingChildNode);
+                    current.AppendChild(current.OwnerDocument!.ImportNode(otherChildNode, true));
                     continue;
                 }
-                // 2. 리스트 노드일 경우
-                else if (existingChildNode.FirstChild.IsListNode())
+                // 4. 리스트 노드일 경우
+                if (existingChildNode.FirstChild.IsListNode())
                 {
                     foreach (XmlNode childNode in otherChildNode.ChildNodes)
                     {
-                        existingChildNode.AppendChild(original.OwnerDocument!.ImportNode(childNode, true));
+                        existingChildNode.AppendChild(current.OwnerDocument!.ImportNode(childNode, true));
                     }
 
                     continue;
