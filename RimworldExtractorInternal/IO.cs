@@ -691,7 +691,7 @@ namespace RimworldExtractorInternal
                             for (int i = 0; i < node.ChildNodes.Count; i++)
                             {
                                 translations.Add(new TranslationEntry(className, $"{name}.{i}", string.Empty,
-                                    node.InnerText, null, null));
+                                    node.ChildNodes[i]!.InnerText, null, null));
                             }
                         }
                         else
