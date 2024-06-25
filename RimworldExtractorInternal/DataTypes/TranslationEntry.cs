@@ -56,6 +56,8 @@ namespace RimworldExtractorInternal.DataTypes
         }
 
         public string ClassNode => $"{ClassName}+{Node}";
+        public string DefName => Node.Contains('.') ? Node[..Node.IndexOf('.')] : Node;
+        public string RealNode => Node.Contains('.') ? Node[(Node.IndexOf('.') + 1)..] : Node;
 
     }
 }

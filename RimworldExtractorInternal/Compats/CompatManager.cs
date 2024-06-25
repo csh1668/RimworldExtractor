@@ -23,6 +23,12 @@ namespace RimworldExtractorInternal.Compats
                 if (compat != null)
                     compats.Add(compat);
             }
+            compats.Sort((x, y) =>
+            {
+                var left = (CompatPriorityAttribute?)x.GetType().GetCustomAttribute(typeof(CompatPriorityAttribute));
+                var right = (CompatPriorityAttribute?)y.GetType().GetCustomAttribute(typeof(CompatPriorityAttribute));
+                return (left?.Priority ?? 100).CompareTo(right?.Priority ?? 100);
+            });
             Log.Msg($"{compats.Count}개의 compat가 로드됨");
         }
 
