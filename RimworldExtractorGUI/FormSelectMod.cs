@@ -8,12 +8,10 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Controls;
 using System.Windows.Forms;
 using Microsoft.Win32;
 using RimworldExtractorInternal;
 using RimworldExtractorInternal.DataTypes;
-using ListBox = System.Windows.Controls.ListBox;
 using OpenFileDialog = System.Windows.Forms.OpenFileDialog;
 using ToolTip = System.Windows.Forms.ToolTip;
 
