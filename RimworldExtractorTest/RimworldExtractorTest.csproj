@@ -1,12 +1,26 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
+    <!-- .NET 7 target and standard properties -->
     <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 
+    <!-- This is a test project, so we don't produce a NuGet package. -->
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
+
+    <!-- Minor enhancements -->
+    <!-- Ensures the build is deterministic, helpful for reproducible builds. -->
+    <Deterministic>true</Deterministic>
+
+    <!-- Generates an XML documentation file, handy for IntelliSense. 
+         Adjust path/filename as desired. -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\TestProject.xml</DocumentationFile>
+
+    <!-- Optionally treat certain warnings as errors (uncomment or add more). 
+         E.g., CS0162 = Unreachable code, CS0649 = Field is never assigned. -->
+    <!-- <WarningsAsErrors>CS0162;CS0649</WarningsAsErrors> -->
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,12 +30,13 @@
     <PackageReference Include="MSTest.TestFramework" Version="2.2.10" />
   </ItemGroup>
 
+  <!-- Reference to another project within your solution -->
   <ItemGroup>
     <ProjectReference Include="..\RimworldExtractorInternal\RimworldExtractorInternal.csproj" />
   </ItemGroup>
 
+  <!-- Optional Using reference for MSTest -->
   <ItemGroup>
     <Using Include="Microsoft.VisualStudio.TestTools.UnitTesting" />
   </ItemGroup>
-
 </Project>
