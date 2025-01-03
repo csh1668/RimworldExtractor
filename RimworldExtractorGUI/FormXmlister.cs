@@ -1,5 +1,4 @@
-﻿using Microsoft.WindowsAPICodePack.Dialogs;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -21,14 +20,18 @@ namespace RimworldExtractorGUI
 
         private void button1_Click(object sender, EventArgs e)
         {
-            var dialog = new CommonOpenFileDialog();
-            dialog.IsFolderPicker = true;
+            //var dialog = new CommonOpenFileDialog();
+            var dialog = new FolderBrowserDialog();
+            //dialog.IsFolderPicker = true;
             dialog.Multiselect = true;
-            dialog.Title = "Languages 폴더가 있는 루트 폴더를 지정해주세요.";
+            //dialog.Title = "Languages 폴더가 있는 루트 폴더를 지정해주세요.";
+            dialog.UseDescriptionForTitle = true;
+            dialog.Description = "Languages 폴더가 있는 루트 폴더를 지정해주세요.";
 
-            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+            //if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+            if (dialog.ShowDialog() == DialogResult.OK)
             {
-                textBox1.Text = string.Join('|', dialog.FileNames);
+                textBox1.Text = string.Join('|', dialog.SelectedPaths);
             }
         }
 
