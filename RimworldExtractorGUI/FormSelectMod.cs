@@ -19,11 +19,12 @@ using ToolTip = System.Windows.Forms.ToolTip;
 
 namespace RimworldExtractorGUI
 {
+    [Serializable]
     public partial class FormSelectMod : Form
     {
-        public ModMetadata? SelectedMod { get; private set; }
-        public List<ExtractableFolder> SelectedFolders { get; private set; }
-        public List<ModMetadata> ReferenceMods { get; init; }
+        public ModMetadata? SelectedMod;
+        public List<ExtractableFolder> SelectedFolders;
+        public List<ModMetadata> ReferenceMods;
 
         private readonly List<ModMetadata> _officialModsCached;
         private readonly List<ModMetadata> _localModsCached;
