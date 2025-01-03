@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RimworldExtractorGUI", "Rim
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RimworldExtractorInternal", "RimworldExtractorInternal\RimworldExtractorInternal.csproj", "{BF4AC247-3AAA-4775-B9B1-8720D81407EF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RimworldExtractorTest", "RimworldExtractorTest\RimworldExtractorTest.csproj", "{B6802ED5-8426-4128-8857-DC83211E6317}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,9 +21,6 @@ Global
 		{BF4AC247-3AAA-4775-B9B1-8720D81407EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BF4AC247-3AAA-4775-B9B1-8720D81407EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BF4AC247-3AAA-4775-B9B1-8720D81407EF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B6802ED5-8426-4128-8857-DC83211E6317}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B6802ED5-8426-4128-8857-DC83211E6317}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B6802ED5-8426-4128-8857-DC83211E6317}.Release|Any CPU.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
