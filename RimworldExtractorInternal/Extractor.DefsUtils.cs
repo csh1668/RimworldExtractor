@@ -455,12 +455,6 @@ namespace RimworldExtractorInternal
             var nodes = curNode.ParentNode?.ChildNodes;
             if (nodes == null)
                 throw new InvalidOperationException("ParentNode was null.");
-
-            if (nodes.Count > 1000)
-            {
-                Log.WrnOnce($"노드 자식의 개수가 {nodes.Count}개입니다. 추출 속도에 영향을 줄 수도 있습니다.", curNode.ParentNode!.GetHashCode());
-            }
-
             int i;
             for (i = 0; i < nodes.Count; i++)
             {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.WindowsAPICodePack.Dialogs;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -21,16 +22,13 @@ namespace RimworldExtractorGUI
 
         private void buttonSelectSingleFile_Click(object sender, EventArgs e)
         {
-            //var dialog = new CommonOpenFileDialog();
-            var dialog = new OpenFileDialog();
+            var dialog = new CommonOpenFileDialog();
             dialog.Title = "엑셀 파일(.xlsx) 파일을 선택해주세요.";
-            //dialog.Filters.Add(new CommonFileDialogFilter("림왈도 형식 엑셀 파일", "*.xlsx"));
-            dialog.Filter = "림왈도 형식 엑셀 파일|*.xlsx";
+            dialog.Filters.Add(new CommonFileDialogFilter("림왈도 형식 엑셀 파일", "*.xlsx"));
             dialog.Multiselect = true;
 
 
-            //if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
-            if (dialog.ShowDialog() == DialogResult.OK)
+            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
                 textBox1.Text = string.Join('|', dialog.FileNames);
             }
@@ -38,17 +36,14 @@ namespace RimworldExtractorGUI
 
         private void buttonSelectDir_Click(object sender, EventArgs e)
         {
-            //var dialog = new CommonOpenFileDialog();
-            var dialog = new FolderBrowserDialog();
-            //dialog.IsFolderPicker = true;
+            var dialog = new CommonOpenFileDialog();
+            dialog.IsFolderPicker = true;
             dialog.Multiselect = true;
-            dialog.UseDescriptionForTitle = true;
-            dialog.Description = "엑셀 파일이 있는 루트 폴더를 선택해주세요.";
+            dialog.Title = "엑셀 파일이 있는 루트 폴더를 선택해주세요.";
 
-            //if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
-            if (dialog.ShowDialog() == DialogResult.OK)
+            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
-                textBox1.Text = string.Join('|', dialog.SelectedPaths);
+                textBox1.Text = string.Join('|', dialog.FileNames);
             }
         }
 

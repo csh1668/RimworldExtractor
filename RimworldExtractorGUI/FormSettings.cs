@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Microsoft.WindowsAPICodePack.Dialogs;
 using RimworldExtractorInternal;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
@@ -176,16 +177,13 @@ namespace RimworldExtractorGUI
 
         private void buttonSelectPathWorkshop_Click(object sender, EventArgs e)
         {
-            //var dialog = new CommonOpenFileDialog();
-            var dialog = new FolderBrowserDialog();
-            //dialog.IsFolderPicker = true;
-            dialog.UseDescriptionForTitle = true;
-            dialog.Description = "림월드 창작마당 경로를 지정해주세요 => Steam\\steamapps\\workshop\\content\\294100";
+            var dialog = new CommonOpenFileDialog();
+            dialog.IsFolderPicker = true;
+            dialog.Title = "림월드 창작마당 경로를 지정해주세요 => Steam\\steamapps\\workshop\\content\\294100";
 
-            //if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
-            if (dialog.ShowDialog() == DialogResult.OK)
+            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
-                textBoxPathWorkshop.Text = dialog.SelectedPath;
+                textBoxPathWorkshop.Text = dialog.FileName;
             }
         }
 

@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml;
 using RimworldExtractorInternal;
+using System.Windows.Controls;
 
 namespace RimworldExtractorGUI
 {

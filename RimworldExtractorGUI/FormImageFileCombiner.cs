@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.WindowsAPICodePack.Dialogs;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -36,15 +37,12 @@ namespace RimworldExtractorGUI
 
         private void buttonSelectPathFile_Click(object sender, EventArgs e)
         {
-            //var dialog = new CommonOpenFileDialog();
-            var dialog = new OpenFileDialog();
+            var dialog = new CommonOpenFileDialog();
             dialog.Title = "패키징할 압축파일의 경로를 지정해주세요.";
-            //dialog.Filters.Add(new CommonFileDialogFilter("ZIP 압축파일", "*.zip"));
-            dialog.Filter = "ZIP 압축파일|*.zip";
+            dialog.Filters.Add(new CommonFileDialogFilter("ZIP 압축파일", "*.zip"));
 
 
-            //if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
-            if (dialog.ShowDialog() == DialogResult.OK)
+            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
                 textBoxPathFile.Text = dialog.FileName;
             }
@@ -130,16 +128,13 @@ namespace RimworldExtractorGUI
 
         private void buttonSelectPathDir_Click(object sender, EventArgs e)
         {
-            //var dialog = new CommonOpenFileDialog();
-            var dialog = new FolderBrowserDialog();
-            //dialog.IsFolderPicker = true;
-            dialog.UseDescriptionForTitle = true;
-            dialog.Description = "패키징할 폴더의 경로를 지정해주세요.";
+            var dialog = new CommonOpenFileDialog();
+            dialog.IsFolderPicker = true;
+            dialog.Title = "패키징할 폴더의 경로를 지정해주세요.";
 
-            //if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
-            if (dialog.ShowDialog() == DialogResult.OK)
+            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
-                textBoxPathFile.Text = dialog.SelectedPath;
+                textBoxPathFile.Text = dialog.FileName;
             }
         }
     }

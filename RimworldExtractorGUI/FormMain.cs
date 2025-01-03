@@ -9,9 +9,9 @@ namespace RimworldExtractorGUI
 {
     public partial class FormMain : Form
     {
-        public ModMetadata? SelectedMod;
-        public List<ExtractableFolder>? SelectedFolders;
-        public List<ModMetadata>? ReferenceMods;
+        public ModMetadata? SelectedMod { get; private set; }
+        public List<ExtractableFolder>? SelectedFolders { get; private set; }
+        public List<ModMetadata>? ReferenceMods { get; private set; }
 
         public FormMain()
         {
