@@ -45,6 +45,7 @@ jobs:
       
     - name: Publish / Post-Cleanup
       run: |
+        dotnet restore
         dotnet publish $env:Solution_Name -c Release -p:PublishDir=${{github.workspace}}/publish_standard
         dotnet publish $env:Solution_Name -c Release -p:PublishDir=${{github.workspace}}/publish_portable -p:PublishProtocol=FileSystem -p:TargetFramework=net7.0-windows -r win-x64 --self-contained true  -p:PublishSingleFile=true -p:IncludeAllContentForSelfExtract=true -p:PublishDir=${{github.workspace}}/publish_portable
         python $env:Script_Path cleanup

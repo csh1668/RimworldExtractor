@@ -100,14 +100,14 @@ namespace RimworldExtractorGUI
             Prefabs.Policy = Enum.GetValues<Prefabs.DuplicatesPolicy>()[comboBoxFileDuplication.SelectedIndex];
             Prefabs.PathBaseRefList = textBoxBaseRefList.Text;
 
-            Prefabs.ExtractableTags = new HashSet<string>(textBoxExtractableTags.Text.Split('/'));
-            Prefabs.TranslationHandles = new List<string>(textBoxTranslationHandles.Text.Split('/'));
-            Prefabs.NodeReplacement = new Dictionary<string, string>(textBoxNodeReplacement.Text.Split("/").Select(x =>
+            Prefabs.ExtractableTags = new HashSet<string>(RemoveSep(textBoxExtractableTags.Text).Split('/'));
+            Prefabs.TranslationHandles = new List<string>(RemoveSep(textBoxTranslationHandles.Text).Split('/'));
+            Prefabs.NodeReplacement = new Dictionary<string, string>(RemoveSep(textBoxNodeReplacement.Text).Split("/").Select(x =>
             {
                 var token = x.Split('|');
                 return new KeyValuePair<string, string>(token[0], token[1]);
             }));
-            Prefabs.FullListTranslationTags = new HashSet<string>(textBoxFullListTranslation.Text.Split('/'));
+            Prefabs.FullListTranslationTags = new HashSet<string>(RemoveSep(textBoxFullListTranslation.Text).Split('/'));
         }
 
         private void buttonSaveAndClose_Click(object sender, EventArgs e)
@@ -199,5 +199,8 @@ namespace RimworldExtractorGUI
                 textBoxBaseRefList.Text = openFileDialog.FileName;
             }
         }
+
+
+        private static string RemoveSep(string s) => s.Replace(" ", "").Replace("\r", "").Replace("\n", "");
     }
 }
