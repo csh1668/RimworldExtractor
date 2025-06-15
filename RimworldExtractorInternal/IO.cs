@@ -279,7 +279,7 @@ namespace RimworldExtractorInternal
 
         public static List<TranslationEntry> FromExcel(string inputPath)
         {
-            var libFixer = new LibreExcelFixer(inputPath);
+            using var libFixer = new LibreExcelFixer(inputPath);
             inputPath = libFixer.DoFix();
 
             var xlsx = new XLWorkbook(inputPath);
