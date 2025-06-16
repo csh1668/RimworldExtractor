@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="ClosedXML" Version="0.105.0" />
+    <PackageReference Include="System.IO.Packaging" Version="9.0.6" />
   </ItemGroup>
 
 </Project>
