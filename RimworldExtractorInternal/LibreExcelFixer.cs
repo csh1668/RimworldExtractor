@@ -53,7 +53,7 @@ namespace RimworldExtractorInternal
             catch (Exception ex)
             {
                 Log.Err($"Failed to fix LibreOffice Excel file {_path}: {ex.Message}");
-                return null;
+                return _tmpRoot;
             }
 
             return _tmpFilePath;
