@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.IO.Compression;
 using System.Linq;
+using System.Xml.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace RimworldExtractorInternal
@@ -22,32 +24,66 @@ namespace RimworldExtractorInternal
 
         public string DoFix()
         {
-            // unzip excel file
             try
             {
                 using var zip = ZipFile.Open(_tmpFilePath, ZipArchiveMode.Update);
 
-                // 1. remove /xl/comments1.xml
-                zip.GetEntry("xl/comments1.xml")?.Delete();
-
-                // 2. /xl/worksheets/_rels/sheet1.xml.rels 에서 Target 어트리뷰트가 comments1.xml 인 Relationship 노드 삭제
-                var relsEntry = zip.GetEntry("xl/worksheets/_rels/sheet1.xml.rels");
-                if (relsEntry != null)
+                // 파일명이 comments##.xml인 것 전부 삭제
+                List<ZipArchiveEntry> entryToRemove = new List<ZipArchiveEntry>();
+                foreach (ZipArchiveEntry entry in zip.Entries)
                 {
-                    using var relsStream = relsEntry.Open();
-                    using var relsReader = new StreamReader(relsStream, Encoding.UTF8);
-                    var relsContent = relsReader.ReadToEnd();
+                    if (Regex.IsMatch(entry.Name, "^comments\\d+\\.xml$"))
+                    {
+                        entryToRemove.Add(entry);
+                    }
+                }
+                foreach (ZipArchiveEntry entry in entryToRemove)
+                {
+                    entry.Delete();
+                }
+                
+                // 파일명이 sheet##.xml.rels인 것을 열어서, Target 어트리뷰트가 comments 파일인 노드 전부 삭제
+                for (int i = zip.Entries.Count -1; i >= 0; i--)
+                {
+                    ZipArchiveEntry entry = zip.Entries[i];
+                    string fileName = entry.Name;
 
-                    var target =
-                        "<Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/comments\" Target=\"../comments1.xml\"/>";
+                    XDocument relsXDoc = new XDocument();
+                    bool isEdited = false;
+                    if (Regex.IsMatch(fileName, "^sheet\\d+\\.xml\\.rels$"))
+                    {
+                        using Stream relsStream = entry.Open();
+                        relsXDoc = XDocument.Load(relsStream);
 
-                    relsContent = relsContent.Replace(target, string.Empty);
+                        // xml 트리에서 해당 노드 검색 및 삭제
+                        IEnumerable<XElement> elementsEnum = relsXDoc.Descendants();
+                        for (int j = elementsEnum.Count() -1 ; j >= 0; j--)
+                        {
+                            XElement element = elementsEnum.ElementAt(j);
+                            
+                            string? attributeValue = element.Attribute("Target")?.Value;
+                            
+                            if (attributeValue != null &&
+                                Regex.IsMatch(attributeValue, "./comments\\d+\\.xml$"))
+                            {
+                                element.Remove();
+                                isEdited = true;
+                            }
+                        }
+                    }
 
-                    // 저장
-                    using var relsWriter = new StreamWriter(relsStream, Encoding.UTF8);
-                    relsWriter.BaseStream.SetLength(0); // Clear the stream before writing
-
-                    relsWriter.Write(relsContent);
+                    /*기존 엔트리를 지우고 위에서 작업한 XDocument를 대체 엔트리에 저장
+                      원래 코드처럼 스트림 가지고 바로 어떻게 해보려고 했는데 뭔가 잘 모르겠어서 이렇게 해둠
+                    */
+                    if (isEdited)
+                    {
+                        string filePath = entry.FullName;
+                        entry.Delete();
+                        
+                        ZipArchiveEntry newEntry = zip.CreateEntry(filePath);
+                        Stream newStream = newEntry.Open();
+                        relsXDoc.Save(newStream);
+                    }
                 }
             }
             catch (Exception ex)
