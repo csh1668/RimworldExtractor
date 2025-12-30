@@ -121,16 +121,17 @@ namespace RimworldExtractorGUI
             var extraction = Extractor.ExtractTranslationData(SelectedMod, SelectedFolders, ReferenceMods);
 
             var outPath = SelectedMod.Identifier.StripInvaildChars();
+            var fileName = RimworldExtractorInternal.Utils.GenerateFileName(); // SelectedMod.Identifier.StripInvaildChars()
             switch (Prefabs.Method)
             {
                 case Prefabs.ExtractionMethod.Excel:
                     IO.ToExcel(extraction, Path.Combine(outPath, outPath));
                     break;
                 case Prefabs.ExtractionMethod.Languages:
-                    IO.ToLanguageXml(extraction, false, false, SelectedMod.Identifier.StripInvaildChars(), outPath);
+                    IO.ToLanguageXml(extraction, false, false, fileName, outPath);
                     break;
                 case Prefabs.ExtractionMethod.LanguagesWithComments:
-                    IO.ToLanguageXml(extraction, false, true, SelectedMod.Identifier.StripInvaildChars(), outPath);
+                    IO.ToLanguageXml(extraction, false, true, fileName, outPath);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -172,7 +173,8 @@ namespace RimworldExtractorGUI
                 try
                 {
                     var path = openfileDialog.FileName;
-                    var fileName = Path.GetFileNameWithoutExtension(path);
+                    //var fileName = Path.GetFileNameWithoutExtension(path);
+                    var fileName = RimworldExtractorInternal.Utils.GenerateFileName();
                     var translations = IO.FromExcel(path);
                     IO.ToLanguageXml(translations, true, Prefabs.CommentOriginal, fileName, Path.GetDirectoryName(path) ?? "");
                     if (MessageBox.Show("완료되었습니다! 변환된 폴더의 위치를 탐색기로 열까요?", "완료", MessageBoxButtons.YesNo) == DialogResult.Yes)

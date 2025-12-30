@@ -14,6 +14,26 @@ namespace RimworldExtractorInternal
 {
     public static partial class Utils
     {
+        public static string GenerateFileName()
+        {
+            var timestamp = DateTime.UtcNow.Ticks / TimeSpan.TicksPerMillisecond;
+            var encoded = ToBase36(timestamp); // 10자 정도
+            var len = Math.Min(encoded.Length, 6);
+            return encoded[..len];
+        }
+
+        private static string ToBase36(long value)
+        {
+            const string chars = "0123456789abcdefghijklmnopqrstuvwxyz";
+            var result = "";
+            while (value > 0)
+            {
+                result = chars[(int)(value % 36)] + result;
+                value /= 36;
+            }
+            return result;
+        }
+
         public static XmlElement Append(this XmlElement parent, Action<XmlElement> work)
         {
             work(parent);
