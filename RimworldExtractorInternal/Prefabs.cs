@@ -32,7 +32,105 @@ namespace RimworldExtractorInternal
         public static string TranslationLanguage = string.Empty;
         public static bool CommentOriginal = false;
 
-        public static HashSet<string> ExtractableTags = new();
+        private static Dictionary<string, ExtractionRule> _extractionRules = new();
+
+        public static HashSet<string> ExtractableTags
+        {
+            get
+            {
+                return _extractionRules.Values.Select(x => x.ToString()).ToHashSet();
+            }
+            set
+            {
+                _extractionRules.Clear();
+                foreach (var item in value)
+                {
+                    var rule = new ExtractionRule(item);
+                    _extractionRules[rule.Tag] = rule;
+                }
+            }
+        }
+
+        public static bool CanExtract(string tagName, string defName)
+        {
+            if (!_extractionRules.TryGetValue(tagName, out var rule))
+                return false;
+            return rule.CanExtract(defName);
+        }
+
+        public class ExtractionRule
+        {
+            public string Tag;
+            public HashSet<string> Whitelist = new();
+            public HashSet<string> Blacklist = new();
+
+            public ExtractionRule(string raw)
+            {
+                var plusIndex = raw.IndexOf('+');
+                var minusIndex = raw.IndexOf('-');
+
+                if (plusIndex == -1 && minusIndex == -1)
+                {
+                    Tag = raw;
+                    return;
+                }
+
+                var firstSepIndex = (plusIndex != -1 && minusIndex != -1)
+                    ? Math.Min(plusIndex, minusIndex)
+                    : Math.Max(plusIndex, minusIndex);
+
+                Tag = raw.Substring(0, firstSepIndex);
+                var remain = raw.Substring(firstSepIndex);
+
+                int i = 0;
+                while (i < remain.Length)
+                {
+                    char mode = remain[i];
+                    int nextPlus = remain.IndexOf('+', i + 1);
+                    int nextMinus = remain.IndexOf('-', i + 1);
+                    int nextSep = (nextPlus == -1 && nextMinus == -1) ? remain.Length :
+                                  (nextPlus == -1) ? nextMinus :
+                                  (nextMinus == -1) ? nextPlus :
+                                  Math.Min(nextPlus, nextMinus);
+
+                    var content = remain.Substring(i + 1, nextSep - (i + 1));
+                    var items = content.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+
+                    var targetSet = (mode == '+') ? Whitelist : Blacklist;
+                    foreach (var item in items) targetSet.Add(item.Trim());
+
+                    i = nextSep;
+                }
+            }
+
+            public bool CanExtract(string defName)
+            {
+                if (Whitelist.Count > 0)
+                {
+                    if (!Whitelist.Contains(defName)) return false;
+                }
+
+                if (Blacklist.Contains(defName)) return false;
+
+                return true;
+            }
+
+            public override string ToString()
+            {
+                var sb = new StringBuilder(Tag);
+                if (Whitelist.Count > 0)
+                {
+                    sb.Append("+");
+                    sb.Append(string.Join(",", Whitelist));
+                }
+                if (Blacklist.Count > 0)
+                {
+                    sb.Append("-");
+                    sb.Append(string.Join(",", Blacklist));
+                }
+                return sb.ToString();
+            }
+        }
 
         public static HashSet<string> FullListTranslationTags = new();
 
@@ -61,7 +159,7 @@ namespace RimworldExtractorInternal
             PathRimworld = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\RimWorld";
             PathWorkshop = "C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\294100";
             PathBaseRefList = "";
-            CurrentVersion = "1.5";
+            CurrentVersion = "1.6";
             PatternVersion = @"^[1]\.\d+";
             PatternVersionWithV = @"^v[1]\.\d+";
             OriginalLanguage = "English";

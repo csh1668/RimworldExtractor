@@ -95,8 +95,8 @@ namespace RimworldExtractorInternal
                 if (curNode.IsTextNode())
                 {
                     var isListNode = token.Length > 1 && int.TryParse(lastTag, out _) &&
-                                     Prefabs.ExtractableTags.Contains(token[^2]);
-                    if (Prefabs.ExtractableTags.Contains(lastTag) || isListNode)
+                                     Prefabs.CanExtract(token[^2], defName);
+                    if (Prefabs.CanExtract(lastTag, defName) || isListNode)
                     {
                         var nodeName = $"{defName}.{curPath}";
                         if (curNormalizedPath != null)
