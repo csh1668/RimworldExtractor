@@ -29,4 +29,9 @@
     <IsTrimmable>false</IsTrimmable>
     <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
   </PropertyGroup>
+
+  <!-- Test projects: relax warnings that conflict with standard xunit conventions -->
+  <PropertyGroup Condition="$(MSBuildProjectName.EndsWith('.Tests'))">
+    <NoWarn>$(NoWarn);CA1707</NoWarn>
+  </PropertyGroup>
 </Project>

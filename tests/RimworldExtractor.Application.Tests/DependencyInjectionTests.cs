@@ -7,15 +7,14 @@ namespace RimworldExtractor.Application.Tests;
 public class DependencyInjectionTests
 {
     [Fact]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Naming", "CA1707:Identifiers should not contain underscores", Justification = "xunit test method naming convention")]
     public void AddApplication_ResolvesExtractionPipeline()
     {
         var services = new ServiceCollection();
         services.AddApplication();
 
         using var provider = services.BuildServiceProvider(validateScopes: true);
-        var pipeline = provider.GetService<IExtractionPipeline>();
+        var pipeline = provider.GetRequiredService<IExtractionPipeline>();
 
-        pipeline.Should().NotBeNull("AddApplication must register IExtractionPipeline");
+        pipeline.Should().NotBeNull();
     }
 }
