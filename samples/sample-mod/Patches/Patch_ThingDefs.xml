@@ -3,9 +3,7 @@
   <Operation Class="PatchOperationAdd">
     <xpath>Defs/ThingDef[defName="SampleMod_WoodenSpear"]</xpath>
     <value>
-      <tradeTags>
-        <li>PrimitiveWeapon</li>
-      </tradeTags>
+      <jobString>Wielding {PAWN_nameDef}'s wooden spear.</jobString>
     </value>
   </Operation>
   <Operation Class="PatchOperationReplace">
