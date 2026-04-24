@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using RimworldExtractor.Domain.Abstractions;
 using RimworldExtractor.Infrastructure.FileSystem;
 using RimworldExtractor.Infrastructure.Settings;
+using RimworldExtractor.Infrastructure.Xml;
 
 namespace RimworldExtractor.Infrastructure;
 
@@ -19,6 +20,8 @@ public static class DependencyInjection
         services.AddSingleton<IFileSystem, PhysicalFileSystem>();
         services.AddSingleton<ISettingsStore>(sp =>
             new JsonSettingsStore(sp.GetRequiredService<IFileSystem>(), settingsPath));
+        services.AddSingleton<IXmlDefExtractor, XmlDefExtractor>();
+        services.AddSingleton<IXPatchProcessor, XPatchProcessor>();
         return services;
     }
 }
