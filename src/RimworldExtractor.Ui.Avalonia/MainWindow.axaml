@@ -1,9 +1,29 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        xmlns:vm="using:RimworldExtractor.Ui.Avalonia.ViewModels"
+        xmlns:views="using:RimworldExtractor.Ui.Avalonia.Views"
         x:Class="RimworldExtractor.Ui.Avalonia.MainWindow"
-        Title="RimworldExtractor.Ui.Avalonia">
-    Welcome to Avalonia!
+        x:DataType="vm:MainViewModel"
+        Title="RimWorld Extractor"
+        Width="900"
+        Height="700"
+        MinWidth="700"
+        MinHeight="500">
+
+  <Grid RowDefinitions="*">
+    <TabControl Grid.Row="0"
+                SelectedIndex="{Binding SelectedTabIndex}">
+
+      <TabItem Header="Extract">
+        <views:ExtractView DataContext="{Binding Extract}"
+                           Margin="8" />
+      </TabItem>
+
+      <TabItem Header="Settings">
+        <views:SettingsView DataContext="{Binding Settings}"
+                            Margin="8" />
+      </TabItem>
+
+    </TabControl>
+  </Grid>
 </Window>

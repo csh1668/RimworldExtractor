@@ -1,0 +1,50 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:RimworldExtractor.Ui.Avalonia.ViewModels"
+             xmlns:views="using:RimworldExtractor.Ui.Avalonia.Views"
+             x:Class="RimworldExtractor.Ui.Avalonia.Views.ExtractView"
+             x:DataType="vm:ExtractViewModel">
+  <Grid RowDefinitions="*,Auto,Auto,Auto">
+
+    <!-- Mod selection panel -->
+    <views:ModSelectView Grid.Row="0"
+                         DataContext="{Binding ModSelect}"
+                         Margin="0,0,0,8" />
+
+    <!-- Output path row -->
+    <Grid Grid.Row="1" ColumnDefinitions="*,Auto" Margin="0,0,0,4">
+      <TextBox Grid.Column="0"
+               Watermark="Output folder (leave empty to use settings default)"
+               Text="{Binding OutputPath}"
+               Margin="0,0,4,0" />
+      <Button Grid.Column="1"
+              Content="Browse..."
+              Command="{Binding BrowseOutputPathCommand}" />
+    </Grid>
+
+    <!-- Progress bar -->
+    <ProgressBar Grid.Row="2"
+                 Value="{Binding Progress}"
+                 Minimum="0"
+                 Maximum="100"
+                 Height="20"
+                 Margin="0,0,0,4"
+                 IsVisible="{Binding IsExtracting}" />
+
+    <!-- Status + action buttons -->
+    <Grid Grid.Row="3" ColumnDefinitions="*,Auto,Auto">
+      <TextBlock Grid.Column="0"
+                 Text="{Binding StatusMessage}"
+                 VerticalAlignment="Center"
+                 TextTrimming="CharacterEllipsis" />
+      <Button Grid.Column="1"
+              Content="Extract"
+              Command="{Binding ExtractCommand}"
+              IsEnabled="{Binding HasSelection}"
+              Margin="4,0,4,0"
+              Classes="accent" />
+      <!-- Cancel button deferred: CancellationToken is passed via RelayCommand parameter -->
+    </Grid>
+
+  </Grid>
+</UserControl>
