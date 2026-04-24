@@ -28,4 +28,11 @@
     <ProjectReference Include="..\..\src\RimworldExtractor.Domain\RimworldExtractor.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+      <_Parameter1>RepositoryRoot</_Parameter1>
+      <_Parameter2>$(MSBuildThisFileDirectory)../../</_Parameter2>
+    </AssemblyAttribute>
+  </ItemGroup>
+
 </Project>
