@@ -1,5 +1,7 @@
 using System.Globalization;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
+using RimworldExtractor.Domain.Settings.Json;
 
 namespace RimworldExtractor.Domain.ValueObjects;
 
@@ -7,6 +9,7 @@ namespace RimworldExtractor.Domain.ValueObjects;
 /// RimWorld major.minor version (e.g. <c>1.6</c>). Only the 1.x series is supported
 /// per legacy <c>Prefabs.PatternVersion</c> regex.
 /// </summary>
+[JsonConverter(typeof(GameVersionJsonConverter))]
 public readonly record struct GameVersion : IComparable<GameVersion>
 {
     private static readonly Regex BareForm = new(@"^1\.(\d+)$", RegexOptions.Compiled);

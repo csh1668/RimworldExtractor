@@ -1,9 +1,13 @@
+using System.Text.Json.Serialization;
+using RimworldExtractor.Domain.Settings.Json;
+
 namespace RimworldExtractor.Domain.ValueObjects;
 
 /// <summary>
 /// A RimWorld language identifier. Carries both display form (e.g. <c>Korean (한국어)</c>)
 /// and the folder-name form (e.g. <c>Korean</c>) used for <c>Languages/{FolderName}/</c> paths.
 /// </summary>
+[JsonConverter(typeof(LanguageCodeJsonConverter))]
 public readonly record struct LanguageCode
 {
     public string Display { get; }
