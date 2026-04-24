@@ -1,0 +1,77 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:RimworldExtractor.Ui.Avalonia.ViewModels"
+             x:Class="RimworldExtractor.Ui.Avalonia.Views.SettingsView"
+             x:DataType="vm:SettingsViewModel">
+  <ScrollViewer>
+    <StackPanel Margin="16" Spacing="8">
+
+      <TextBlock Text="Paths" FontWeight="Bold" FontSize="16" Margin="0,0,0,4" />
+
+      <!-- RimWorld path -->
+      <TextBlock Text="RimWorld Folder" />
+      <Grid ColumnDefinitions="*,Auto">
+        <TextBox Grid.Column="0" Text="{Binding RimworldPath}" Margin="0,0,4,0" />
+        <Button Grid.Column="1" Content="Browse..." Command="{Binding BrowseRimworldPathCommand}" />
+      </Grid>
+
+      <!-- Workshop path -->
+      <TextBlock Text="Workshop Folder" />
+      <Grid ColumnDefinitions="*,Auto">
+        <TextBox Grid.Column="0" Text="{Binding WorkshopPath}" Margin="0,0,4,0" />
+        <Button Grid.Column="1" Content="Browse..." Command="{Binding BrowseWorkshopPathCommand}" />
+      </Grid>
+
+      <!-- Base ref list path -->
+      <TextBlock Text="Base Reference List" />
+      <Grid ColumnDefinitions="*,Auto">
+        <TextBox Grid.Column="0" Text="{Binding BaseRefListPath}" Margin="0,0,4,0" />
+        <Button Grid.Column="1" Content="Browse..." Command="{Binding BrowseBaseRefListPathCommand}" />
+      </Grid>
+
+      <Separator Margin="0,8" />
+      <TextBlock Text="Languages" FontWeight="Bold" FontSize="16" Margin="0,0,0,4" />
+
+      <TextBlock Text="Original Language" />
+      <TextBox Text="{Binding OriginalLanguage}" />
+
+      <TextBlock Text="Translation Language" />
+      <TextBox Text="{Binding TranslationLanguage}" />
+
+      <Separator Margin="0,8" />
+      <TextBlock Text="Extraction" FontWeight="Bold" FontSize="16" Margin="0,0,0,4" />
+
+      <TextBlock Text="Game Version (e.g. 1.6)" />
+      <TextBox Text="{Binding GameVersion}" />
+
+      <CheckBox Content="Include original text as comments" IsChecked="{Binding CommentOriginal}" />
+      <CheckBox Content="Enable Tkey" IsChecked="{Binding EnableTkey}" />
+
+      <Separator Margin="0,8" />
+      <TextBlock Text="Output" FontWeight="Bold" FontSize="16" Margin="0,0,0,4" />
+
+      <TextBlock Text="Duplicates Policy" />
+      <ComboBox SelectedIndex="{Binding DuplicatesPolicy}" HorizontalAlignment="Stretch">
+        <ComboBoxItem Content="Stop" />
+        <ComboBoxItem Content="Overwrite" />
+        <ComboBoxItem Content="Keep Original" />
+      </ComboBox>
+
+      <TextBlock Text="Output Format" />
+      <ComboBox SelectedIndex="{Binding ExtractionFormat}" HorizontalAlignment="Stretch">
+        <ComboBoxItem Content="Excel" />
+        <ComboBoxItem Content="Languages" />
+        <ComboBoxItem Content="Languages with Comments" />
+      </ComboBox>
+
+      <Separator Margin="0,8" />
+
+      <Button Content="Save Settings"
+              Command="{Binding SaveCommand}"
+              IsEnabled="{Binding !IsSaving}"
+              Classes="accent"
+              HorizontalAlignment="Right" />
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>
