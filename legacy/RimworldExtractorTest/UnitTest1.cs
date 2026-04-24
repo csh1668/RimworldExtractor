@@ -6,6 +6,7 @@ namespace RimworldExtractorTest
     public class UnitTest1
     {
         [TestMethod]
+        [Ignore("Machine-specific paths — superseded by LegacyBaselineTests which runs against samples/sample-mod/")]
         public void TestMethod1()
         { 
             Prefabs.Init();
