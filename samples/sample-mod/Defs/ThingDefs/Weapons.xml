@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+  <ThingDef>
+    <defName>SampleMod_WoodenSpear</defName>
+    <label>wooden spear</label>
+    <description>A sharpened stick. Primitive but effective.</description>
+  </ThingDef>
+  <ThingDef Name="SampleMod_SwordBase" Abstract="True">
+    <statBases>
+      <MeleeWeapon_AverageDPS>8</MeleeWeapon_AverageDPS>
+    </statBases>
+  </ThingDef>
+  <ThingDef ParentName="SampleMod_SwordBase">
+    <defName>SampleMod_IronSword</defName>
+    <label>iron sword</label>
+    <description>A balanced iron blade.</description>
+  </ThingDef>
+</Defs>
