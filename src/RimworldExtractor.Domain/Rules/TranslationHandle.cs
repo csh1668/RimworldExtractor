@@ -1,3 +1,6 @@
+using System.Text.Json.Serialization;
+using RimworldExtractor.Domain.Settings.Json;
+
 namespace RimworldExtractor.Domain.Rules;
 
 /// <summary>
@@ -5,6 +8,7 @@ namespace RimworldExtractor.Domain.Rules;
 /// extractor to dive into a sub-node referenced by a class attribute. A leading <c>*</c>
 /// in the raw form means "any class name" (wildcard).
 /// </summary>
+[JsonConverter(typeof(TranslationHandleJsonConverter))]
 public sealed record TranslationHandle
 {
     public string Tag { get; }

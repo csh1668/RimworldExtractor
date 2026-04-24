@@ -1,9 +1,13 @@
+using System.Text.Json.Serialization;
+using RimworldExtractor.Domain.Settings.Json;
+
 namespace RimworldExtractor.Domain.Rules;
 
 /// <summary>
 /// A rule deciding whether a given XML tag under a given DefName should be treated as translatable.
 /// Whitelist restricts to specific DefNames; Blacklist excludes specific DefNames (Blacklist beats Whitelist).
 /// </summary>
+[JsonConverter(typeof(ExtractionRuleJsonConverter))]
 public sealed record ExtractionRule
 {
     public string Tag { get; }
