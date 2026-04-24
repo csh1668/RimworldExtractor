@@ -1,0 +1,73 @@
+name: CI
+
+on:
+  push:
+    branches: [master, main, 'feat/**', 'fix/**', 'refactor/**']
+  pull_request:
+    branches: [master, main]
+
+env:
+  # Enables source-link/deterministic behaviors even when not on dedicated CI
+  ContinuousIntegrationBuild: true
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+
+jobs:
+  build:
+    name: Build & Test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Show SDK
+        run: dotnet --info
+
+      - name: Restore
+        run: dotnet restore RimworldExtractor.slnx
+
+      - name: Build
+        run: dotnet build RimworldExtractor.slnx -c Release --no-restore
+
+      - name: Format check
+        run: dotnet format RimworldExtractor.slnx --verify-no-changes --no-restore
+
+      - name: Test
+        run: dotnet test RimworldExtractor.slnx -c Release --no-build --logger "console;verbosity=detailed"
+
+  legacy-baseline:
+    name: Legacy baseline snapshot
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET 7 (legacy) and .NET 10 (for test filter syntax)
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            7.0.x
+            10.0.x
+
+      - name: Restore legacy test project
+        run: dotnet restore legacy/RimworldExtractorTest/RimworldExtractorTest.csproj
+
+      - name: Build legacy test project
+        run: dotnet build legacy/RimworldExtractorTest/RimworldExtractorTest.csproj -c Release --no-restore
+
+      - name: Run baseline snapshot test
+        run: |
+          dotnet test legacy/RimworldExtractorTest/RimworldExtractorTest.csproj \
+            -c Release \
+            --no-build \
+            --filter "FullyQualifiedName~LegacyBaselineTests" \
+            --logger "console;verbosity=detailed"
