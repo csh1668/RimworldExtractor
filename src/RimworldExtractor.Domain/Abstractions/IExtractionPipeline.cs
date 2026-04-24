@@ -1,4 +1,29 @@
+using RimworldExtractor.Domain.Entities;
+using RimworldExtractor.Domain.Settings;
+
 namespace RimworldExtractor.Domain.Abstractions;
+
+/// <summary>
+/// Inputs to a single extraction run.
+/// </summary>
+public sealed record ExtractionRequest(
+    ModMetadata Target,
+    IReadOnlyList<ExtractableFolder> SelectedFolders,
+    IReadOnlyList<ModMetadata>? ReferenceMods,
+    AppSettings Settings);
+
+/// <summary>
+/// Outputs of a single extraction run.
+/// </summary>
+public sealed record ExtractionResult(IReadOnlyList<TranslationEntry> Entries)
+{
+    public static ExtractionResult Empty { get; } = new(Array.Empty<TranslationEntry>());
+}
+
+/// <summary>
+/// Progress update emitted by the pipeline during a run.
+/// </summary>
+public sealed record ExtractionProgress(double Percentage, string Message);
 
 /// <summary>
 /// Runs an extraction pipeline end-to-end. Phase 1 ships a no-op implementation;
@@ -6,19 +31,8 @@ namespace RimworldExtractor.Domain.Abstractions;
 /// </summary>
 public interface IExtractionPipeline
 {
-    Task<ExtractionResult> RunAsync(ExtractionRequest request, CancellationToken cancellationToken);
-}
-
-/// <summary>
-/// Inputs to a single extraction run.
-/// </summary>
-/// <param name="ModPath">Absolute path to the mod root directory.</param>
-public sealed record ExtractionRequest(string ModPath);
-
-/// <summary>
-/// Outputs of a single extraction run. Phase 4 will enrich this shape; Phase 1 keeps a minimal record so the DI smoke test can complete.
-/// </summary>
-public sealed record ExtractionResult(IReadOnlyList<string> Messages)
-{
-    public static ExtractionResult Empty { get; } = new(Array.Empty<string>());
+    Task<ExtractionResult> RunAsync(
+        ExtractionRequest request,
+        IProgress<ExtractionProgress>? progress = null,
+        CancellationToken cancellationToken = default);
 }
