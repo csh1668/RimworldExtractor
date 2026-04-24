@@ -24,6 +24,24 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <!--
+      AOT trade-off (Phase 6 investigation):
+      Native AOT was attempted but is blocked by two reflection-heavy dependencies:
+        ClosedXML 0.104.x (IL2104 trim warning: uses reflection for cell formatting / XML parts)
+        Serilog 4.x (IL2104 trim warning: uses reflection for enrichers / sinks)
+      Fixing both would require AOT-incompatible suppressions or library replacements beyond Phase 6 scope.
+
+      Decision: publish as single-file + ReadyToRun self-contained executable (pass -self-contained at publish time).
+      Trade-off: ~120 MB binary vs ~5 MB AOT, ~100 ms cold start vs ~20 ms AOT.
+      R2R pre-JITs hot paths so runtime feel is similar to JIT. Revisit when ClosedXML ships AOT support.
+      SelfContained and PublishSingleFile are NOT set here so this project can be referenced by test projects.
+    -->
+    <PublishAot>false</PublishAot>
+    <PublishSingleFile Condition="'$(PublishSingleFile)' == ''">false</PublishSingleFile>
+    <PublishReadyToRun>true</PublishReadyToRun>
+    <PublishTrimmed>false</PublishTrimmed>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <RootNamespace>RimworldExtractor.Cli</RootNamespace>
   </PropertyGroup>
 
 </Project>
