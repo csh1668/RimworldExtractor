@@ -45,7 +45,10 @@ public sealed class ExtractPatchesStage : IExtractionStage
     public async Task ExecuteAsync(ExtractionContext context)
     {
         var settings = context.Request.Settings.Extraction;
-        var rules = settings.Rules.ToDictionary(r => r.Tag, r => r);
+        // Use last-wins to handle duplicate tags (legacy Prefabs.dat can have them).
+        var rules = new Dictionary<string, Domain.Rules.ExtractionRule>(StringComparer.Ordinal);
+        foreach (var rule in settings.Rules)
+            rules[rule.Tag] = rule;
         var handles = settings.TranslationHandles;
         var enableTKey = settings.EnableTkey;
 

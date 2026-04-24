@@ -64,8 +64,10 @@ public sealed class ApplyPrePatchesStage : IExtractionStage
             }
         }
 
-        var rulesDictionary = settings.Rules
-            .ToDictionary(r => r.Tag, r => r, StringComparer.Ordinal);
+        // Use last-wins to handle duplicate tags (legacy Prefabs.dat can have them).
+        var rulesDictionary = new Dictionary<string, Domain.Rules.ExtractionRule>(StringComparer.Ordinal);
+        foreach (var rule in settings.Rules)
+            rulesDictionary[rule.Tag] = rule;
 
         foreach (var patchDir in patchFolders)
         {

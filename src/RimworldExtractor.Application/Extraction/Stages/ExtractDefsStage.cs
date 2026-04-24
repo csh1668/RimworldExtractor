@@ -2,6 +2,7 @@ using System.Globalization;
 using Microsoft.Extensions.Logging;
 using RimworldExtractor.Domain.Entities;
 using RimworldExtractor.Domain.Mods;
+using RimworldExtractor.Domain.Rules;
 using RimworldExtractor.Infrastructure.Xml;
 
 namespace RimworldExtractor.Application.Extraction.Stages;
@@ -28,7 +29,10 @@ public sealed class ExtractDefsStage : IExtractionStage
     public Task ExecuteAsync(ExtractionContext context)
     {
         var settings = context.Request.Settings.Extraction;
-        var rules = settings.Rules.ToDictionary(r => r.Tag, r => r);
+        // Use last-wins to handle duplicate tags (legacy Prefabs.dat can have them).
+        var rules = new Dictionary<string, ExtractionRule>(StringComparer.Ordinal);
+        foreach (var rule in settings.Rules)
+            rules[rule.Tag] = rule;
         var handles = settings.TranslationHandles;
         var enableTKey = settings.EnableTkey;
 
