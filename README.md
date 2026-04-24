@@ -1,22 +1,156 @@
-# RimworldExtractor: An assistance tool for extracting translation data for RimWorld.
-### 림추출기: 림월드의 공식 컨텐츠나 모드의 번역 데이터를 추출하기 위한 번역 보조 툴입니다.
+# RimworldExtractor v2
 
-### [다운로드 (Downloads)](https://github.com/csh1668/RimworldExtractor/releases)
+**An extraction and translation tool for RimWorld mods.** Supports `Defs`, `Keyed`, `Strings`, and `Patches` extraction with full XML inheritance resolution, TranslationHandle, Full-List Translation, TKey (SlateRef), and patch-based content.
 
-![스크린샷 2024-02-25 184956](https://github.com/csh1668/RimworldExtractor/assets/18442452/75e36e73-3cc7-425d-9755-36c399f6ee34)
-기존에 존재하던 [알파 추출기](https://github.com/Han-ju/AlphaExtractor)의 여러 아쉬운 점을 보완하고자 개발하였습니다. \
-\
-예) Patches에 존재하는 번역 데이터를 제대로 처리하지 못하는 점, TranslationHandle이나 Full-List Translation을 지원하지 않는 점, XML 상속을 지원하지 않아 정확한 인덱싱이 불가한 점. TKey를 지원하지 않는 점 등
+**림추출기 v2:** 림월드 공식 컨텐츠 및 모드의 번역 데이터 추출 도구.
 
-## 주요 기능 (Main Features)
+### Download
 
-- `Defs`, `Keyed`, `Strings`, `Patches`의 추출 가능
-  1. ParentDef을 고려하기 위한 `XML 상속`, `참조 모드` 기능 지원
-  2. 정확한 DefInjection을 위한 `TranslationHandle`, `Full-List Translation`, `TKey(SlateRef)` 기능 지원
-  3. XML Extension 모드의 `tKey`, `tToopTip`, 바익 프레임워크의 `MVCF` 등 여러 기반 모드의 추가 기능 지원
-  4. 심화된 `Patches` 지원: nomatch 지원, 패치 과정에서 생성되는 Def의 추출 지원, 추출 및 XML로 변환 시 요구 모드 등에 따라 `Patches` 파일 자동 생성.
-- 추출 시 `엑셀(림왈도 형식, .xlsx)`, `XML`, `XML(주석 포함)`의 저장 방식 지원
-- XML과 엑셀 파일 간 상호 변환 기능 (XLSX -> XML, XML -> XLSX)
-- 번역 분석기 기능
-- 알파 추출기 형식 사용 가능
-- 커뮤니티 배포를 위한 이미지 파일과 압축 파일을 하나로 합치는 기능
+Grab the latest binaries from [Releases](https://github.com/csh1668/RimworldExtractor/releases):
+
+| Platform | CLI | GUI |
+|----------|-----|-----|
+| Windows x64 | `rimextract-win-x64.exe` | `RimworldExtractor-GUI-win-x64.zip` |
+| Linux x64 | `rimextract-linux-x64` | `RimworldExtractor-GUI-linux-x64.tar.gz` |
+| macOS ARM64 | `rimextract-osx-arm64` | `RimworldExtractor-GUI-osx-arm64.zip` |
+
+---
+
+## Quick Start
+
+### GUI
+
+1. Download and extract the GUI archive for your platform.
+2. Launch `RimworldExtractor.Ui.Avalonia` (or `.exe` on Windows).
+3. On first launch, configure paths: **RimWorld installation**, **Steam Workshop**, and **output directory**.
+4. Select a mod, choose format (`Languages/` XML, XLSX, or XML with comments), and click **Extract**.
+
+### CLI
+
+```bash
+# Extract a mod to Languages/ XML (default format)
+rimextract extract --mod "YourModName" --out ./output
+
+# Extract to XLSX
+rimextract extract --mod "ludeon.rimworld.royalty" --out ./output --format xlsx
+
+# Override game version
+rimextract extract --mod "SomeMod" --out ./output --version 1.6
+
+# Use a custom settings file
+rimextract --config /path/to/settings.json extract --mod "SomeMod" --out ./output
+
+# Convert an existing XLSX back to Languages/ XML
+rimextract convert --input extraction.xlsx --output ./Languages
+```
+
+---
+
+## CLI Reference
+
+### `rimextract extract`
+
+Extracts translatable strings from a mod and writes output files.
+
+| Option | Description |
+|--------|-------------|
+| `--mod <name>` | Mod name, `packageId`, or folder ID (required) |
+| `--out <dir>` | Output directory (required) |
+| `--format <fmt>` | `languages` (default), `xlsx`, or `comments` |
+| `--version <x.y>` | Override RimWorld version (e.g. `1.6`) |
+
+Exit codes: `0` = success, `1` = error.
+
+### `rimextract convert`
+
+Converts an XLSX extraction file back to RimWorld `Languages/` XML.
+
+| Option | Description |
+|--------|-------------|
+| `--input <file.xlsx>` | Source XLSX file (required) |
+| `--output <dir>` | Output directory (required) |
+
+### `rimextract analyze`
+
+> Not implemented in v2.0. Full diff support is planned for v2.1.
+> Use the GUI for comparison workflows in the meantime.
+
+Exit code `2`.
+
+### Global option
+
+`--config <path>` — override the settings file path (defaults to `%APPDATA%\RimworldExtractor\settings.json` on Windows, `~/.config/rimworld-extractor/settings.json` on Linux/macOS).
+
+---
+
+## GUI Features
+
+- Cross-platform desktop UI built with **Avalonia** (Windows, macOS, Linux).
+- Settings editor: paths, language codes, extraction rules, node replacements, version.
+- Mod browser with search and filtering.
+- Output formats: `Languages/` XML, XLSX (spreadsheet), and XML with original-language comments.
+- XML ↔ XLSX round-trip conversion.
+- Compat plugins for popular framework mods: MVCF, VerbFramework, FactionDef extras, NoTranslate, ScenarioDef, AncientMarketLibrary, and node-replacement rules.
+
+---
+
+## Migration from v1
+
+v2 is a complete rewrite. Settings are automatically migrated on first launch:
+
+- `Prefabs.dat` → `settings.json` (automatic via `LegacyPrefabsReader` on first run with old file present)
+- The extraction pipeline produces byte-identical output to v1 for all baseline sample mods.
+- The legacy `tools.py` packaging scripts remain in `legacy/` for v1 release maintenance.
+
+**Breaking changes:**
+- `Prefabs.dat` is no longer written; edit `settings.json` directly or use the GUI.
+- The WinForms UI (`RimWorldExtractor.exe`) is replaced by the Avalonia GUI. The old binary is preserved in `legacy/` for reference.
+
+---
+
+## Building from Source
+
+**Prerequisites:** .NET 10 SDK (see `global.json` for exact version).
+
+```bash
+git clone https://github.com/csh1668/RimworldExtractor.git
+cd RimworldExtractor
+
+# Build everything
+dotnet build RimworldExtractor.slnx -c Release
+
+# Run tests
+dotnet test RimworldExtractor.slnx -c Release
+
+# Run the GUI
+dotnet run --project src/RimworldExtractor.Ui.Avalonia
+
+# Publish CLI (single-file, self-contained)
+dotnet publish src/RimworldExtractor.Cli -c Release -r win-x64 \
+  --self-contained -p:PublishSingleFile=true -o publish/cli
+```
+
+---
+
+## Architecture
+
+v2 follows Clean Architecture with these layers:
+
+| Project | Role |
+|---------|------|
+| `RimworldExtractor.Domain` | Entities, value objects, enums, settings, domain abstractions |
+| `RimworldExtractor.Application` | Pipeline stages (9), compat registry, mod discovery |
+| `RimworldExtractor.Infrastructure` | File system, XML, Excel (ClosedXML), settings JSON, output strategies |
+| `RimworldExtractor.Plugins` | 7 built-in compat plugins (DI-registered) |
+| `RimworldExtractor.Ui.Avalonia` | Cross-platform desktop GUI (Avalonia) |
+| `RimworldExtractor.Cli` | CLI binary (`rimextract`) using System.CommandLine |
+
+---
+
+## Contributing
+
+Pull requests are welcome. Please:
+
+1. Open an issue to discuss significant changes before implementation.
+2. Run `dotnet test` and `dotnet format --verify-no-changes` before submitting.
+3. Target the `feat/remake-v2` branch for v2 features; `master` for v1 hotfixes.
