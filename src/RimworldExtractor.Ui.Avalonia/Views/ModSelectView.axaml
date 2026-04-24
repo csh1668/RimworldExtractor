@@ -1,0 +1,53 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:RimworldExtractor.Ui.Avalonia.ViewModels"
+             x:Class="RimworldExtractor.Ui.Avalonia.Views.ModSelectView"
+             x:DataType="vm:ModSelectViewModel">
+  <Grid RowDefinitions="Auto,*,Auto,*" ColumnDefinitions="*,Auto">
+
+    <!-- Search box -->
+    <TextBox Grid.Row="0" Grid.Column="0"
+             Watermark="Search mods..."
+             Text="{Binding SearchText}"
+             Margin="0,0,4,4" />
+
+    <Button Grid.Row="0" Grid.Column="1"
+            Content="Refresh"
+            Command="{Binding LoadModsCommand}"
+            Margin="0,0,0,4" />
+
+    <!-- Mod list -->
+    <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+            BorderBrush="Gray" BorderThickness="1" Margin="0,0,0,4">
+      <ListBox ItemsSource="{Binding Mods}"
+               SelectedItem="{Binding SelectedMod}"
+               SelectionMode="Single">
+        <ListBox.ItemTemplate>
+          <DataTemplate x:DataType="vm:ModItemViewModel">
+            <TextBlock Text="{Binding DisplayName}" />
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+    </Border>
+
+    <!-- Folder selection label -->
+    <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+               Text="Extractable Folders:"
+               FontWeight="SemiBold"
+               Margin="0,4,0,2" />
+
+    <!-- Folder list with checkboxes -->
+    <Border Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2"
+            BorderBrush="Gray" BorderThickness="1">
+      <ListBox ItemsSource="{Binding AvailableFolders}"
+               SelectionMode="Multiple">
+        <ListBox.ItemTemplate>
+          <DataTemplate>
+            <TextBlock Text="{Binding FolderName}" />
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+    </Border>
+
+  </Grid>
+</UserControl>
