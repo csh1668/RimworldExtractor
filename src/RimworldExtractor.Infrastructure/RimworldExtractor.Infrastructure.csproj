@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\RimworldExtractor.Application\RimworldExtractor.Application.csproj" />
     <ProjectReference Include="..\RimworldExtractor.Domain\RimworldExtractor.Domain.csproj" />
   </ItemGroup>
 

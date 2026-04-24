@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\RimworldExtractor.Domain\RimworldExtractor.Domain.csproj" />
+    <ProjectReference Include="..\RimworldExtractor.Infrastructure\RimworldExtractor.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>
