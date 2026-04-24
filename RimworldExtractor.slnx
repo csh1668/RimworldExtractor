@@ -12,5 +12,6 @@
     <Project Path="tests/RimworldExtractor.Domain.Tests/RimworldExtractor.Domain.Tests.csproj" />
     <Project Path="tests/RimworldExtractor.Infrastructure.Tests/RimworldExtractor.Infrastructure.Tests.csproj" />
     <Project Path="tests/RimworldExtractor.Integration.Tests/RimworldExtractor.Integration.Tests.csproj" />
+    <Project Path="tests/RimworldExtractor.Ui.Avalonia.Tests/RimworldExtractor.Ui.Avalonia.Tests.csproj" />
   </Folder>
 </Solution>
