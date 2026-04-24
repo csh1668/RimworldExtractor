@@ -1,5 +1,6 @@
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Xml;
 using System.Xml.Linq;
 using RimworldExtractor.Domain.Entities;
 using RimworldExtractor.Domain.Mods;
@@ -176,13 +177,7 @@ public sealed class XmlLanguagesWriter : IXmlLanguagesWriter
         }
 
         var filePath = JoinPath(outputPath, fileName + ".xml");
-        await _fileWriter.WriteAsync(filePath, async stream =>
-        {
-            await using var writer = new StreamWriter(stream, Encoding.UTF8, leaveOpen: true);
-            await writer.WriteAsync("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
-            await writer.FlushAsync(cancellationToken);
-            await doc.Root!.SaveAsync(stream, SaveOptions.None, cancellationToken);
-        }, cancellationToken);
+        await SaveXDocumentAsync(doc, filePath, cancellationToken);
     }
 
     // ─── DefInjected (normal) ────────────────────────────────────────────────────
@@ -359,7 +354,7 @@ public sealed class XmlLanguagesWriter : IXmlLanguagesWriter
             var filePath = JoinPath(dirPath, baseName + ".txt");
             await _fileWriter.WriteAsync(filePath, async stream =>
             {
-                await using var writer = new StreamWriter(stream, Encoding.UTF8, leaveOpen: true);
+                await using var writer = new StreamWriter(stream, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false), leaveOpen: true);
                 foreach (var line in lines)
                     await writer.WriteLineAsync(line.AsMemory(), cancellationToken);
             }, cancellationToken);
@@ -466,7 +461,15 @@ public sealed class XmlLanguagesWriter : IXmlLanguagesWriter
     {
         await _fileWriter.WriteAsync(path, async stream =>
         {
-            await doc.SaveAsync(stream, SaveOptions.None, cancellationToken);
+            var settings = new XmlWriterSettings
+            {
+                Encoding = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false),
+                Indent = true,
+                Async = true,
+            };
+            await using var xmlWriter = XmlWriter.Create(stream, settings);
+            await doc.SaveAsync(xmlWriter, cancellationToken);
+            await xmlWriter.FlushAsync();
         }, cancellationToken);
     }
 

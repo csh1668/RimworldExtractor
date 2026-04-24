@@ -20,8 +20,11 @@ public static class DependencyInjection
         services.AddSingleton<IFileSystem, PhysicalFileSystem>();
         services.AddSingleton<ISettingsStore>(sp =>
             new JsonSettingsStore(sp.GetRequiredService<IFileSystem>(), settingsPath));
+        services.AddSingleton<SafeFileWriter>();
         services.AddSingleton<IXmlDefExtractor, XmlDefExtractor>();
         services.AddSingleton<IXPatchProcessor, XPatchProcessor>();
+        services.AddSingleton<IXmlLanguagesWriter, XmlLanguagesWriter>();
+        services.AddSingleton<IXmlLanguagesReader, XmlLanguagesReader>();
         return services;
     }
 }
