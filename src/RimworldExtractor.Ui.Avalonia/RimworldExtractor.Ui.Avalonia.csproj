@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <!-- Avalonia XAML loader and ReactiveUI use reflection; AOT/trim analysis produces false-positive errors -->
+    <IsAotCompatible>false</IsAotCompatible>
+    <IsTrimmable>false</IsTrimmable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Force patched version of Tmds.DBus.Protocol (GHSA-xrw6-gwf8-vvr9); transitively pulled by Avalonia.Desktop -->
+    <PackageReference Include="Tmds.DBus.Protocol" PrivateAssets="all" />
+    <PackageReference Include="Avalonia" />
+    <PackageReference Include="Avalonia.Desktop" />
+    <PackageReference Include="Avalonia.Themes.Fluent" />
+    <PackageReference Include="Avalonia.Fonts.Inter" />
+    <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
+    <PackageReference Include="Avalonia.Diagnostics">
+      <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
+      <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RimworldExtractor.Application\RimworldExtractor.Application.csproj" />
+    <ProjectReference Include="..\RimworldExtractor.Infrastructure\RimworldExtractor.Infrastructure.csproj" />
+    <ProjectReference Include="..\RimworldExtractor.Plugins\RimworldExtractor.Plugins.csproj" />
+  </ItemGroup>
+</Project>
