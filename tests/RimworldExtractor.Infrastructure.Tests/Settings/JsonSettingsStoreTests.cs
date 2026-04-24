@@ -1,6 +1,7 @@
 using System.Text.Json;
 using FluentAssertions;
 using RimworldExtractor.Domain.Settings;
+using RimworldExtractor.Infrastructure.FileSystem;
 using RimworldExtractor.Infrastructure.Settings;
 
 namespace RimworldExtractor.Infrastructure.Tests.Settings;
@@ -25,7 +26,7 @@ public class JsonSettingsStoreTests : IDisposable
     [Fact]
     public async Task LoadAsync_WhenFileAbsent_ReturnsDefault()
     {
-        var store = new JsonSettingsStore(_settingsPath);
+        var store = new JsonSettingsStore(new PhysicalFileSystem(), _settingsPath);
 
         var loaded = await store.LoadAsync(TestContext.Current.CancellationToken);
 
@@ -35,7 +36,7 @@ public class JsonSettingsStoreTests : IDisposable
     [Fact]
     public async Task SaveAsync_ThenLoadAsync_RoundTripsEqual()
     {
-        var store = new JsonSettingsStore(_settingsPath);
+        var store = new JsonSettingsStore(new PhysicalFileSystem(), _settingsPath);
         var original = AppSettings.Default with
         {
             Paths = PathSettings.Default with { Rimworld = "/rw" }
@@ -50,7 +51,7 @@ public class JsonSettingsStoreTests : IDisposable
     [Fact]
     public async Task SaveAsync_CreatesBackupOfPrevious()
     {
-        var store = new JsonSettingsStore(_settingsPath);
+        var store = new JsonSettingsStore(new PhysicalFileSystem(), _settingsPath);
         var v1 = AppSettings.Default with { Paths = PathSettings.Default with { Rimworld = "/rw1" } };
         var v2 = AppSettings.Default with { Paths = PathSettings.Default with { Rimworld = "/rw2" } };
 
@@ -66,7 +67,7 @@ public class JsonSettingsStoreTests : IDisposable
     [Fact]
     public async Task SaveAsync_DoesNotLeaveTempFile()
     {
-        var store = new JsonSettingsStore(_settingsPath);
+        var store = new JsonSettingsStore(new PhysicalFileSystem(), _settingsPath);
         await store.SaveAsync(AppSettings.Default, TestContext.Current.CancellationToken);
 
         File.Exists(_settingsPath + ".tmp").Should().BeFalse();
@@ -76,7 +77,7 @@ public class JsonSettingsStoreTests : IDisposable
     public async Task LoadAsync_WithCorruptFile_Throws()
     {
         await File.WriteAllTextAsync(_settingsPath, "{{{ not valid json", TestContext.Current.CancellationToken);
-        var store = new JsonSettingsStore(_settingsPath);
+        var store = new JsonSettingsStore(new PhysicalFileSystem(), _settingsPath);
 
         Func<Task> act = () => store.LoadAsync(TestContext.Current.CancellationToken);
 

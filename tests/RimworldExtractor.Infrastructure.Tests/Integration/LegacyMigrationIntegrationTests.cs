@@ -1,4 +1,5 @@
 using FluentAssertions;
+using RimworldExtractor.Infrastructure.FileSystem;
 using RimworldExtractor.Infrastructure.Legacy;
 using RimworldExtractor.Infrastructure.Settings;
 
@@ -49,7 +50,7 @@ public class LegacyMigrationIntegrationTests : IDisposable
         // Act: legacy read → JSON save → JSON load
         var readFromLegacy = LegacyPrefabsReader.Read(prefabsPath);
         var jsonPath = Path.Combine(_tmpDir, "settings.json");
-        var store = new JsonSettingsStore(jsonPath);
+        var store = new JsonSettingsStore(new PhysicalFileSystem(), jsonPath);
         await store.SaveAsync(readFromLegacy, TestContext.Current.CancellationToken);
         var readFromJson = await store.LoadAsync(TestContext.Current.CancellationToken);
 
