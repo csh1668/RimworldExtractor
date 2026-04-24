@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ModMetaData>
+  <name>RimworldExtractor Sample Mod</name>
+  <packageId>RimworldExtractor.SampleMod</packageId>
+  <author>RimworldExtractor</author>
+  <supportedVersions>
+    <li>1.6</li>
+  </supportedVersions>
+  <description>Synthetic fixture for baseline snapshot tests. Do not modify without regenerating snapshots.</description>
+</ModMetaData>
