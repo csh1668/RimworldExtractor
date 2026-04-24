@@ -25,6 +25,7 @@
     <ProjectReference Include="..\..\src\RimworldExtractor.Application\RimworldExtractor.Application.csproj" />
     <ProjectReference Include="..\..\src\RimworldExtractor.Domain\RimworldExtractor.Domain.csproj" />
     <ProjectReference Include="..\..\src\RimworldExtractor.Infrastructure\RimworldExtractor.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\RimworldExtractor.Plugins\RimworldExtractor.Plugins.csproj" />
   </ItemGroup>
 
 </Project>

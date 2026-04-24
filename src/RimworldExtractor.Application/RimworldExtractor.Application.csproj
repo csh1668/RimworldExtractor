@@ -3,6 +3,7 @@
   <ItemGroup>
     <ProjectReference Include="..\RimworldExtractor.Domain\RimworldExtractor.Domain.csproj" />
     <ProjectReference Include="..\RimworldExtractor.Infrastructure\RimworldExtractor.Infrastructure.csproj" />
+    <ProjectReference Include="..\RimworldExtractor.Plugins\RimworldExtractor.Plugins.csproj" />
   </ItemGroup>
 
   <ItemGroup>
