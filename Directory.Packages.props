@@ -16,11 +16,11 @@
 
     <!-- MVVM / UI -->
     <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.0" />
-    <PackageVersion Include="Avalonia" Version="11.2.1" />
-    <PackageVersion Include="Avalonia.Desktop" Version="11.2.1" />
-    <PackageVersion Include="Avalonia.Themes.Fluent" Version="11.2.1" />
-    <PackageVersion Include="Avalonia.Fonts.Inter" Version="11.2.1" />
-    <PackageVersion Include="Avalonia.ReactiveUI" Version="11.2.1" />
+    <PackageVersion Include="Avalonia" Version="11.3.12" />
+    <PackageVersion Include="Avalonia.Desktop" Version="11.3.12" />
+    <PackageVersion Include="Avalonia.Themes.Fluent" Version="11.3.12" />
+    <PackageVersion Include="Avalonia.Fonts.Inter" Version="11.3.12" />
+    <PackageVersion Include="Avalonia.ReactiveUI" Version="11.3.12" />
 
     <!-- Excel / XML -->
     <PackageVersion Include="ClosedXML" Version="0.104.2" />
