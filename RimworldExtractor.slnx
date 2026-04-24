@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/src/">
+    <Project Path="src/RimworldExtractor.Application/RimworldExtractor.Application.csproj" />
     <Project Path="src/RimworldExtractor.Domain/RimworldExtractor.Domain.csproj" />
   </Folder>
 </Solution>
