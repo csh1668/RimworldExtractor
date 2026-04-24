@@ -29,8 +29,8 @@ public class LanguagesOutputStrategyTests
         foreach (var file in fs.EnumerateFiles(root))
             yield return file;
         foreach (var dir in fs.EnumerateDirectories(root))
-        foreach (var file in EnumerateAllFiles(fs, dir))
-            yield return file;
+            foreach (var file in EnumerateAllFiles(fs, dir))
+                yield return file;
     }
 
     [Fact]
