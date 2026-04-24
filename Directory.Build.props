@@ -8,7 +8,13 @@
     <AnalysisLevel>latest-recommended</AnalysisLevel>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <!--
+      Suppressed analyzers:
+        CS1591 — xml-doc warnings (GenerateDocumentationFile=true emits these; documented via team convention)
+        CA1848 — "Use LoggerMessage delegates" (perf nudge; may revisit with source-generated logging in Phase 2)
+        CA2254 — "Log message template should be a static expression" (rejects dynamic templates; pragmatic for now)
+    -->
+    <NoWarn>$(NoWarn);CS1591;CA1848;CA2254</NoWarn>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <IsAotCompatible>true</IsAotCompatible>
     <IsTrimmable>true</IsTrimmable>
