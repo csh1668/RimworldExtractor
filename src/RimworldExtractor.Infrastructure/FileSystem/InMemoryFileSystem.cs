@@ -19,15 +19,17 @@ public sealed class InMemoryFileSystem : IFileSystem
 
     public void AddFile(string path, string contents)
     {
+        path = Normalize(path);
         EnsureParentDirs(path);
         _files[path] = Encoding.UTF8.GetBytes(contents);
     }
 
-    public bool FileExists(string path) => _files.ContainsKey(path);
-    public bool DirectoryExists(string path) => _directories.Contains(path);
+    public bool FileExists(string path) => _files.ContainsKey(Normalize(path));
+    public bool DirectoryExists(string path) => _directories.Contains(Normalize(path));
 
     public void CreateDirectory(string path)
     {
+        path = Normalize(path);
         var parts = path.TrimStart('/').Split('/', StringSplitOptions.RemoveEmptyEntries);
         var current = "";
         foreach (var part in parts)
@@ -39,6 +41,7 @@ public sealed class InMemoryFileSystem : IFileSystem
 
     public Task<string> ReadAllTextAsync(string path, CancellationToken cancellationToken = default)
     {
+        path = Normalize(path);
         if (!_files.TryGetValue(path, out var bytes))
             throw new FileNotFoundException("File not found in InMemoryFileSystem", path);
         return Task.FromResult(Encoding.UTF8.GetString(bytes));
@@ -46,6 +49,7 @@ public sealed class InMemoryFileSystem : IFileSystem
 
     public Task WriteAllTextAsync(string path, string contents, CancellationToken cancellationToken = default)
     {
+        path = Normalize(path);
         EnsureParentDirs(path);
         _files[path] = Encoding.UTF8.GetBytes(contents);
         return Task.CompletedTask;
@@ -53,6 +57,7 @@ public sealed class InMemoryFileSystem : IFileSystem
 
     public Task<string[]> ReadAllLinesAsync(string path, CancellationToken cancellationToken = default)
     {
+        path = Normalize(path);
         if (!_files.TryGetValue(path, out var bytes))
             throw new FileNotFoundException("File not found in InMemoryFileSystem", path);
         var text = Encoding.UTF8.GetString(bytes);
@@ -61,6 +66,7 @@ public sealed class InMemoryFileSystem : IFileSystem
 
     public Task WriteAllLinesAsync(string path, IEnumerable<string> lines, CancellationToken cancellationToken = default)
     {
+        path = Normalize(path);
         EnsureParentDirs(path);
         _files[path] = Encoding.UTF8.GetBytes(string.Join('\n', lines) + '\n');
         return Task.CompletedTask;
@@ -68,6 +74,7 @@ public sealed class InMemoryFileSystem : IFileSystem
 
     public Stream OpenRead(string path)
     {
+        path = Normalize(path);
         if (!_files.TryGetValue(path, out var bytes))
             throw new FileNotFoundException("File not found in InMemoryFileSystem", path);
         return new MemoryStream(bytes, writable: false);
@@ -77,6 +84,7 @@ public sealed class InMemoryFileSystem : IFileSystem
 
     public Stream CreateFile(string path)
     {
+        path = Normalize(path);
         EnsureParentDirs(path);
         var ms = new WritebackStream(bytes => _files[path] = bytes);
         return ms;
@@ -84,6 +92,8 @@ public sealed class InMemoryFileSystem : IFileSystem
 
     public void Move(string source, string destination)
     {
+        source = Normalize(source);
+        destination = Normalize(destination);
         if (!_files.TryGetValue(source, out var bytes))
             throw new FileNotFoundException("Source not found in InMemoryFileSystem", source);
         EnsureParentDirs(destination);
@@ -93,6 +103,9 @@ public sealed class InMemoryFileSystem : IFileSystem
 
     public void Replace(string source, string destination, string? backup)
     {
+        source = Normalize(source);
+        destination = Normalize(destination);
+        if (backup is not null) backup = Normalize(backup);
         if (!_files.TryGetValue(source, out var newBytes))
             throw new FileNotFoundException("Source not found in InMemoryFileSystem", source);
         if (_files.TryGetValue(destination, out var oldBytes) && backup is not null)
@@ -104,11 +117,11 @@ public sealed class InMemoryFileSystem : IFileSystem
         _files.Remove(source);
     }
 
-    public void Delete(string path) => _files.Remove(path);
+    public void Delete(string path) => _files.Remove(Normalize(path));
 
     public IEnumerable<string> EnumerateFiles(string path)
     {
-        var prefix = path.TrimEnd('/') + "/";
+        var prefix = Normalize(path).TrimEnd('/') + "/";
         return _files.Keys
             .Where(p => p.StartsWith(prefix, StringComparison.Ordinal))
             .Where(p => !p[prefix.Length..].Contains('/'))
@@ -117,7 +130,7 @@ public sealed class InMemoryFileSystem : IFileSystem
 
     public IEnumerable<string> EnumerateDirectories(string path)
     {
-        var prefix = path.TrimEnd('/') + "/";
+        var prefix = Normalize(path).TrimEnd('/') + "/";
         var result = new HashSet<string>(StringComparer.Ordinal);
         foreach (var dir in _directories)
         {
@@ -131,9 +144,12 @@ public sealed class InMemoryFileSystem : IFileSystem
 
     private void EnsureParentDirs(string path)
     {
+        // path is already normalized at this point
         var lastSlash = path.LastIndexOf('/');
         if (lastSlash > 0) CreateDirectory(path[..lastSlash]);
     }
+
+    private static string Normalize(string path) => path.Replace('\\', '/');
 
     private sealed class WritebackStream : MemoryStream
     {
