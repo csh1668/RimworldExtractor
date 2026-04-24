@@ -52,7 +52,7 @@ public class LegacyBaselineTests
                 e.SourceFile
             })
             .ToList();
-        var actual = JsonSerializer.Serialize(ordered, JsonOptions);
+        var actual = NormalizeLineEndings(JsonSerializer.Serialize(ordered, JsonOptions));
 
         // Assert / capture
         var snapshotPath = Path.Combine(
@@ -65,7 +65,10 @@ public class LegacyBaselineTests
             Assert.Fail($"Snapshot created at {snapshotPath}. Review it and re-run the test.");
         }
 
-        var expected = File.ReadAllText(snapshotPath);
+        var expected = NormalizeLineEndings(File.ReadAllText(snapshotPath));
         Assert.AreEqual(expected, actual, "Extraction output drifted from committed snapshot.");
     }
+
+    private static string NormalizeLineEndings(string value) =>
+        value.Replace("\r\n", "\n").Replace("\r", "\n");
 }
