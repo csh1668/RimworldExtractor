@@ -1,14 +1,13 @@
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
-using RimworldExtractor.Application;
 using RimworldExtractor.Domain.Abstractions;
-using Xunit;
 
 namespace RimworldExtractor.Application.Tests;
 
 public class DependencyInjectionTests
 {
     [Fact]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Naming", "CA1707:Identifiers should not contain underscores", Justification = "xunit test method naming convention")]
     public void AddApplication_ResolvesExtractionPipeline()
     {
         var services = new ServiceCollection();
