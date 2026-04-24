@@ -1,0 +1,101 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  ContinuousIntegrationBuild: true
+
+jobs:
+  publish:
+    name: Publish (${{ matrix.rid }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            rid: win-x64
+            cli-ext: '.exe'
+            archive-ext: 'zip'
+          - os: ubuntu-latest
+            rid: linux-x64
+            cli-ext: ''
+            archive-ext: 'tar.gz'
+          - os: macos-latest
+            rid: osx-arm64
+            cli-ext: ''
+            archive-ext: 'zip'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Restore
+        run: dotnet restore RimworldExtractor.slnx
+
+      - name: Publish CLI
+        run: >
+          dotnet publish src/RimworldExtractor.Cli
+          -c Release
+          -r ${{ matrix.rid }}
+          --self-contained
+          -p:PublishSingleFile=true
+          -o publish/cli-${{ matrix.rid }}
+
+      - name: Publish GUI
+        run: >
+          dotnet publish src/RimworldExtractor.Ui.Avalonia
+          -c Release
+          -r ${{ matrix.rid }}
+          --self-contained
+          -o publish/gui-${{ matrix.rid }}
+
+      - name: Archive GUI
+        shell: bash
+        run: |
+          cd publish
+          if [ "${{ matrix.archive-ext }}" = "tar.gz" ]; then
+            tar -czf ../RimworldExtractor-GUI-${{ matrix.rid }}.tar.gz gui-${{ matrix.rid }}
+          else
+            cd gui-${{ matrix.rid }} && 7z a -tzip ../../RimworldExtractor-GUI-${{ matrix.rid }}.zip . && cd ../..
+          fi
+
+      - name: Copy CLI binary
+        shell: bash
+        run: |
+          cp publish/cli-${{ matrix.rid }}/RimworldExtractor.Cli${{ matrix.cli-ext }} \
+             rimextract-${{ matrix.rid }}${{ matrix.cli-ext }}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-${{ matrix.rid }}
+          path: |
+            rimextract-${{ matrix.rid }}${{ matrix.cli-ext }}
+            RimworldExtractor-GUI-${{ matrix.rid }}.*
+
+  release:
+    name: Create GitHub Release
+    needs: publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+          path: artifacts
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/*
+          generate_release_notes: true
