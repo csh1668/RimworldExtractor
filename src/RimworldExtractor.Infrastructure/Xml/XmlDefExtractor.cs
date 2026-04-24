@@ -203,9 +203,11 @@ public sealed class XmlDefExtractor : IXmlDefExtractor
     }
 
     /// <summary>
-    /// Port of <c>Extractor.DefsUtils.cs:205-231</c> — checks each handle in
-    /// <paramref name="handles"/> against the children of <paramref name="node"/>.
+    /// Port of <c>Extractor.DefsUtils.cs:205-231</c> (<c>MatchTranslationHandle</c>) — checks
+    /// each handle in <paramref name="handles"/> against the children of <paramref name="node"/>.
     /// Returns the normalized path segment via <paramref name="result"/> when a match is found.
+    /// Non-wildcard handles use <c>NormalizedHandle.Normalize</c>; wildcard (<c>*</c>) handles
+    /// use <c>.Split('.').Last()</c> to extract the unqualified type name.
     /// </summary>
     private static bool MatchTranslationHandle(
         XElement node,
