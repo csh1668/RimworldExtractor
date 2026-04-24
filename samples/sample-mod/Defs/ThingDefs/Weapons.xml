@@ -6,6 +6,7 @@
     <description>A sharpened stick. Primitive but effective.</description>
   </ThingDef>
   <ThingDef Name="SampleMod_SwordBase" Abstract="True">
+    <description>A blade of ancient design.</description>
     <statBases>
       <MeleeWeapon_AverageDPS>8</MeleeWeapon_AverageDPS>
     </statBases>
@@ -13,6 +14,5 @@
   <ThingDef ParentName="SampleMod_SwordBase">
     <defName>SampleMod_IronSword</defName>
     <label>iron sword</label>
-    <description>A balanced iron blade.</description>
   </ThingDef>
 </Defs>
