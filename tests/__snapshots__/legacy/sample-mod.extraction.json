@@ -1,0 +1,68 @@
+[
+  {
+    "className": "Keyed",
+    "node": "SampleMod_Farewell",
+    "original": "Safe travels.",
+    "sourceFile": null
+  },
+  {
+    "className": "Keyed",
+    "node": "SampleMod_Hello",
+    "original": "Hello, traveler!",
+    "sourceFile": null
+  },
+  {
+    "className": "Patches.ThingDef",
+    "node": "SampleMod_IronSword.label",
+    "original": "steel-edged iron sword",
+    "sourceFile": null
+  },
+  {
+    "className": "Patches.ThingDef",
+    "node": "SampleMod_WoodenSpear.jobString",
+    "original": "Wielding {PAWN_nameDef}\u0027s wooden spear.",
+    "sourceFile": null
+  },
+  {
+    "className": "Strings",
+    "node": "Names.Last.0",
+    "original": "Ashwood",
+    "sourceFile": null
+  },
+  {
+    "className": "Strings",
+    "node": "Names.Last.1",
+    "original": "Brightforge",
+    "sourceFile": null
+  },
+  {
+    "className": "Strings",
+    "node": "Names.Last.2",
+    "original": "Cinderfall",
+    "sourceFile": null
+  },
+  {
+    "className": "ThingDef",
+    "node": "SampleMod_IronSword.description",
+    "original": "A blade of ancient design.",
+    "sourceFile": null
+  },
+  {
+    "className": "ThingDef",
+    "node": "SampleMod_IronSword.label",
+    "original": "iron sword",
+    "sourceFile": null
+  },
+  {
+    "className": "ThingDef",
+    "node": "SampleMod_WoodenSpear.description",
+    "original": "A sharpened stick. Primitive but effective.",
+    "sourceFile": null
+  },
+  {
+    "className": "ThingDef",
+    "node": "SampleMod_WoodenSpear.label",
+    "original": "wooden spear",
+    "sourceFile": null
+  }
+]
