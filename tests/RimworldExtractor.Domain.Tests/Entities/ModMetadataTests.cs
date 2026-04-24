@@ -66,4 +66,25 @@ public class ModMetadataTests
 
         a.Should().Be(b);
     }
+
+    [Fact]
+    public void Equality_WithDifferentModDependenciesInstances_ButSameContent_IsEqual()
+    {
+        var depsA = new List<string> { "Ludeon.RimWorld", "author.foo" };
+        var depsB = new List<string> { "Ludeon.RimWorld", "author.foo" };
+        var a = new ModMetadata("/a", "1", "m", "a.m", true, depsA);
+        var b = new ModMetadata("/a", "1", "m", "a.m", true, depsB);
+
+        a.Should().Be(b, "ModDependencies should compare by sequence, not reference");
+        a.GetHashCode().Should().Be(b.GetHashCode());
+    }
+
+    [Fact]
+    public void Equality_WithDifferentModDependenciesContent_IsNotEqual()
+    {
+        var a = new ModMetadata("/a", "1", "m", "a.m", true, new List<string> { "x" });
+        var b = new ModMetadata("/a", "1", "m", "a.m", true, new List<string> { "y" });
+
+        a.Should().NotBe(b);
+    }
 }

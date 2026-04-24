@@ -25,4 +25,31 @@ public sealed record ModMetadata(
     }
 
     public static ModMetadata Empty { get; } = new("", "", "", "", IsOfficialContent: false);
+
+    public bool Equals(ModMetadata? other)
+    {
+        if (other is null) return false;
+        if (ReferenceEquals(this, other)) return true;
+        return RootDir == other.RootDir
+            && Id == other.Id
+            && ModName == other.ModName
+            && PackageId == other.PackageId
+            && IsOfficialContent == other.IsOfficialContent
+            && (ModDependencies is null
+                ? other.ModDependencies is null
+                : other.ModDependencies is not null && ModDependencies.SequenceEqual(other.ModDependencies));
+    }
+
+    public override int GetHashCode()
+    {
+        var hash = new HashCode();
+        hash.Add(RootDir);
+        hash.Add(Id);
+        hash.Add(ModName);
+        hash.Add(PackageId);
+        hash.Add(IsOfficialContent);
+        if (ModDependencies is not null)
+            foreach (var d in ModDependencies) hash.Add(d);
+        return hash.ToHashCode();
+    }
 }
