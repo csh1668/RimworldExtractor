@@ -12,6 +12,10 @@
 
   <ItemGroup>
     <!-- Force patched version of Tmds.DBus.Protocol (GHSA-xrw6-gwf8-vvr9); transitively pulled by Avalonia.Desktop -->
+    <PackageReference Include="CommunityToolkit.Mvvm" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" />
+    <PackageReference Include="Serilog.Extensions.Logging" />
+    <PackageReference Include="Serilog.Sinks.File" />
     <PackageReference Include="Tmds.DBus.Protocol" PrivateAssets="all" />
     <PackageReference Include="Avalonia" />
     <PackageReference Include="Avalonia.Desktop" />
