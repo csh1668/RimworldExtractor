@@ -21,5 +21,6 @@
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <IsAotCompatible>false</IsAotCompatible>
     <IsTrimmable>false</IsTrimmable>
+    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
   </PropertyGroup>
 </Project>
