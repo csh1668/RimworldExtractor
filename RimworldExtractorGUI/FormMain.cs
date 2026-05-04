@@ -26,8 +26,8 @@ namespace RimworldExtractorGUI
             }
             catch (Exception e)
             {
-                MessageBox.Show("Prefabs.dat ÆÄÀÏÀÇ ¹öÀüÀÌ ±¸¹öÀüÀÌ°Å³ª ¼Õ»óµÇ¾ú½À´Ï´Ù. ÆÄÀÏ »èÁ¦ ÈÄ ´Ù½Ã ÁøÇàÇØÁÖ¼¼¿ä.\n" +
-                                $"¿¡·¯¸Ş½ÃÁö: {e.Message}");
+                MessageBox.Show("Prefabs.dat íŒŒì¼ì˜ ë²„ì „ì´ êµ¬ë²„ì „ì´ê±°ë‚˜ ì†ìƒë˜ì—ˆìŠµë‹ˆë‹¤. íŒŒì¼ ì‚­ì œ í›„ ë‹¤ì‹œ ì§„í–‰í•´ì£¼ì„¸ìš”.\n" +
+                                $"ì—ëŸ¬ë©”ì‹œì§€: {e.Message}");
                 Close();
                 throw;
             }
@@ -43,11 +43,11 @@ namespace RimworldExtractorGUI
                     {
                         if (latest == current)
                         {
-                            linkLabelLatestVersion.Text = $"{current} ÃÖ½Å ¹öÀüÀÔ´Ï´Ù";
+                            linkLabelLatestVersion.Text = $"{current} ìµœì‹  ë²„ì „ì…ë‹ˆë‹¤";
                         }
                         else
                         {
-                            linkLabelLatestVersion.Text = $"{current} < {latest} ÃÖ½Å ¹öÀü »ç¿ë°¡´É";
+                            linkLabelLatestVersion.Text = $"{current} < {latest} ìµœì‹  ë²„ì „ ì‚¬ìš©ê°€ëŠ¥";
                         }
                     }
 
@@ -62,7 +62,7 @@ namespace RimworldExtractorGUI
                 }
                 catch (Exception e)
                 {
-                    Log.Wrn($"ÃÖ½Å ¹öÀü È®ÀÎ¿¡ ½ÇÆĞÇÏ¿´½À´Ï´Ù: {e.Message}");
+                    Log.Wrn($"ìµœì‹  ë²„ì „ í™•ì¸ì— ì‹¤íŒ¨í•˜ì˜€ìŠµë‹ˆë‹¤: {e.Message}");
                 }
             });
         }
@@ -97,14 +97,14 @@ namespace RimworldExtractorGUI
                 SelectedFolders = formSelectMod.SelectedFolders;
                 buttonExtract.Enabled = true;
 
-                labelSelectedMods.Text = $"¼±ÅÃµÈ ¸ğµå: {SelectedMod.ModName}";
+                labelSelectedMods.Text = $"ì„ íƒëœ ëª¨ë“œ: {SelectedMod.ModName}";
                 if (ReferenceMods?.Count > 0)
                 {
                     var concatText = string.Join(", ", ReferenceMods.Select(x => x.ModName));
                     var stripedText = concatText.Substring(0, Math.Min(concatText.Length, 200));
                     if (concatText.Length > 200)
                         stripedText += "...";
-                    labelSelectedMods.Text += $"\nÂüÁ¶·Î ¼±ÅÃµÈ ¸ğµå: {concatText}";
+                    labelSelectedMods.Text += $"\nì°¸ì¡°ë¡œ ì„ íƒëœ ëª¨ë“œ: {concatText}";
                 }
             }
         }
@@ -116,22 +116,21 @@ namespace RimworldExtractorGUI
                 return;
             }
 
-            Log.Msg("ÃßÃâ ½ÃÀÛ...");
+            Log.Msg("ì¶”ì¶œ ì‹œì‘...");
 
             var extraction = Extractor.ExtractTranslationData(SelectedMod, SelectedFolders, ReferenceMods);
 
             var outPath = SelectedMod.Identifier.StripInvaildChars();
-            var fileName = RimworldExtractorInternal.Utils.GenerateFileName(); // SelectedMod.Identifier.StripInvaildChars()
             switch (Prefabs.Method)
             {
                 case Prefabs.ExtractionMethod.Excel:
                     IO.ToExcel(extraction, Path.Combine(outPath, outPath));
                     break;
                 case Prefabs.ExtractionMethod.Languages:
-                    IO.ToLanguageXml(extraction, false, false, fileName, outPath);
+                    IO.ToLanguageXml(extraction, false, false, outPath, outPath);
                     break;
                 case Prefabs.ExtractionMethod.LanguagesWithComments:
-                    IO.ToLanguageXml(extraction, false, true, fileName, outPath);
+                    IO.ToLanguageXml(extraction, false, true, outPath, outPath);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -139,20 +138,20 @@ namespace RimworldExtractorGUI
 
 
             var (cntDefs, cntKeyed, cntStrings, cntPatches) = extraction.Count();
-            Log.Msg($"¹ø¿ª µ¥ÀÌÅÍ ¼ö: ÃÑ {extraction.Count}°³ Áß Defs {cntDefs}°³, Keyed {cntKeyed}°³, Strings {cntStrings}°³, Patches {cntPatches}°³, ¿Ï·á!");
+            Log.Msg($"ë²ˆì—­ ë°ì´í„° ìˆ˜: ì´ {extraction.Count}ê°œ ì¤‘ Defs {cntDefs}ê°œ, Keyed {cntKeyed}ê°œ, Strings {cntStrings}ê°œ, Patches {cntPatches}ê°œ, ì™„ë£Œ!");
 
-            var hasError = HasErrorAfter("ÃßÃâ ½ÃÀÛ...");
+            var hasError = HasErrorAfter("ì¶”ì¶œ ì‹œì‘...");
 
             if (hasError)
             {
-                if (MessageBox.Show("¿Ï·áµÇ¾úÁö¸¸ ÃßÃâ Áß ¿¡·¯°¡ ¹ß»ıÇÏ¿´½À´Ï´Ù. ¾Æ¹«Æ° ÃßÃâµÈ ÆÄÀÏÀÇ À§Ä¡¸¦ Å½»ö±â·Î ¿­±î¿ä?", "¿Ï·á?", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                if (MessageBox.Show("ì™„ë£Œë˜ì—ˆì§€ë§Œ ì¶”ì¶œ ì¤‘ ì—ëŸ¬ê°€ ë°œìƒí•˜ì˜€ìŠµë‹ˆë‹¤. ì•„ë¬´íŠ¼ ì¶”ì¶œëœ íŒŒì¼ì˜ ìœ„ì¹˜ë¥¼ íƒìƒ‰ê¸°ë¡œ ì—´ê¹Œìš”?", "ì™„ë£Œ?", MessageBoxButtons.YesNo) == DialogResult.Yes)
                 {
                     Process.Start("explorer.exe", outPath);
                 }
             }
             else
             {
-                if (MessageBox.Show("¿Ï·áµÇ¾ú½À´Ï´Ù! ÃßÃâµÈ ÆÄÀÏÀÇ À§Ä¡¸¦ Å½»ö±â·Î ¿­±î¿ä?", "¿Ï·á", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                if (MessageBox.Show("ì™„ë£Œë˜ì—ˆìŠµë‹ˆë‹¤! ì¶”ì¶œëœ íŒŒì¼ì˜ ìœ„ì¹˜ë¥¼ íƒìƒ‰ê¸°ë¡œ ì—´ê¹Œìš”?", "ì™„ë£Œ", MessageBoxButtons.YesNo) == DialogResult.Yes)
                 {
                     Process.Start("explorer.exe", outPath);
                 }
@@ -164,20 +163,18 @@ namespace RimworldExtractorGUI
         private void buttonConvertXml_Click(object sender, EventArgs e)
         {
             var openfileDialog = new OpenFileDialog();
-            openfileDialog.Title = "¸² ÃßÃâ±â¿¡¼­ »ı¼ºÇÑ ¿¢¼¿ ÆÄÀÏÀ» ¼±ÅÃÇØÁÖ¼¼¿ä.";
+            openfileDialog.Title = "ë¦¼ ì¶”ì¶œê¸°ì—ì„œ ìƒì„±í•œ ì—‘ì…€ íŒŒì¼ì„ ì„ íƒí•´ì£¼ì„¸ìš”.";
             openfileDialog.FileName = "";
-            openfileDialog.Filter = "¹ø¿ª µ¥ÀÌÅÍ ÆÄÀÏ|*.xlsx";
+            openfileDialog.Filter = "ë²ˆì—­ ë°ì´í„° íŒŒì¼|*.xlsx";
 
             if (openfileDialog.ShowDialog() == DialogResult.OK)
             {
                 try
                 {
                     var path = openfileDialog.FileName;
-                    //var fileName = Path.GetFileNameWithoutExtension(path);
-                    var fileName = RimworldExtractorInternal.Utils.GenerateFileName();
                     var translations = IO.FromExcel(path);
-                    IO.ToLanguageXml(translations, true, Prefabs.CommentOriginal, fileName, Path.GetDirectoryName(path) ?? "");
-                    if (MessageBox.Show("¿Ï·áµÇ¾ú½À´Ï´Ù! º¯È¯µÈ Æú´õÀÇ À§Ä¡¸¦ Å½»ö±â·Î ¿­±î¿ä?", "¿Ï·á", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                    IO.ToLanguageXml(translations, true, Prefabs.CommentOriginal, Path.GetFileName(path), Path.GetDirectoryName(path) ?? "");
+                    if (MessageBox.Show("ì™„ë£Œë˜ì—ˆìŠµë‹ˆë‹¤! ë³€í™˜ëœ í´ë”ì˜ ìœ„ì¹˜ë¥¼ íƒìƒ‰ê¸°ë¡œ ì—´ê¹Œìš”?", "ì™„ë£Œ", MessageBoxButtons.YesNo) == DialogResult.Yes)
                     {
                         Process.Start("explorer.exe", Path.GetDirectoryName(path) ?? "");
                     }
@@ -215,10 +212,10 @@ namespace RimworldExtractorGUI
                     var root = roots[i];
                     var translations = IO.FromLanguageXml(root);
                     IO.ToExcel(translations, Path.Combine(root, Path.GetFileNameWithoutExtension(root)));
-                    Log.Msg($"{i + 1}/{roots.Length}::¼öÁ¤ ¿Ï·á: {root}");
+                    Log.Msg($"{i + 1}/{roots.Length}::ìˆ˜ì • ì™„ë£Œ: {root}");
                 }
 
-                MessageBox.Show("º¯È¯ÀÌ ¿Ï·áµÇ¾ú½À´Ï´Ù!");
+                MessageBox.Show("ë³€í™˜ì´ ì™„ë£Œë˜ì—ˆìŠµë‹ˆë‹¤!");
             }
         }
 
@@ -268,28 +265,28 @@ namespace RimworldExtractorGUI
                                 analyzerEntry.MergeTranslation();
                                 newPath = Path.Combine(
                                     Path.GetDirectoryName(analyzerEntry.FilePath),
-                                    Path.GetFileNameWithoutExtension(analyzerEntry.FilePath) + "- ÆíÁıµÊ");
+                                    Path.GetFileNameWithoutExtension(analyzerEntry.FilePath) + "- í¸ì§‘ë¨");
                                 IO.ToExcel(analyzerEntry.NewTranslations, newPath, true);
-                                Log.Msg($"{i + 1}/{analyzerEntries.Count}::¼öÁ¤ ¿Ï·á: {newPath}");
+                                Log.Msg($"{i + 1}/{analyzerEntries.Count}::ìˆ˜ì • ì™„ë£Œ: {newPath}");
                                 continue;
                             case TranslationAnalyzerEntry.SaveMethodEnum.New:
                                 newPath = Path.Combine(
                                     Path.GetDirectoryName(analyzerEntry.FilePath),
-                                    Path.GetFileNameWithoutExtension(analyzerEntry.FilePath) + "- ÆíÁıµÊ");
+                                    Path.GetFileNameWithoutExtension(analyzerEntry.FilePath) + "- í¸ì§‘ë¨");
                                 IO.ToExcel(
                                     analyzerEntry.Changes
                                         .Where(x => x.Reason == TranslationAnalyzerEntry.ChangeReason.AddedNewly)
                                         .Select(x => x.New).ToList(), newPath);
-                                Log.Msg($"{i + 1}/{analyzerEntries.Count}::¼öÁ¤ ¿Ï·á: {newPath}");
+                                Log.Msg($"{i + 1}/{analyzerEntries.Count}::ìˆ˜ì • ì™„ë£Œ: {newPath}");
                                 continue;
                                 break;
                             default:
                                 throw new ArgumentOutOfRangeException();
                         }
-                        Log.Msg($"{i + 1}/{analyzerEntries.Count}::¼öÁ¤ ¿Ï·á: {analyzerEntry.FilePath}");
+                        Log.Msg($"{i + 1}/{analyzerEntries.Count}::ìˆ˜ì • ì™„ë£Œ: {analyzerEntry.FilePath}");
                     }
 
-                    MessageBox.Show($"{analyzerEntries.Count}°³ÀÇ ÆÄÀÏ¿¡ ´ëÇÑ ¼öÁ¤ÀÌ ¿Ï·áµÇ¾ú½À´Ï´Ù.");
+                    MessageBox.Show($"{analyzerEntries.Count}ê°œì˜ íŒŒì¼ì— ëŒ€í•œ ìˆ˜ì •ì´ ì™„ë£Œë˜ì—ˆìŠµë‹ˆë‹¤.");
                 }
             }
         }

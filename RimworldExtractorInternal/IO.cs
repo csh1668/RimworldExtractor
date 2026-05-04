@@ -345,8 +345,8 @@ namespace RimworldExtractorInternal
             }
             return translations;
         }
-
-        public static void ToLanguageXml(List<TranslationEntry> translations, bool skipNoTranslation, bool commentOriginal, string fileName, string rootDirPath)
+        
+        public static void ToLanguageXml(List<TranslationEntry> translations, bool skipNoTranslation, bool commentOriginal, string ModName, string rootDirPath)
         {
             var languagesDir = PathCombineCreateDir(rootDirPath, "Languages");
             var translationDir = PathCombineCreateDir(languagesDir, Prefabs.TranslationLanguage);
@@ -505,7 +505,7 @@ namespace RimworldExtractorInternal
 
                 }
 
-                docPatch.SaveSafely(Path.Combine(outputPath, fileName + ".xml"));
+                docPatch.SaveSafely(Path.Combine(outputPath, Utils.GenerateFileName(ModName, "Patches") + ".xml"));
             }
 
             if (defInjected.Count > 0)
@@ -552,7 +552,7 @@ namespace RimworldExtractorInternal
                     var className = tokens[0];
                     var outputPath = isOfficial
                         ? Path.Combine(defInjectedDir, className, tokens[1] + ".xml")
-                        : Path.Combine(defInjectedDir, className, fileName + ".xml");
+                        : Path.Combine(defInjectedDir, className, Utils.GenerateFileName(ModName, key) + ".xml");
 
                     doc.DoFullListTranslation();
                     doc.SaveSafely(outputPath);
@@ -597,13 +597,12 @@ namespace RimworldExtractorInternal
                     });
 
                 }
-
-                int counter = 0;
+                
                 foreach (var ((className, nodeParent), doc) in xmls)
                 {
                     var tokens = nodeParent.Split('.');
                     var outputPath = Path.Combine(defInjectedDir, className,
-                        fileName + $"-{counter++:D2}" + ".xml");
+                        Utils.GenerateFileName(ModName, className, nodeParent) + ".xml");
 
                     doc.DoFullListTranslation();
                     doc.SaveSafely(outputPath);
@@ -635,7 +634,7 @@ namespace RimworldExtractorInternal
 
                 foreach (var (key, doc) in xmls)
                 {
-                    var outputPath = isOfficial ? Path.Combine(keyedDir, $"{key}.xml"): Path.Combine(keyedDir, $"{fileName}.xml");
+                    var outputPath = isOfficial ? Path.Combine(keyedDir, $"{key}.xml"): Path.Combine(keyedDir, Utils.GenerateFileName(ModName, "Keyed") + ".xml");
                     doc.SaveSafely(outputPath);
                 }
             }
