@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -16,21 +17,32 @@ namespace RimworldExtractorInternal
     {
         public static string GenerateFileName(string ModName, string TypeName)
         {
-            return ToBase36(HashCode.Combine(ModName, TypeName));
+            return ToBase36(GetDeterministicHash(ModName, TypeName));
         }
         
         public static string GenerateFileName(string ModName, string TypeName, string DefName)
         {
-            return ToBase36(HashCode.Combine(ModName, TypeName, DefName));
+            return ToBase36(GetDeterministicHash(ModName, TypeName, DefName));
         }
 
-        private static string ToBase36(long value)
+        public static uint GetDeterministicHash(params string[] inputs)
+        {
+            string inputCombined = string.Join("::", inputs);
+            byte[] inputBytes = Encoding.UTF8.GetBytes(inputCombined);
+            
+            // Deterministic Hashing
+            byte[] hashBytes = SHA256.HashData(inputBytes);
+            
+            return BitConverter.ToUInt32(hashBytes, 0);
+        }
+        
+        public static string ToBase36(uint value)
         {
             const string chars = "0123456789abcdefghijklmnopqrstuvwxyz";
             const int resultLength = 6;
-            int charsLength = chars.Length;
+            uint charsLength = (uint)chars.Length;
             
-            value = unchecked((uint)value) % 2176782336;
+            value = value % 2176782336u;
             char[] result = new char[resultLength];
             
             for (int i = resultLength - 1; i >= 0; i--)
